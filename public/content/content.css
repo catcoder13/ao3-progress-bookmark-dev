@@ -1,0 +1,14 @@
+.ao3-read-assist {
+  position:fixed;
+  right:0;
+  top: 0;
+  z-index: 99;
+
+  padding: 10px;
+  background-color: yellow;
+}
+
+#workskin.bookmarkInProgress .chapter [role=article] > p:hover {
+  background-color: #F5F5F5;
+  cursor: pointer;
+}
