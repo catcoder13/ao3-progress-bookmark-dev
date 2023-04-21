@@ -3,14 +3,17 @@ const ao3Domain = "https://archiveofourown.org"
 const PAGE = {
   WORKS: 0,
   TAGS: 1,
-  OTHERS: 2
+  OTHERS: 2,
+  NOTAO3: 3
 }
 const isAO3 = tab => tab.url && tab.url.startsWith(ao3Domain)
 
 const getPageType = tab => {
-  if (!tab.url) return PAGE.OTHERS
+  if (!tab.url) return PAGE.NOTAO3
   if (tab.url.indexOf('/works/') !== -1) return PAGE.WORKS
   if (tab.url.indexOf('/tags/') !== -1) return PAGE.TAGS
+
+  return PAGE.OTHERS
 }
 
 const setBrowserIcon = tab => {
@@ -19,6 +22,7 @@ const setBrowserIcon = tab => {
       chrome.action.setIcon({path: 'imgs/bavy_g.png'})
       break
     case PAGE.TAGS:
+    case PAGE.OTHERS:
       chrome.action.setIcon({path: 'imgs/bavy_w.png'})
       break
     default:
