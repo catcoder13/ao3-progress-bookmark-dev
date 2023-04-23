@@ -6,7 +6,14 @@ const chapterDoms = mainContent.querySelectorAll('#chapters > .chapter')
 const chProgress = reactive({})
 chapterDoms.forEach(ch => {
   const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-  chProgress[chIndex] = { top: -1, height: 0, progress: 0 }
+  chProgress[chIndex] = {
+    // top: -1,
+    middle: -1,
+    height: 0,
+    progress: 0,
+    title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim()
+    // title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>.*?<\/a>:\s*/g, '').trim()
+  }
 })
 
 const urlParams = (new URLSearchParams(window.location.search)).get('view_full_work')
@@ -24,7 +31,7 @@ console.log('localStore', localStore)
 const onScroll = () => {
   const scrollBottom = window.scrollY + window.innerHeight
   if (pageMode) {
-    curChI.value = Object.keys(chProgress).filter(chI => chProgress[chI].top < scrollBottom).length
+    curChI.value = Object.keys(chProgress).filter(chI => chProgress[chI].middle < scrollBottom).length
     curChI.value = curChI.value < 2 ? 0 : curChI.value - 1
     Object.keys(chProgress).forEach(chI => {
       if (chI < curChI.value) chProgress[chI].progress = 100
@@ -32,8 +39,8 @@ const onScroll = () => {
     })
   }
 
-  chProgress[curChI.value].progress = (Math.min(1, Math.max(0, (scrollBottom - chProgress[curChI.value].top) / chProgress[curChI.value].height)) * 100).toFixed(0)
-  console.log(curChI.value, chProgress[curChI.value].progress)
+  chProgress[curChI.value].progress = (Math.min(1, Math.max(0, (scrollBottom - chProgress[curChI.value].middle) / chProgress[curChI.value].height)) * 100).toFixed(0)
+  // console.log(curChI.value, chProgress[curChI.value].progress)
 }
 
 const onResize = () => {
@@ -41,10 +48,9 @@ const onResize = () => {
   chapterDoms.forEach(ch => {
     const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
     const {height, top} = ch.getBoundingClientRect()
-    chProgress[chIndex] = {
-      top: window.scrollY + top,
-      height: height
-    }
+    // chProgress[chIndex].top = window.scrollY + top
+    chProgress[chIndex].middle = window.scrollY + top + window.innerHeight / 2
+    chProgress[chIndex].height = height
   })
 
   onScroll()
@@ -56,26 +62,6 @@ window.addEventListener('resize', onResize)
 onResize()
 
 
-// const onBookmark = bookmarkInProgress => {
-//   chapterDoms.forEach(ch => {
-//     const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-//     if (!paraEventRef[chIndex]) paraEventRef[chIndex] = {}
-//     ch.querySelectorAll('[role=article] > p').forEach((pElem, j) => {
-//       if (!paraEventRef[chIndex][j]) paraEventRef[chIndex][j] = () => {
-//         console.log(pElem.innerHTML)
-//         console.log('ch', chIndex, 'p', j)
-//       }
 
-//       if (bookmarkInProgress) pElem.addEventListener('click', paraEventRef[chIndex][j])
-//       else pElem.removeEventListener('click', paraEventRef[chIndex][j])
-      
-//     })
-//   })
-// }
 
-// const toggleBookmark = () => {
-//   bookmarkInProgress = !bookmarkInProgress
-//   bookmarkBtn.innerHTML = bookmarkInProgress ? 'stop bookmark' : 'start bookmark'
-//   mainContent.classList.toggle('bookmarkInProgress', bookmarkInProgress)
-//   onBookmark(bookmarkInProgress)
-// }
+export {chProgress, curChI, mainContent, chapterDoms}
