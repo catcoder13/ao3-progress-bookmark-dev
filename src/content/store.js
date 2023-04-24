@@ -1,67 +1,59 @@
-import { reactive, ref } from "vue"
-
-const mainContent = document.querySelector('#workskin')
-const chapterDoms = mainContent.querySelectorAll('#chapters > .chapter')
-
-const chProgress = reactive({})
-chapterDoms.forEach(ch => {
-  const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-  chProgress[chIndex] = {
-    // top: -1,
-    middle: -1,
-    height: 0,
-    progress: 0,
-    title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim()
-    // title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>.*?<\/a>:\s*/g, '').trim()
-  }
-})
-
-const urlParams = (new URLSearchParams(window.location.search)).get('view_full_work')
-const pageMode = (urlParams && urlParams.toLowerCase() === 'true') ? 1 : 0
-
-const curChI = ref(parseInt(mainContent.querySelector(".chapter").getAttribute('id').split('chapter-')[1]) - 1)
-
+import { reactive } from "vue"
+import { workId, workMode } from "./work"
+import { curChI, mainContent } from "./page" 
+// import {c}
+const STORAGE_KEY = 'AO3_IN_PAGE_BOOKMARK'
 
 // get localstorage data
-const localStore = JSON.parse(localStorage.getItem("ao3ReadAssistObj")) || {
-  bookmarks: {}, // work's id -> chapter id -> para id
+const localStoreRaw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+  bookmarks: { [workId]: {} } // work's id -> chapter id -> para id
 }
+const localStore = reactive(localStoreRaw)
+
+if (localStore.bookmarks[workId]) {
+  if (workMode) {
+    Object.keys(localStore.bookmarks[workId]).forEach(cIndex => {
+      Object.keys(localStore.bookmarks[workId][cIndex]).forEach(itemID => {
+        const {elem, type} = localStore.bookmarks[workId][cIndex][itemID]
+        const bmElement = document.createElement('span')
+        bmElement.classList.add('bookmarkIcon')
+        elem.appendChild(bmElement)
+      })
+    })
+  } else {
+    console.log('chapter index', curChI.value)
+    if (localStore.bookmarks[workId][curChI.value]) {
+      const paras = mainContent.querySelectorAll(`#chapter-${curChI.value + 1} [role=article] > p`)
+      Object.keys(localStore.bookmarks[workId][curChI.value]).forEach(itemID => {
+        const {elem, type} = localStore.bookmarks[workId][curChI.value][itemID]
+        console.log('elem', elem)
+        const bmElement = document.createElement('span')
+        bmElement.classList.add('bookmarkIcon')
+        paras[itemID].appendChild(bmElement)
+        // elem.appendChild(bmElement)
+        // console.log('bound', elem.getBoundingClientRect())
+      })
+    }
+    
+  }
+}
+
 console.log('localStore', localStore)
 
-const onScroll = () => {
-  const scrollBottom = window.scrollY + window.innerHeight
-  if (pageMode) {
-    curChI.value = Object.keys(chProgress).filter(chI => chProgress[chI].middle < scrollBottom).length
-    curChI.value = curChI.value < 2 ? 0 : curChI.value - 1
-    Object.keys(chProgress).forEach(chI => {
-      if (chI < curChI.value) chProgress[chI].progress = 100
-      else if (chI > curChI.value) chProgress[chI].progress = 0
-    })
-  }
+const saveBookmark = (cIndex, elemIndex, elem) => {
+  if (!localStore.bookmarks[workId][cIndex]) localStore.bookmarks[workId][cIndex] = {}
 
-  chProgress[curChI.value].progress = (Math.min(1, Math.max(0, (scrollBottom - chProgress[curChI.value].middle) / chProgress[curChI.value].height)) * 100).toFixed(0)
-  // console.log(curChI.value, chProgress[curChI.value].progress)
+  localStore.bookmarks[workId][cIndex][elemIndex] = {elem, type: 1}
+  updateLocalStorage()
 }
 
-const onResize = () => {
-  // update each chapter progress, height and start position
-  chapterDoms.forEach(ch => {
-    const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-    const {height, top} = ch.getBoundingClientRect()
-    // chProgress[chIndex].top = window.scrollY + top
-    chProgress[chIndex].middle = window.scrollY + top + window.innerHeight / 2
-    chProgress[chIndex].height = height
-  })
-
-  onScroll()
+const updateLocalStorage = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
 }
 
-window.addEventListener('scroll', onScroll)
-window.addEventListener('resize', onResize)
+const clearLocalStorage = () => {
+  localStorage.removeItem(STORAGE_KEY)
+  console.log(localStorage.getItem(STORAGE_KEY))
+}
 
-onResize()
-
-
-
-
-export {chProgress, curChI, mainContent, chapterDoms}
+export {saveBookmark, clearLocalStorage}

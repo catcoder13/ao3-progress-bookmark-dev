@@ -1,5 +1,6 @@
 import { ref } from 'vue'
-import {mainContent, chapterDoms} from './store'
+import {mainContent, chapterDoms} from './page'
+import { saveBookmark } from './store'
 
 const paraEventRef = {}
 const onBookmark = bookmarkInProgress => {
@@ -9,7 +10,7 @@ const onBookmark = bookmarkInProgress => {
     ch.querySelectorAll('[role=article] > p').forEach((pElem, j) => {
       if (!paraEventRef[chIndex][j]) paraEventRef[chIndex][j] = () => {
         console.log(pElem.innerHTML)
-        console.log('ch', chIndex, 'p', j)
+        saveBookmark(chIndex, j, pElem)
       }
 
       if (bookmarkInProgress) pElem.addEventListener('click', paraEventRef[chIndex][j])
@@ -22,7 +23,6 @@ const onBookmark = bookmarkInProgress => {
 const bookmarkInProgress = ref(false)
 const toggleBookmark = () => {
   bookmarkInProgress.value = !bookmarkInProgress.value
-  // bookmarkBtn.innerHTML = bookmarkInProgress ? 'stop bookmark' : 'start bookmark'
   mainContent.classList.toggle('bookmarkInProgress', bookmarkInProgress.value)
   onBookmark(bookmarkInProgress.value)
 }

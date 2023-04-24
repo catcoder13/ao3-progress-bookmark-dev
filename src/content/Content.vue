@@ -1,6 +1,6 @@
 <template>
   <div class="ao3-in-page-bookmark-content">
-    <div v-if="chProgress" :class="navbarClass()">
+    <div v-if="chapters" :class="navbarClass()">
       <div class="chapter-progress">
         <div :class="chapterProgressBarClass(progress)" v-for="({ch, progress}) in chapterProgress" :key="ch">
           <div :style="chapterProgressBarSpanStyle(progress)">
@@ -9,12 +9,13 @@
         </div>
       </div>
       <div class="nav-info">
-        Chapter {{curChI + 1}}: {{chProgress[curChI.toString()].title}}
+        Chapter {{curChI + 1}}: {{chapters[curChI.toString()].title}}
       </div>
     </div>
     <div class="toolbar">
       <span class="bm-para" @click="toggleBookmark">Bookmark by paragraph <span class="bm-icon"></span></span>
       <span class="bm-pos">Bookmark by position <span class="bm-icon"></span></span>
+      <button @click="clearLocalStorage">Clear local storage</button>
     </div>
   </div>
     
@@ -23,13 +24,14 @@
 <script>
 import { computed } from 'vue'
 import {toggleBookmark, bookmarkInProgress} from './bookmark'
-import { chProgress, curChI } from './store'
+import {clearLocalStorage} from './store'
+import { chapters, curChI } from './page'
 
 export default {
   name: 'App',
   setup () {
     const chapterProgress = computed(() => {
-      return Object.keys(chProgress).map(chI => ({ch: chI + 1, progress: chProgress[chI].progress, title: chProgress[chI].title}))
+      return Object.keys(chapters).map(chI => ({ch: chI + 1, progress: chapters[chI].progress, title: chapters[chI].title}))
     })
 
     const navbarClass = () => {
@@ -53,7 +55,9 @@ export default {
         
       }
     }
-    return {chProgress, chapterProgress, curChI, toggleBookmark, bookmarkInProgress, navbarClass, chapterProgressBarClass, chapterProgressBarSpanStyle}
+    return {chapters, chapterProgress, curChI,
+            toggleBookmark, bookmarkInProgress, navbarClass, chapterProgressBarClass, chapterProgressBarSpanStyle,
+            clearLocalStorage}
   }
 }
 </script>
@@ -143,5 +147,18 @@ export default {
 #workskin.bookmarkInProgress .chapter [role=article] > p:hover {
   background-color: #F5F5F5;
   cursor: pointer;
+}
+
+#workskin {
+  [role=article] > p {
+    position: relative;
+
+    span.bookmarkIcon {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      background-color: aqua;
+    }
+  }
 }
 </style>
