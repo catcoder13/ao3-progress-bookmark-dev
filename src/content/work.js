@@ -1,6 +1,6 @@
 const urlParams = (new URLSearchParams(window.location.search)).get('view_full_work')
 const workMode = (urlParams && urlParams.toLowerCase() === 'true') ? 1 : 0
-
+console.log('cookie', document.cookie)
 const match = (window.location.href).match(/\/works\/(\d+)(?:\/chapters\/(\d+))?/)
 let workId = null
 let chapterId = null

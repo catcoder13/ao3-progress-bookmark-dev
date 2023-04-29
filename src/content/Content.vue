@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="nav-info">
-        Chapter {{curChI + 1}}: {{chapters[curChI.toString()].title}}
+        Chapter {{curChI + 1}}: {{chapters[curChI].title}}
       </div>
     </div>
     <div class="toolbar">
@@ -31,7 +31,7 @@ export default {
   name: 'App',
   setup () {
     const chapterProgress = computed(() => {
-      return Object.keys(chapters).map(chI => ({ch: chI + 1, progress: chapters[chI].progress, title: chapters[chI].title}))
+      return Object.keys(chapters).map(chI => ({ch: chI, progress: chapters[chI].progress, title: chapters[chI].title}))
     })
 
     const navbarClass = () => {
@@ -144,20 +144,46 @@ export default {
   }
 }
 
-#workskin.bookmarkInProgress .chapter [role=article] > p:hover {
+#workskin.bookmarkInProgress .userstuff > p:hover {
   background-color: #F5F5F5;
   cursor: pointer;
+
+  &::before {
+    content: 'bookmark';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translateY(100%);
+    font-size: 10px;
+    background-color: rgb(193, 193, 193);
+  }
 }
 
 #workskin {
-  [role=article] > p {
+  .userstuff > p {
     position: relative;
 
-    span.bookmarkIcon {
-      display: inline-block;
-      width: 50px;
-      height: 50px;
-      background-color: aqua;
+    &.bookmarked {
+      background-color: whitesmoke;
+
+      &::before {
+        content: 'bookmarked';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        transform: translateY(100%);
+        font-size: 10px;
+        background-color: aqua;
+      }
+
+      &:hover {
+        background-color: rgb(255, 203, 203);
+
+        &::before {
+          content: 'remove bookmark';
+          background-color: rgb(253, 158, 158);
+        }
+      }
     }
   }
 }
