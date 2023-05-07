@@ -1,5 +1,7 @@
 import {reactive, ref} from 'vue'
-import {workMode, chapterId} from './work'
+import {workMode, workId, chapterId} from './work'
+import { localStore } from './store'
+import { initBookmark } from './bookmark'
 
 const mainContent = document.querySelector('#workskin')
 const chapterDoms = mainContent.querySelectorAll('#chapters > .chapter')
@@ -15,7 +17,10 @@ if (chapterDoms.length) { // multi chapter
   chaptersRef[0] = reactive({
     middle: -1, height: 0, progress: 0, id: chapterId,
     title: mainContent.querySelector('.title').innerText,
-    dom: mainContent.querySelector('#chapters')
+    dom: mainContent.querySelector('#chapters > .userstuff'),
+    paraBM: reactive({}),
+    percBM: reactive([]),
+    bmIndex: reactive({})
   })
 }
 
@@ -26,7 +31,10 @@ chapterDoms.forEach(ch => {
   chaptersRef[chIndex] = reactive({
     middle: -1, height: 0, progress: 0, id: chapterId,
     title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim(),
-    dom: ch
+    dom: ch.querySelector(':scope > .userstuff'),
+    paraBM: reactive({}),
+    percBM: reactive([]),
+    bmIndex: reactive({})
   })
   
 })
@@ -34,28 +42,27 @@ chapterDoms.forEach(ch => {
 chapters = chaptersRef
 console.log('chapters', chapters)
 
+if (localStore.bookmarks[workId]) {
+  initBookmark(localStore.bookmarks[workId], chapters, curChI)
+}
+
 const onScroll = () => {
   const scrollBottom = window.scrollY + window.innerHeight
   let curChInView = chapterDoms.length > 0 ? curChI.value : 0
   if (workMode) {
     curChInView = Object.keys(chapters).filter(chI => chapters[chI].middle < scrollBottom).length
     curChInView = curChInView < 2 ? 0 : curChInView - 1
-    Object.keys(chapters).forEach(chI => {
-      if (chI < curChInView) chapters[chI].progress = 100
-      else if (chI > curChInView) chapters[chI].progress = 0
-    })
   }
-
+  chapters[curChInView].progress = (Math.min(1, Math.max(0, (scrollBottom - chapters[curChInView].middle) / chapters[curChInView].height)) * 100).toFixed(0)
   curChI.value = curChInView
-
-  chapters[curChI.value].progress = (Math.min(1, Math.max(0, (scrollBottom - chapters[curChI.value].middle) / chapters[curChI.value].height)) * 100).toFixed(0)
 }
 
 const onResize = () => {
   Object.keys(chapters).forEach(chIndex => {
     const {height, top} = chapters[chIndex].dom.getBoundingClientRect()
-    chapters[chIndex].middle = window.scrollY + top + window.innerHeight / 2
     chapters[chIndex].height = height
+    chapters[chIndex].middle = window.scrollY + top
+    // chapters[chIndex].middle = window.scrollY + top + window.innerHeight / 2
   })
   onScroll()
 }

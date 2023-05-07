@@ -4,13 +4,15 @@ console.log('cookie', document.cookie)
 const match = (window.location.href).match(/\/works\/(\d+)(?:\/chapters\/(\d+))?/)
 let workId = null
 let chapterId = null
+
 if (match) {
   workId = match[1]
   chapterId = match[2]
-  console.log(workId, chapterId)
 } else {
   console.log('url not match')
 }
+
+console.log('workMode: ', workMode, workId, chapterId)
 
 
 export {workId, chapterId, workMode}

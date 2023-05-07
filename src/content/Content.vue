@@ -1,12 +1,19 @@
 <template>
   <div class="ao3-in-page-bookmark-content">
-    <div v-if="chapters" :class="navbarClass()">
+    <div v-if="chapters" class="navbar">
       <div class="chapter-progress">
-        <div :class="chapterProgressBarClass(progress)" v-for="({ch, progress}) in chapterProgress" :key="ch">
-          <div :style="chapterProgressBarSpanStyle(progress)">
-            <!-- <span>{{progress}}%</span> -->
-          </div>
+        <template v-if="Object.keys(chapters).length > 1">
+          <div  class="chapter-progress__bar" v-for="i in curChI" :key="i"></div>
+        </template>
+
+        <div class="chapter-progress__bar empty" :class="chapterProgressBarClass(chapters[curChI].progress)">
+          <div :style="chapterProgressBarSpanStyle(chapters[curChI].progress)"></div>
+          <span v-for="(pos, i) in currentChBMPos" :key="i" :style="{left: `${pos}%`}"></span>
         </div>
+
+        <template v-if="Object.keys(chapters).length > 1">
+          <div class="chapter-progress__bar empty" v-for="i in (Object.keys(chapters).length - curChI - 1)" :key="i"></div>
+        </template>
       </div>
       <div class="nav-info">
         Chapter {{curChI + 1}}: {{chapters[curChI].title}}
@@ -22,41 +29,44 @@
 </template>
 
 <script>
-import { computed } from 'vue'
-import {toggleBookmark, bookmarkInProgress} from './bookmark'
+import {ref, computed} from 'vue'
+import {onBookmark} from './bookmark'
 import {clearLocalStorage} from './store'
-import { chapters, curChI } from './page'
+import { chapters, curChI , mainContent} from './page'
 
 export default {
   name: 'App',
   setup () {
-    const chapterProgress = computed(() => {
-      return Object.keys(chapters).map(chI => ({ch: chI, progress: chapters[chI].progress, title: chapters[chI].title}))
-    })
-
-    const navbarClass = () => {
-      return {
-        navbar: true,
-        show: chapterProgress.value[0].progress > 0
-      }
-    }
-
     const chapterProgressBarClass = progress => {
       return {
-        'chapter-progress__bar': true,
         'isCurrent': progress > 0 && progress < 100
       }
     }
+
+    const currentChBMPos = computed(() => {
+      const paras = chapters[curChI.value].dom.querySelectorAll(':scope > p')
+      const chHeight = chapters[curChI.value].dom.getBoundingClientRect().height
+      
+      return Object.keys(chapters[curChI.value].paraBM).map(i => {
+        return (paras[i].offsetTop + paras[i].offsetHeight) / chHeight * 100
+      })
+    })
 
     const chapterProgressBarSpanStyle = progress => {
       return {
         width: `${progress}%`,
         backgroundColor: progress === 100 ? '#444444' : '#444444',
-        
       }
     }
-    return {chapters, chapterProgress, curChI,
-            toggleBookmark, bookmarkInProgress, navbarClass, chapterProgressBarClass, chapterProgressBarSpanStyle,
+
+    const bookmarkInProgress = ref(false)
+    const toggleBookmark = () => {
+      bookmarkInProgress.value = !bookmarkInProgress.value
+      mainContent.classList.toggle('bookmarkInProgress', bookmarkInProgress.value)
+      onBookmark(bookmarkInProgress.value, chapters)
+    }
+    return {chapters, curChI, currentChBMPos,
+            toggleBookmark, chapterProgressBarClass, chapterProgressBarSpanStyle,
             clearLocalStorage}
   }
 }
@@ -73,12 +83,13 @@ export default {
     top: 0;
     left: 0;
     width: 100%;
-    max-height: 0;
-    opacity: 0;
+    height: 6px;
+    // max-height: 0;
+    // opacity: 0;
     overflow: hidden;
     transition: max-height 0.2s, opacity 0.2s;
 
-    &.show {max-height: 100px; opacity: 1;}
+    // &.show {max-height: 100px; opacity: 1;}
     
     .nav-info {
       float: right;
@@ -89,23 +100,27 @@ export default {
 
     .chapter-progress {
       display: flex;
-      height: 8px;
       overflow: hidden;
       background-color: #FFFFFF;
 
       .chapter-progress__bar {
         position: relative;
         bottom: 0;
-        background-color: #999999;
+        background-color: #444444;
         border-right: 1px solid #FFFFFF;
         box-sizing: border-box;
         transition: height 0.2s, flex 0.2s;
-        height: 4px;
+        height: 3px;
         flex: 1;
         
         &.isCurrent {
           flex: 200px;
-          height: 8px;
+          height: 6px;
+          background-color: #999999;
+        }
+
+        &.empty {
+          background-color: #999999;
         }
 
         & > div {
@@ -113,12 +128,15 @@ export default {
           top: 0;
           left: 0;
           height: 100%;
+        }
 
-          span {
-            position: absolute;
-            right: 0;
-            font-size: 10px;
-          }
+        & > span {
+          position: absolute;
+          top: 0;
+          width: 0px;
+          border-left: 1px solid aqua;
+          height: 100%;
+          font-size: 10px;
         }
       }
     }
