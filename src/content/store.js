@@ -1,5 +1,5 @@
 import { reactive } from "vue"
-import { workId } from "./work"
+import { workId } from "./static"
 
 const STORAGE_KEY = 'AO3_IN_PAGE_BOOKMARK'
 // get localstorage data
@@ -22,6 +22,7 @@ const updatePercKeyValue = (chIndex, bmLocation) => {
   localStore.bookmarks[workId][chIndex].percBM.push({id: percBMLength, perc: bmLocation})
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
+  console.log('update perc bm value on local storage', localStore)
 }
 
 const updateParaKeyValue = (chIndex, bmLocation) => {
