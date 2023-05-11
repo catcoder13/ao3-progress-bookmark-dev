@@ -11,30 +11,40 @@ const localStore = reactive(localStoreRaw)
 
 console.log('localStore', localStore)
 
-const updatePercKeyValue = (chIndex, bmLocation) => {
+// const updateParaKeyValue = (chIndex, bmLocation) => {
+//   if (!localStore.bookmarks[workId]) localStore.bookmarks[workId] = {}
+//   if (!localStore.bookmarks[workId][chIndex]) localStore.bookmarks[workId][chIndex] = {
+//     paraBM: {},
+//     percBM: []
+//   }
+
+//   localStore.bookmarks[workId][chIndex].paraBM[bmLocation] = 1
+
+//   localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
+// }
+
+const updatePercKeyValue = (chIndex, bmID, perc) => {
   if (!localStore.bookmarks[workId]) localStore.bookmarks[workId] = {}
   if (!localStore.bookmarks[workId][chIndex]) localStore.bookmarks[workId][chIndex] = {
-    paraBM: {},
+    // paraBM: {},
     percBM: []
   }
 
-  const percBMLength = localStore.bookmarks[workId][chIndex].percBM.length
-  localStore.bookmarks[workId][chIndex].percBM.push({id: percBMLength, perc: bmLocation})
-
+  // update local store record
+  localStore.bookmarks[workId][chIndex].percBM.push({id: bmID, perc: perc})
   localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
   console.log('update perc bm value on local storage', localStore)
+
+  // TODO: update remote store record
 }
 
-const updateParaKeyValue = (chIndex, bmLocation) => {
-  if (!localStore.bookmarks[workId]) localStore.bookmarks[workId] = {}
-  if (!localStore.bookmarks[workId][chIndex]) localStore.bookmarks[workId][chIndex] = {
-    paraBM: {},
-    percBM: []
-  }
 
-  localStore.bookmarks[workId][chIndex].paraBM[bmLocation] = 1
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
+const removePercKeyValue = (chIndex, bmID) => {
+  // delete local store record
+  localStore.bookmarks[workId][chIndex].percBM = localStore.bookmarks[workId][chIndex].percBM.filter(({id}) => id !== bmID)
+
+  // TODO: delete remote store record
 }
 
 // const updateLocalStorage = () => {
@@ -48,4 +58,4 @@ const clearLocalStorage = () => {
   console.log(localStorage.getItem(STORAGE_KEY))
 }
 
-export {localStore, updatePercKeyValue, updateParaKeyValue, clearLocalStorage}
+export {localStore, updatePercKeyValue, removePercKeyValue, clearLocalStorage}

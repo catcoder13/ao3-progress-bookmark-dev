@@ -17,10 +17,9 @@ if (chapterDoms.length) { // multi chapter
     title: mainContent.querySelector('.title').innerText,
     // dom: mainContent.querySelector('#chapters > .userstuff'),
     dom: mainContent.querySelector('#chapters'),
-    paraBM: reactive({}),
+    // paraBM: reactive({}),
     percBM: reactive([]),
-    bmIndex: reactive({}),
-    paraBMCount: 0,
+    // paraBMCount: 0,
     percBMCount: 0
   })
 }
@@ -34,10 +33,9 @@ chapterDoms.forEach(ch => {
     title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim(),
     // dom: ch.querySelector(':scope > .userstuff'),
     dom: ch,
-    paraBM: reactive({}),
+    // paraBM: reactive({}),
     percBM: reactive([]),
-    bmIndex: reactive({}),
-    paraBMCount: 0,
+    // paraBMCount: 0,
     percBMCount: 0
   })
   

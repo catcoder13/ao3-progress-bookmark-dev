@@ -3,10 +3,10 @@
     <div v-if="chapters" class="navbar" :class="navBarClass()">
       
       <div class="chapter-progress">
-        <div class="chapter-progress__bar" v-for="({progress, paraBMCount}, chI) in chapters" :key="chI"
+        <div class="chapter-progress__bar" v-for="({progress, percBMCount}, chI) in chapters" :key="chI"
           :class="chapterProgressBarClass(chI)">
           <div v-if="chI == curChI" :style="{width: `${progress}%`}"></div>
-          <template v-if="chI == curChI && paraBMCount > 0 && progress > 0 && progress < 100">
+          <template v-if="chI == curChI && percBMCount > 0 && progress > 0 && progress < 100">
             <span v-for="(pos, i) in currentChBMPos" :key="i" :style="{left: `${pos}%`}"></span>
           </template>
         </div>
@@ -18,7 +18,7 @@
       
     </div>
     <div class="toolbar">
-      <span class="bm-para" @click="toggleParaBookmark">Bookmark by paragraph <span class="bm-icon"></span></span>
+      <!-- <span class="bm-para" @click="toggleParaBookmark">Bookmark by paragraph <span class="bm-icon"></span></span> -->
       <span class="bm-pos" @click="togglePercBookmark">Bookmark by position <span class="bm-icon"></span></span>
       <button @click="clearLocalStorage">Clear local storage</button>
     </div>
@@ -36,7 +36,7 @@
 
 <script>
 import {ref, computed, reactive} from 'vue'
-import {setupParaBookmark, addPercBookmark} from './bookmark'
+import {addPercBookmark} from './bookmark'
 import {clearLocalStorage} from './store'
 import { chapters, curChI} from './page'
 
@@ -47,7 +47,7 @@ export default {
     const chapterProgressBarClass = chI => {
       return {
         'isCurrent': chI == curChI.value && chapters[chI].progress < 100,
-        'hasParaBM': chapters[chI].paraBMCount > 0,
+        'hasBM': chapters[chI].percBMCount > 0,
         'empty': chI >= curChI.value && chapters[chI].progress < 100
       }
     }
@@ -62,36 +62,32 @@ export default {
     }
 
     const currentChBMPos = computed(() => {
-      const paras = chapters[curChI.value].dom.querySelectorAll(':scope > .userstuff > p')
-      const {height: chHeight, top: chTop} = chapters[curChI.value].dom.getBoundingClientRect()
-      
-      return Object.keys(chapters[curChI.value].paraBM).map(i => {
-        const {top: pTop, height: pHeight} = paras[i].getBoundingClientRect()
-        // console.log('pTop', pTop, 'chTop', chTop)
-        return (pTop - chTop + pHeight) / chHeight * 100
-        // return (paras[i].offsetTop + paras[i].offsetHeight) / chHeight * 100
-      })
+      return chapters[curChI.value].percBM.map(({id, perc}) => perc * 100)
     })
+    // const currentChBMPos = computed(() => {
+    //   const paras = chapters[curChI.value].dom.querySelectorAll(':scope > .userstuff > p')
+    //   const {height: chHeight, top: chTop} = chapters[curChI.value].dom.getBoundingClientRect()
+      
+    //   return Object.keys(chapters[curChI.value].paraBM).map(i => {
+    //     const {top: pTop, height: pHeight} = paras[i].getBoundingClientRect()
+    //     // console.log('pTop', pTop, 'chTop', chTop)
+    //     return (pTop - chTop + pHeight) / chHeight * 100
+    //     // return (paras[i].offsetTop + paras[i].offsetHeight) / chHeight * 100
+    //   })
+    // })
 
-    const canBookmarkPara = ref(false)
-    const toggleParaBookmark = () => {
-      canBookmarkPara.value = !canBookmarkPara.value
-      setupParaBookmark(canBookmarkPara.value, chapters)
-    }
+    // const canBookmarkPara = ref(false)
+    // const toggleParaBookmark = () => {
+    //   canBookmarkPara.value = !canBookmarkPara.value
+    //   setupParaBookmark(canBookmarkPara.value, chapters)
+    // }
 
     const canBookmarkPerc = ref(false)
-    const percBM = reactive({
-      y: 0,
-      precise: 0,
-      show: false
-    })
+    const percBM = reactive({ y: 0, precise: 0, show: false })
 
     
     const togglePercBookmark = e => {
       canBookmarkPerc.value = !canBookmarkPerc.value
-      // e.stopPropagation()
-
-      // setupPercBookmark(canBookmarkPerc.value, chapters, curChI.value)
 
       if (!onMouseMove) onMouseMove = e => {
         // console.log('client y: ', e.clientY)
@@ -113,8 +109,8 @@ export default {
         newPerc = (clickedY - lastTop) / chapters[hoverCH].height
         
         if (newPerc > 0 && newPerc < 1) {
+          // if cursor is too close to one of the existing perc bm
           if (chapters[hoverCH].percBM.some(({perc}) => Math.abs(perc - newPerc) < 0.01)) {
-            // this perc is too close to one of the existing perc bm
             percBM.show = false
             console.log('too close to existing bm')
           } else {
@@ -124,7 +120,6 @@ export default {
             percBM.show = true
             console.log('ch: ', parseInt(hoverCH) + 1, 'perc: ', newPerc)
           }
-          
         } else {
           percBM.show = false
           console.log('exceed perc bookmark area')
@@ -148,7 +143,7 @@ export default {
     }
 
     return {chapters, curChI, currentChBMPos, navBarClass, chapterProgressBarClass,
-            toggleParaBookmark, togglePercBookmark, onPercBMAddClick, onPercBMDoneClick, percBM,
+            togglePercBookmark, onPercBMAddClick, onPercBMDoneClick, percBM,
             clearLocalStorage}
   }
 }
@@ -231,14 +226,14 @@ $bar_darken_color: #444444;
           }
         }
 
-        &.hasParaBM {
+        &.hasBM {
           background-color: $bm_darken_color;
         }
 
         &.empty {
           background-color: $bar_color;
 
-          &.hasParaBM {
+          &.hasBM {
             background-color: $bm_color;
 
             & > div { background-color: $bm_darken_color;}
@@ -319,20 +314,20 @@ $bar_darken_color: #444444;
   }
 } // ao3-in-page-bookmark
 
-#workskin.canBookmarkPara .userstuff > p:hover {
-  background-color: #F5F5F5;
-  cursor: pointer;
+// #workskin.canBookmarkPara .userstuff > p:hover {
+//   background-color: #F5F5F5;
+//   cursor: pointer;
 
-  &::before {
-    content: 'bookmark';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    transform: translateY(100%);
-    font-size: 10px;
-    background-color: rgb(193, 193, 193);
-  }
-}
+//   &::before {
+//     content: 'bookmark';
+//     position: absolute;
+//     bottom: 0;
+//     right: 0;
+//     transform: translateY(100%);
+//     font-size: 10px;
+//     background-color: rgb(193, 193, 193);
+//   }
+// }
 
 #workskin {
   .chapter:nth-child(n+2) {
@@ -374,31 +369,31 @@ $bar_darken_color: #444444;
     }
   }
 
-  .userstuff > p {
-    position: relative;
+  // .userstuff > p {
+  //   position: relative;
 
-    &.bookmarked {
-      background-color: whitesmoke;
+  //   &.bookmarked {
+  //     background-color: whitesmoke;
 
-      &::before {
-        content: 'bookmarked';
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        transform: translateY(100%);
-        font-size: 10px;
-        background-color: aqua;
-      }
+  //     &::before {
+  //       content: 'bookmarked';
+  //       position: absolute;
+  //       bottom: 0;
+  //       right: 0;
+  //       transform: translateY(100%);
+  //       font-size: 10px;
+  //       background-color: aqua;
+  //     }
 
-      &:hover {
-        background-color: rgb(255, 203, 203);
+  //     &:hover {
+  //       background-color: rgb(255, 203, 203);
 
-        &::before {
-          content: 'remove bookmark';
-          background-color: rgb(253, 158, 158);
-        }
-      }
-    }
-  }
+  //       &::before {
+  //         content: 'remove bookmark';
+  //         background-color: rgb(253, 158, 158);
+  //       }
+  //     }
+  //   }
+  // }
 }
 </style>
