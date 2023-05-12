@@ -11,35 +11,24 @@ const curChI = ref(0)
 
 if (chapterDoms.length) { // multi chapter
   curChI.value = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
+
+  chapterDoms.forEach(ch => {
+    const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
+    chaptersRef[chIndex] = reactive({
+      top: -1, height: 0, progress: 0, id: chapterId,
+      title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim(),
+      dom: ch,
+      percBM: reactive([])
+    })
+  })
 } else { // one shot
   chaptersRef[0] = reactive({
     top: -1, height: 0, progress: 0, id: chapterId,
     title: mainContent.querySelector('.title').innerText,
-    // dom: mainContent.querySelector('#chapters > .userstuff'),
     dom: mainContent.querySelector('#chapters'),
-    // paraBM: reactive({}),
-    percBM: reactive([]),
-    // paraBMCount: 0,
-    percBMCount: 0
+    percBM: reactive([])
   })
 }
-
-chapterDoms.forEach(ch => {
-  const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-  // const chID = ch.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)(?:\/chapters\/(\d+))?/)[2]
-  // console.log('chapter id', chID, chIndex)
-  chaptersRef[chIndex] = reactive({
-    top: -1, height: 0, progress: 0, id: chapterId,
-    title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim(),
-    // dom: ch.querySelector(':scope > .userstuff'),
-    dom: ch,
-    // paraBM: reactive({}),
-    percBM: reactive([]),
-    // paraBMCount: 0,
-    percBMCount: 0
-  })
-  
-})
 
 chapters = chaptersRef
 console.log('chapters', chapters)
@@ -51,27 +40,43 @@ if (localStore.bookmarks[workId]) {
 const onScroll = () => {
   const scrollBottom = window.scrollY + window.innerHeight
   let curChInView = chapterDoms.length > 0 ? curChI.value : 0
+  
   if (fullViewMode) {
-    curChInView = Object.keys(chapters).filter(chI => chapters[chI].top < scrollBottom).length
+    curChInView = Object.keys(chapters).filter(chI => {
+      const trigger = chapters[chI].top + window.innerHeight / 2
+      return trigger < scrollBottom
+    }).length
     curChInView = curChInView < 2 ? 0 : curChInView - 1
   }
-  chapters[curChInView].progress = (Math.min(1, Math.max(0, (scrollBottom - chapters[curChInView].top) / chapters[curChInView].height)) * 100).toFixed(0)
+  
+  const triggerHorizon = chapters[curChInView].top + window.innerHeight / 2
+  chapters[curChInView].progress = (Math.min(1, Math.max(0, (scrollBottom - triggerHorizon) / chapters[curChInView].height)) * 100).toFixed(0)
   curChI.value = curChInView
 }
 
 const onResize = () => {
-  Object.keys(chapters).forEach(chIndex => {
-    const {height, top} = chapters[chIndex].dom.getBoundingClientRect()
-    chapters[chIndex].height = height
-    chapters[chIndex].top = window.scrollY + top
-    // chapters[chIndex].top = window.scrollY + top + window.innerHeight / 2
-  })
+  const chIs = Object.keys(chapters)
+  const {top, height} = mainContent.getBoundingClientRect()
+  // set first chapter top
+  chapters[chIs[0]].top = window.scrollY + top
+  
+  // middle chapters
+  for (var i=1; i < chIs.length; i++) {
+    const chI = chIs[i]
+    const prevChI = chIs[i-1]
+    const {top: mTop} = chapters[chI].dom.getBoundingClientRect()
+    chapters[chI].top = window.scrollY + mTop
+    chapters[prevChI].height = chapters[chI].top - chapters[prevChI].top
+  }
+
+  // set last chapter height
+  chapters[chIs[chIs.length - 1]].height = chapters[chIs[0]].top + height - chapters[chIs[chIs.length - 1]].top
+  
   onScroll()
 }
 
 window.addEventListener('scroll', onScroll)
 window.addEventListener('resize', onResize)
-
 onResize()
 
 

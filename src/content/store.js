@@ -11,30 +11,14 @@ const localStore = reactive(localStoreRaw)
 
 console.log('localStore', localStore)
 
-// const updateParaKeyValue = (chIndex, bmLocation) => {
-//   if (!localStore.bookmarks[workId]) localStore.bookmarks[workId] = {}
-//   if (!localStore.bookmarks[workId][chIndex]) localStore.bookmarks[workId][chIndex] = {
-//     paraBM: {},
-//     percBM: []
-//   }
-
-//   localStore.bookmarks[workId][chIndex].paraBM[bmLocation] = 1
-
-//   localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
-// }
-
 const updatePercKeyValue = (chIndex, bmID, perc) => {
   if (!localStore.bookmarks[workId]) localStore.bookmarks[workId] = {}
-  if (!localStore.bookmarks[workId][chIndex]) localStore.bookmarks[workId][chIndex] = {
-    // paraBM: {},
-    percBM: []
-  }
+  if (!localStore.bookmarks[workId][chIndex]) localStore.bookmarks[workId][chIndex] = {percBM: []}
 
   // update local store record
   localStore.bookmarks[workId][chIndex].percBM.push({id: bmID, perc: perc})
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
   console.log('update perc bm value on local storage', localStore)
-
+  updateLocalStorage()
   // TODO: update remote store record
 }
 
@@ -42,16 +26,16 @@ const updatePercKeyValue = (chIndex, bmID, perc) => {
 
 const removePercKeyValue = (chIndex, bmID) => {
   // delete local store record
+  console.log('delete local bm, id: ', bmID)
   localStore.bookmarks[workId][chIndex].percBM = localStore.bookmarks[workId][chIndex].percBM.filter(({id}) => id !== bmID)
+  updateLocalStorage()
 
   // TODO: delete remote store record
 }
 
-// const updateLocalStorage = () => {
-
-
-//   localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
-// }
+const updateLocalStorage = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(localStore))
+}
 
 const clearLocalStorage = () => {
   localStorage.removeItem(STORAGE_KEY)
