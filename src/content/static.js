@@ -15,9 +15,10 @@ if (match) {
 console.log('fullViewMode: ', fullViewMode, workId, chapterId)
 
 const mainContent = document.querySelector('#workskin')
-const chapterDoms = mainContent.querySelectorAll('#chapters > .chapter')
+const chaptersWrapper = mainContent.querySelector("#chapters")
+const chapterDoms = chaptersWrapper.querySelectorAll(':scope > .chapter')
 
 export {
   workId, chapterId, fullViewMode,
-  mainContent, chapterDoms
+  mainContent, chaptersWrapper, chapterDoms
 }

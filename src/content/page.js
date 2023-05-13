@@ -1,5 +1,5 @@
 import {reactive, ref} from 'vue'
-import {fullViewMode, workId, chapterId, mainContent, chapterDoms} from './static'
+import {fullViewMode, workId, chapterId, mainContent, chaptersWrapper, chapterDoms} from './static'
 import { localStore } from './store'
 import { initBookmark } from './bookmark'
 
@@ -33,8 +33,9 @@ if (chapterDoms.length) { // multi chapter
 chapters = chaptersRef
 console.log('chapters', chapters)
 
+
 if (localStore.bookmarks[workId]) {
-  initBookmark(localStore.bookmarks[workId], chapters, curChI)
+  initBookmark(localStore.bookmarks[workId], chapters, curChI.value)
 }
 
 const onScroll = () => {
@@ -56,21 +57,27 @@ const onScroll = () => {
 
 const onResize = () => {
   const chIs = Object.keys(chapters)
-  const {top, height} = mainContent.getBoundingClientRect()
-  // set first chapter top
-  chapters[chIs[0]].top = window.scrollY + top
-  
-  // middle chapters
-  for (var i=1; i < chIs.length; i++) {
-    const chI = chIs[i]
-    const prevChI = chIs[i-1]
-    const {top: mTop} = chapters[chI].dom.getBoundingClientRect()
-    chapters[chI].top = window.scrollY + mTop
-    chapters[prevChI].height = chapters[chI].top - chapters[prevChI].top
-  }
+  chIs.forEach(chI => {
+    const {top, height} = chapters[chI].dom.getBoundingClientRect()
+    chapters[chI].top = window.scrollY + top
+    chapters[chI].height = height
+  })
 
-  // set last chapter height
-  chapters[chIs[chIs.length - 1]].height = chapters[chIs[0]].top + height - chapters[chIs[chIs.length - 1]].top
+  // const {top, height} = chaptersWrapper.getBoundingClientRect()
+  // // set first chapter top
+  // chapters[chIs[0]].top = window.scrollY + top
+  
+  // // middle chapters
+  // for (var i=1; i < chIs.length; i++) {
+  //   const chI = chIs[i]
+  //   const prevChI = chIs[i-1]
+  //   const {top: mTop} = chapters[chI].dom.getBoundingClientRect()
+  //   chapters[chI].top = window.scrollY + mTop
+  //   chapters[prevChI].height = chapters[chI].top - chapters[prevChI].top
+  // }
+
+  // // set last chapter height
+  // chapters[chIs[chIs.length - 1]].height = chapters[chIs[0]].top + height - chapters[chIs[chIs.length - 1]].top
   
   onScroll()
 }

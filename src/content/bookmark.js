@@ -9,9 +9,9 @@ const initBookmark = (work, chapters, curChI) => {
       })
     })
   } else { // one chapter/one shot per view
-    if (work[curChI.value]) {
-      work[curChI.value].percBM.forEach(({id, perc}) => {
-        chapters[curChI.value].percBM.push({id: id, perc: perc})
+    if (work[curChI]) {
+      work[curChI].percBM.forEach(({id, perc}) => {
+        chapters[curChI].percBM.push({id: id, perc: perc})
       })
     }
   }
@@ -19,6 +19,8 @@ const initBookmark = (work, chapters, curChI) => {
 
 const addPercBookmark = (chapters, chI, perc) => {
   const bmID = (perc * 10000).toFixed(0)
+  if (chapters[chI].percBM.some(({id}) => id === bmID)) return
+  
   chapters[chI].percBM.push({id: bmID, perc: perc})
   updatePercKeyValue(chI, bmID, perc)
 }
