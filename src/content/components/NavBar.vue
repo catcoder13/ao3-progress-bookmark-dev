@@ -17,6 +17,7 @@
 
 <script>
 import { computed } from 'vue'
+import {fullViewMode} from '../static'
 export default {
   props: ['chapters', 'curChI'],
   setup (props) {
@@ -25,7 +26,8 @@ export default {
       const enterView = chIs[0] < props.curChI || props.chapters[props.curChI].progress > 0
       const exitView = props.chapters[chIs[chIs.length - 1]].progress == 100
       return {
-        show: enterView && !exitView
+        show: enterView && !exitView,
+        fullViewMode: fullViewMode
       }
     }
 
@@ -48,8 +50,8 @@ export default {
 <style lang="scss">
 $bm_color: #9cdddd;
 $bm_darken_color: #22a5a5;
-$bar_color: #aaaaaa;
-$bar_darken_color: #666666;
+$bar_color: #777777;
+$bar_darken_color: #333333;
 
 .navbar {
   position: fixed;
@@ -63,9 +65,14 @@ $bar_darken_color: #666666;
     height: 5px;
   }
 
+  &:not(.fullViewMode) .chapter-progress .chapter-progress__bar,
+  &:not(.fullViewMode) .chapter-progress .chapter-progress__bar.hasBM,
+  &.fullViewMode .chapter-progress .chapter-progress__bar.isCurrent.hasBM {
+    border-bottom: none;
+  }
+
   .chapter-progress {
     display: flex;
-    // overflow: hidden;
     background-color: #FFFFFF;
     height: 7px;
 
@@ -73,7 +80,6 @@ $bar_darken_color: #666666;
       position: relative;
       bottom: 0;
       background-color: $bar_darken_color;
-      // border-right: 1px solid #FFFFFF;
       box-sizing: border-box;
       transition: height 0.2s, flex 0.2s;
       height: 5px;
@@ -97,28 +103,17 @@ $bar_darken_color: #666666;
         }
       }
 
-      // &.hasBM { background-color: $bm_darken_color; }
+      &.hasBM { border-bottom: 3px solid $bm_color; }
 
-      &.empty {
-        background-color: $bar_color;
-
-        &.hasBM {
-          border-bottom: 2px solid $bm_darken_color;
-          // background-color: $bm_color;
-
-          // .progress { background-color: $bm_darken_color;}
-        }
-      }
+      &.empty { background-color: $bar_color; }
 
       & > span {
         position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 2px;
-        height: 2px;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 3px;
+        height: 3px;
         background-color: $bm_color;
-        // border-left: 1px solid #000000;
-        // height: 100%;
         font-size: 10px;
       }
 

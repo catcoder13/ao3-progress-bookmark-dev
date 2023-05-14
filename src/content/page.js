@@ -1,5 +1,5 @@
 import {reactive, ref} from 'vue'
-import {fullViewMode, workId, chapterId, mainContent, chaptersWrapper, chapterDoms} from './static'
+import {fullViewMode, workId, chapterId, mainContent, chapterDoms} from './static'
 import { localStore } from './store'
 import { initBookmark } from './bookmark'
 

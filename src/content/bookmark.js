@@ -1,5 +1,8 @@
+import {ref} from 'vue'
 import { fullViewMode } from './static'
 import { updatePercKeyValue, removePercKeyValue } from './store'
+
+const tooCloseBM = ref(null)
 
 const initBookmark = (work, chapters, curChI) => {
   if (fullViewMode) { // full view
@@ -23,10 +26,13 @@ const addPercBookmark = (chapters, chI, perc) => {
   
   chapters[chI].percBM.push({id: bmID, perc: perc})
   updatePercKeyValue(chI, bmID, perc)
+  tooCloseBM.value = {chI, id: bmID, perc}
 }
 
 const removePercBookmark = (chapters, chI, bmID) => {
   chapters[chI].percBM = chapters[chI].percBM.filter(({id}) => id !== bmID) // delete local perc bm record
+  console.log(tooCloseBM.value, chI, bmID)
+  if (tooCloseBM.value && tooCloseBM.value.chI == chI && tooCloseBM.value.id === bmID) tooCloseBM.value = null
   removePercKeyValue(chI, bmID) // delete store record
 }
 
@@ -34,4 +40,4 @@ const removeAllPercBookmark = chapters => {
 
 }
 
-export {initBookmark, addPercBookmark, removePercBookmark}
+export {initBookmark, addPercBookmark, removePercBookmark, tooCloseBM}
