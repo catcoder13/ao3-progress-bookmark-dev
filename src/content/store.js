@@ -1,33 +1,29 @@
 import { reactive } from "vue"
-import { workId } from "./static"
+import { workId, userName } from "./static"
 
-const STORAGE_KEY = 'AO3_IN_PAGE_BOOKMARK'
+
+const STORAGE_KEY_PREFIX = 'AO3_IPB_'
+const STORAGE_KEY = STORAGE_KEY_PREFIX + (userName ? 'user_' + userName : 'guest')
 // get localstorage data
-const localStoreRaw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-  bookmarks: {} // work's id -> chapter id -> {paraBM, percBM}
-}
+const localStoreRaw = JSON.parse(localStorage.getItem(STORAGE_KEY)) ||
+  {works: {}} // workID -> {chI, progressValue}
+
 
 const localStore = reactive(localStoreRaw)
 
 console.log('localStore', localStore)
 
-const updatePercKeyValue = (chIndex, bmID, perc) => {
-  if (!localStore.bookmarks[workId]) localStore.bookmarks[workId] = {}
-  if (!localStore.bookmarks[workId][chIndex]) localStore.bookmarks[workId][chIndex] = {percBM: []}
-
+const updateBookmarkStore = (chI, perc) => {
+  if (!localStore.works[workId]) localStore.works[workId] = {}
   // update local store record
-  localStore.bookmarks[workId][chIndex].percBM.push({id: bmID, perc: perc})
+  localStore.works[workId] = {chI, perc}
   console.log('update perc bm value on local storage', localStore)
   updateLocalStorage()
   // TODO: update remote store record
 }
 
-
-
-const removePercKeyValue = (chIndex, bmID) => {
-  // delete local store record
-  console.log('delete local bm, id: ', bmID)
-  localStore.bookmarks[workId][chIndex].percBM = localStore.bookmarks[workId][chIndex].percBM.filter(({id}) => id !== bmID)
+const removeBookmarkStore = () => {
+  localStore.works[workId] = {}
   updateLocalStorage()
 
   // TODO: delete remote store record
@@ -42,4 +38,4 @@ const clearLocalStorage = () => {
   console.log(localStorage.getItem(STORAGE_KEY))
 }
 
-export {localStore, updatePercKeyValue, removePercKeyValue, clearLocalStorage}
+export {localStore, updateBookmarkStore, removeBookmarkStore, clearLocalStorage}

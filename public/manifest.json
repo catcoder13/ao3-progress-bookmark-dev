@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AO3 In-page Bookmark",
   "version": "1.0",
-  "description": "Improve reading experience on AO3, helps to keep track on reading progress with in-page bookmark, and more.",
+  "description": "Improve navigating experience on AO3's work page, helps to keep track on reading progress with in-page bookmark and progress visuals",
   "icons":  {
     "128": "imgs/bavy_w.png"
   },

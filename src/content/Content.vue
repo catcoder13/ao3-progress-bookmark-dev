@@ -3,30 +3,29 @@
 
   <div class="toolbar" :class="{'inView': showToolbar}" @mouseenter="showToolbar = true" @mouseleave="showToolbar = false">
     <span class="bm-pos" @click="togglePercBookmark">{{canBookmarkPerc ? 'Stop' : 'Add'}} bookmark</span>
-    <span class="prev-bm-button">Prev</span>
-    <span class="next-bm-button">Next</span>
     <button @click="clearLocalStorage">Clear local storage</button>
   </div>
 
   <BookmarkEditor v-if="canBookmarkPerc" :chapters="chapters" @finish="onBookmarkEnd"></BookmarkEditor>
   
-  <BookmarkElems :chapters="chapters" :curChI="curChI" :canBookmarkPerc="canBookmarkPerc"></BookmarkElems>
+  <BookmarkElem v-if="canShowBookmark" :chapters="chapters" :class={canBookmarkPerc}></BookmarkElem>
 </template>
 
 <script>
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
 import {clearLocalStorage} from './store'
 import {chapters, curChI} from './page'
+import { mainBM } from './bookmark'
 
 import NavBar from './components/NavBar.vue'
-import BookmarkElems from './components/BookmarkElems.vue'
+import BookmarkElem from './components/BookmarkElem.vue'
 import BookmarkEditor from './components/BookmarkEditor.vue'
 
-import { mainContent } from './static'
+import { fullViewMode, mainContent } from './static'
 
 export default {
   name: 'App',
-  components: {NavBar, BookmarkElems, BookmarkEditor},
+  components: {NavBar, BookmarkElem, BookmarkEditor},
   setup () {
     const showToolbar = ref(false)
     const canBookmarkPerc = ref(false)
@@ -42,8 +41,24 @@ export default {
       canBookmarkPerc.value = false
     }
 
-    return {chapters, curChI, showToolbar, canBookmarkPerc, 
+    const canShowBookmark = computed(() => {
+      if (!mainBM.chI) return false
+      if (fullViewMode) return true
+
+      return mainBM.chI == curChI.value
+    })
+
+    const scrollToPrevBM = () => {
+
+    }
+
+    const scrollToNextBM = () => {
+
+    }
+
+    return {chapters, curChI, showToolbar, canBookmarkPerc, canShowBookmark,
             togglePercBookmark,onBookmarkEnd,
+            scrollToPrevBM, scrollToNextBM,
             clearLocalStorage}
   }
 }
@@ -88,6 +103,24 @@ export default {
       border-radius: 20px;
       cursor: pointer;
     }
+
+    .bm-nav {
+      margin-bottom: 5px;
+
+      span {
+        display: inline-block;
+        background-color: whitesmoke;
+        border-radius: 20px;
+        padding: 3px 10px;
+        cursor: pointer;
+        transform: scale(0.9);
+        transition: transform 0.2s;
+
+        &:hover {
+          transform: scale(1);
+        }
+      }
+    }
   }
 } // ao3-in-page-bookmark
 
@@ -99,18 +132,6 @@ export default {
   &.bmInProgress #chapters > .chapter,
   &.bmInProgress.oneshot #chapters {
     background-color: rgba(#aaaaaa, 0.3);
-  }
-}
-
-@keyframes bookmarkFade {
-  0% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-  }
-
-  100% {
-    opacity: 0.5;
-    transform: translateY(-50%) scale(1.2);
   }
 }
 </style>

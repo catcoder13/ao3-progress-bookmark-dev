@@ -1,34 +1,36 @@
 <template>
-  <div class="perc-bookmark-indicator" :class="percBookmarkIndicatorClass()" :style="{top: `${percBM.y}px`}">
+  <div class="perc-bookmark-indicator" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
     <div>
-      <span v-if="percBM.invalid" class="perc-bookmark-indicator__info">Out of bookmark region</span>
-      <span v-else-if="tooCloseBM" class="perc-bookmark-indicator__info">Bookmarked</span>
+      <span v-if="editBM.invalid" class="perc-bookmark-indicator__info">Out of bookmark region</span>
+      <span v-else-if="mainBM.tooClose" class="perc-bookmark-indicator__info">Bookmarked</span>
       <span v-else class="perc-bookmark-indicator__info">Add bookmark</span>
 
       <div class="perc-bookmark-indicator__button">
-        <span v-if="!tooCloseBM" class="add" @click="onPercBMAddClick" :class="{disable: percBM.invalid || !!tooCloseBM}">Add</span>
-        <span v-else class="remove" @click="onPercBookmarkRemoveClick" :class="{disable: !tooCloseBM}">Remove</span>
+        <template v-if="!editBM.invalid">
+          <span v-if="!mainBM.tooClose" class="add" @click="onPercBMAddClick" :class="{disable: editBM.invalid || mainBM.tooClose}">Add</span>
+          <span v-else class="remove" @click="onPercBookmarkRemoveClick" :class="{disable: !mainBM.tooClose}">Remove</span>
+        </template>
         <span class="done" @click="onPercBMDoneClick">Done</span>
       </div>
       
-      <span v-if="percBM.invalid" class="remark">-</span>
-      <span v-else-if="tooCloseBM" class="remark">Chapter {{parseInt(tooCloseBM.chI) + 1}} | progress: {{ (tooCloseBM.perc * 100).toFixed(2) }}%</span>
-      <span v-else class="remark">Chapter {{parseInt(percBM.chI) + 1}} | progress: {{ (percBM.precise * 100).toFixed(2) }}%</span>
+      <span v-if="editBM.invalid" class="remark">-</span>
+      <span v-else-if="mainBM.tooClose" class="remark">Chapter {{parseInt(mainBM.chI) + 1}} | progress: {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+      <span v-else class="remark">Chapter {{parseInt(editBM.chI) + 1}} | progress: {{ (editBM.precise * 100).toFixed(2) }}%</span>
     </div>
     
-    <span class="perc-bm-dummy">&#10006;</span>
+    <span class="perc-bm-dummy"></span>
   </div>
 </template>
 
 <script>
 import { onMounted, onUnmounted, reactive } from 'vue'
-import { tooCloseBM, addPercBookmark, removePercBookmark } from '../bookmark'
+import { updateBookmark, removeBookmark, mainBM } from '../bookmark'
 
 export default {
   props: ['chapters'],
   emits: ['finish'],
   setup (p, {emit}) {
-    const percBM = reactive({ y: window.innerHeight / 2, precise: 0, invalid: 0 }) 
+    const editBM = reactive({ y: window.innerHeight / 2, precise: 0, invalid: 0 }) 
 
     let clientY = 0
     const onMouseMove = e => {
@@ -49,27 +51,23 @@ export default {
       })
 
       newPerc = (clickedY - lastTop) / p.chapters[hoverCH].height
-      percBM.y = e.clientY
+      editBM.y = e.clientY
       
 
       if (newPerc > 0 && newPerc < 1) {
-        percBM.invalid = 0
+        editBM.invalid = 0
         // if cursor is too close to one of the existing perc bm
-        const hasTooClose = p.chapters[hoverCH].percBM.some((bm) => {
-          const tooClose = Math.abs(bm.perc - newPerc) < 0.005
-          if (tooClose) tooCloseBM.value = {...bm, chI: hoverCH}
-          return tooClose
-        })
-        if (hasTooClose) {
+        mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.005
+
+        if (mainBM.tooClose) {
           console.log('too close to existing bm')
         } else {
-          tooCloseBM.value = null
-          percBM.chI = hoverCH
-          percBM.precise = newPerc
+          editBM.chI = hoverCH
+          editBM.precise = newPerc
         }
       } else {
-        tooCloseBM.value = null
-        percBM.invalid = 1
+        mainBM.tooClose = false
+        editBM.invalid = 1
         console.log('exceed perc bookmark area')
       }
     } // onMouseMove
@@ -82,23 +80,23 @@ export default {
 
     onUnmounted(() => {
       console.log('on unmounted')
-      tooCloseBM.value = null
+      mainBM.tooClose = false
       document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('scroll', onMouseMove)
     })
 
     const onPercBMAddClick = () => {
-      if (percBM.invalid || !!tooCloseBM.value) return
-      addPercBookmark(p.chapters, percBM.chI, percBM.precise)
+      if (editBM.invalid || mainBM.tooClose) return
+      updateBookmark(editBM.chI, editBM.precise)
     }
 
     const onPercBookmarkRemoveClick = () => {
-      if (!tooCloseBM.value) return
-      removePercBookmark(p.chapters, tooCloseBM.value.chI, tooCloseBM.value.id)
+      if (!mainBM.tooClose) return
+      removeBookmark()
     }
 
     const onPercBMDoneClick = () => {
-      tooCloseBM.value = null
+      mainBM.tooClose = false
       document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('scroll', onMouseMove)
       emit('finish')
@@ -106,13 +104,13 @@ export default {
 
     const percBookmarkIndicatorClass = () => {
       return {
-        'outOfRange': percBM.invalid === 1,
-        'tooCloseToBM': !!tooCloseBM.value
+        'outOfRange': editBM.invalid === 1,
+        'tooCloseToBM': mainBM.tooClose
       }
     }
 
     return { 
-      percBM, tooCloseBM,
+      editBM, mainBM,
       onPercBMAddClick, onPercBookmarkRemoveClick, onPercBMDoneClick, percBookmarkIndicatorClass
     }
   }
@@ -139,6 +137,7 @@ $red: #fe4141;
   text-align: center;
   pointer-events: none;
 
+  &.outOfRange > div { background-color: rgba($bm_blue, 0.2);}
   &.outOfRange,
   &.tooCloseToBM {
     &::before,
@@ -152,7 +151,7 @@ $red: #fe4141;
     float: right;
     width: 210px;
     height: 96px;
-    margin-right: 40px;
+    margin-right: 50px;
     padding: 10px;
     background-color: $bm_blue;
     transition: background-color 0.2s;
@@ -165,10 +164,10 @@ $red: #fe4141;
   &::before {
     content: '';
     position: absolute;
-    width: 100px;
+    width: 80px;
     top: 50%;
     transform: translateY(-50%);
-    right: 0;
+    right: 15px;
     display: block;
     border-bottom: 2px dashed $bm_blue;
     pointer-events: none;
@@ -180,8 +179,10 @@ $red: #fe4141;
     top: 50%;
     right: 0;
     transform: translateY(-50%);
-    line-height: 1;
-    font-size: 20px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: $bm_blue;
     animation: bookmarkFade 0.5s infinite alternate;
   }
 
@@ -225,6 +226,18 @@ $red: #fe4141;
         opacity: 0.5;
       }
     }
+  }
+}
+
+@keyframes bookmarkFade {
+  0% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: translateY(-50%) scale(1.2);
   }
 }
 </style>

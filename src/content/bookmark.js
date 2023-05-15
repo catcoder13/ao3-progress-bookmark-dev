@@ -1,43 +1,20 @@
-import {ref} from 'vue'
-import { fullViewMode } from './static'
-import { updatePercKeyValue, removePercKeyValue } from './store'
+import {reactive} from 'vue'
+import { updateBookmarkStore, removeBookmarkStore } from './store'
 
-const tooCloseBM = ref(null)
+const mainBM = reactive({chI: null, perc: null, tooClose: false})
 
-const initBookmark = (work, chapters, curChI) => {
-  if (fullViewMode) { // full view
-    Object.keys(work).forEach(chI => {
-      work[chI].percBM.forEach(({id, perc}) => {
-        chapters[chI].percBM.push({id: id, perc: perc})
-      })
-    })
-  } else { // one chapter/one shot per view
-    if (work[curChI]) {
-      work[curChI].percBM.forEach(({id, perc}) => {
-        chapters[curChI].percBM.push({id: id, perc: perc})
-      })
-    }
-  }
+const updateBookmark = (chI, perc) => {
+  updateBookmarkStore(chI, perc)
+  mainBM.chI = chI
+  mainBM.perc = perc
+  mainBM.tooClose = true
 }
 
-const addPercBookmark = (chapters, chI, perc) => {
-  const bmID = (perc * 10000).toFixed(0)
-  if (chapters[chI].percBM.some(({id}) => id === bmID)) return
-  
-  chapters[chI].percBM.push({id: bmID, perc: perc})
-  updatePercKeyValue(chI, bmID, perc)
-  tooCloseBM.value = {chI, id: bmID, perc}
+const removeBookmark = () => {
+  mainBM.chI = null
+  mainBM.perc = null
+  mainBM.tooClose = false
+  removeBookmarkStore() // delete store record
 }
 
-const removePercBookmark = (chapters, chI, bmID) => {
-  chapters[chI].percBM = chapters[chI].percBM.filter(({id}) => id !== bmID) // delete local perc bm record
-  console.log(tooCloseBM.value, chI, bmID)
-  if (tooCloseBM.value && tooCloseBM.value.chI == chI && tooCloseBM.value.id === bmID) tooCloseBM.value = null
-  removePercKeyValue(chI, bmID) // delete store record
-}
-
-const removeAllPercBookmark = chapters => {
-
-}
-
-export {initBookmark, addPercBookmark, removePercBookmark, tooCloseBM}
+export {updateBookmark, removeBookmark, mainBM}

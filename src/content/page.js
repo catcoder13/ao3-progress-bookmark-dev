@@ -1,13 +1,15 @@
 import {reactive, ref} from 'vue'
 import {fullViewMode, workId, chapterId, mainContent, chapterDoms} from './static'
 import { localStore } from './store'
-import { initBookmark } from './bookmark'
+import { mainBM } from './bookmark'
 
 console.log('chapter length', chapterDoms.length)
 
 let chapters = null
 const chaptersRef = {}
 const curChI = ref(0)
+
+
 
 if (chapterDoms.length) { // multi chapter
   curChI.value = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
@@ -18,7 +20,7 @@ if (chapterDoms.length) { // multi chapter
       top: -1, height: 0, progress: 0, id: chapterId,
       title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim(),
       dom: ch,
-      percBM: reactive([])
+      // percBM: reactive([])
     })
   })
 } else { // one shot
@@ -26,7 +28,7 @@ if (chapterDoms.length) { // multi chapter
     top: -1, height: 0, progress: 0, id: chapterId,
     title: mainContent.querySelector('.title').innerText,
     dom: mainContent.querySelector('#chapters'),
-    percBM: reactive([])
+    // percBM: reactive([])
   })
 }
 
@@ -34,8 +36,10 @@ chapters = chaptersRef
 console.log('chapters', chapters)
 
 
-if (localStore.bookmarks[workId]) {
-  initBookmark(localStore.bookmarks[workId], chapters, curChI.value)
+if (localStore.works[workId]) {
+  const {chI, perc} = localStore.works[workId]
+  mainBM.chI = chI
+  mainBM.perc = perc
 }
 
 const onScroll = () => {
@@ -53,6 +57,8 @@ const onScroll = () => {
   const triggerHorizon = chapters[curChInView].top + window.innerHeight / 2
   chapters[curChInView].progress = (Math.min(1, Math.max(0, (scrollBottom - triggerHorizon) / chapters[curChInView].height)) * 100).toFixed(0)
   curChI.value = curChInView
+
+  // inViewBM.value = chapters[curChInView].percBM.some(bm => bm.)
 }
 
 const onResize = () => {
@@ -62,23 +68,6 @@ const onResize = () => {
     chapters[chI].top = window.scrollY + top
     chapters[chI].height = height
   })
-
-  // const {top, height} = chaptersWrapper.getBoundingClientRect()
-  // // set first chapter top
-  // chapters[chIs[0]].top = window.scrollY + top
-  
-  // // middle chapters
-  // for (var i=1; i < chIs.length; i++) {
-  //   const chI = chIs[i]
-  //   const prevChI = chIs[i-1]
-  //   const {top: mTop} = chapters[chI].dom.getBoundingClientRect()
-  //   chapters[chI].top = window.scrollY + mTop
-  //   chapters[prevChI].height = chapters[chI].top - chapters[prevChI].top
-  // }
-
-  // // set last chapter height
-  // chapters[chIs[chIs.length - 1]].height = chapters[chIs[0]].top + height - chapters[chIs[chIs.length - 1]].top
-  
   onScroll()
 }
 

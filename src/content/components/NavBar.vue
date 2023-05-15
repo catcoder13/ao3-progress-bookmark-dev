@@ -1,12 +1,11 @@
 <template>
   <div class="navbar" :class="navBarClass()">
     <div class="chapter-progress">
-      <div class="chapter-progress__bar" v-for="({progress, percBM}, chI) in chapters" :key="chI"
+      <div class="chapter-progress__bar" v-for="({progress}, chI) in chapters" :key="chI"
         :class="chapterProgressBarClass(chI)">
         <div class="progress" v-if="chI == curChI" :style="{width: `${progress}%`}"></div>
-        <template v-if="chI == curChI && percBM.length > 0 && progress > 0 && progress < 100">
-          <span v-for="(pos, i) in currentChBMPos" :key="i" :style="{left: `${pos}%`}"></span>
-        </template>
+        <span v-if="chI == curChI && mainBM.chI && mainBM.chI == curChI && progress > 0 && progress < 100"
+          :style="{left: `${mainBM.perc * 100}%`}"></span>
         <div class="chapter-info">
           Chapter {{chI + 1}}: {{chapters[chI].title}}
         </div>
@@ -16,7 +15,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { mainBM } from '../bookmark'
 import {fullViewMode} from '../static'
 export default {
   props: ['chapters', 'curChI'],
@@ -32,17 +31,15 @@ export default {
     }
 
     const chapterProgressBarClass = chI => {
+      const {progress} = props.chapters[chI]
       return {
-        'isCurrent': chI == props.curChI && props.chapters[chI].progress < 100,
-        'hasBM': props.chapters[chI].percBM.length > 0,
-        'empty': chI >= props.curChI && props.chapters[chI].progress < 100
+        'isCurrent': chI == props.curChI && progress > 0 && progress < 100,
+        'hasBM': mainBM.chI && mainBM.chI === chI,
+        'empty': chI >= props.curChI && progress < 100
       }
     }
 
-    const currentChBMPos = computed(() => props.chapters[props.curChI].percBM.map(({perc}) => perc * 100))
-
-    return {navBarClass, chapterProgressBarClass, currentChBMPos}
-
+    return {mainBM, navBarClass, chapterProgressBarClass}
   }
 }
 </script>
@@ -62,7 +59,7 @@ $bar_darken_color: #333333;
 
   &:not(.show) .chapter-progress .chapter-progress__bar.isCurrent {
     flex: 1;
-    height: 5px;
+    height: 3px;
   }
 
   &:not(.fullViewMode) .chapter-progress .chapter-progress__bar,
@@ -82,7 +79,7 @@ $bar_darken_color: #333333;
       background-color: $bar_darken_color;
       box-sizing: border-box;
       transition: height 0.2s, flex 0.2s;
-      height: 5px;
+      height: 3px;
       flex: 1;
 
       &:not(:last-child) {
