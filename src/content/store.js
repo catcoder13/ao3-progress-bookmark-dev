@@ -13,10 +13,10 @@ const localStore = reactive(localStoreRaw)
 
 console.log('localStore', localStore)
 
-const updateBookmarkStore = (chI, perc) => {
+const updateBookmarkStore = (chI, perc, chID) => {
   if (!localStore.works[workId]) localStore.works[workId] = {}
   // update local store record
-  localStore.works[workId] = {chI, perc}
+  localStore.works[workId] = { chI, perc, chID }
   console.log('update perc bm value on local storage', localStore)
   updateLocalStorage()
   // TODO: update remote store record

@@ -1,29 +1,43 @@
 <template>
   <div class="navbar" :class="navBarClass()">
     <div class="chapter-progress">
-      <div class="chapter-progress__bar" v-for="({progress}, chI) in chapters" :key="chI"
-        :class="chapterProgressBarClass(chI)">
-        <div class="progress" v-if="chI == curChI" :style="{width: `${progress}%`}"></div>
-        <span v-if="chI == curChI && mainBM.chI && mainBM.chI == curChI && progress > 0 && progress < 100"
-          :style="{left: `${mainBM.perc * 100}%`}"></span>
-        <div class="chapter-info">
-          Chapter {{chI + 1}}: {{chapters[chI].title}}
+      <template v-if="fullViewMode && Object.keys(chapters).length > 1">
+        <div class="chapter-progress__bar" v-for="({progress}, chI) in chapters" :key="chI"
+          @click="() => jumpToChapter(chI)"
+          :class="chapterProgressBarClass(chI)" :title="`Chapter ${parseInt(chI) + 1} : ${chapters[chI].title}`">
+          <div class="progress" v-if="chI == curChI" :style="{width: `${progress}%`}"></div>
+          <span v-if="chI == curChI && mainBM.chI && mainBM.chI == curChI && progress > 0 && progress < 100"
+            :style="{left: `${mainBM.perc * 100}%`}"
+            :title="`Bookmarked at Chapter ${parseInt(chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
+          <!-- <div class="chapter-info">
+            Chapter {{parseInt(chI) + 1}}: {{chapters[chI].title}}
+          </div> -->
         </div>
-      </div>
+      </template>
+      <div v-else class="chapter-progress__bar isCurrent">
+        <div class="progress" :style="{width: `${chapters[curChI].progress}%`}"></div>
+        <span v-if="mainBM.chI == curChI" :style="{left: `${mainBM.perc * 100}%`}"
+          :title="`Bookmarked at Chapter ${parseInt(mainBM.chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
+          <!-- <div class="chapter-info">
+            Chapter {{parseInt(chI) + 1}}: {{chapters[chI].title}}
+          </div> -->
+        </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mainBM } from '../bookmark'
+import { chapters, curChI, onScroll } from '../page'
 import {fullViewMode} from '../static'
+import {mousePos} from '../cursor'
+
 export default {
-  props: ['chapters', 'curChI'],
-  setup (props) {
+  setup () {
     const navBarClass = () => {
-      const chIs = Object.keys(props.chapters)
-      const enterView = chIs[0] < props.curChI || props.chapters[props.curChI].progress > 0
-      const exitView = props.chapters[chIs[chIs.length - 1]].progress == 100
+      const chIs = Object.keys(chapters)
+      const enterView = chIs[0] < curChI.value || chapters[curChI.value].progress > 0
+      const exitView = chapters[chIs[chIs.length - 1]].progress == 100
       return {
         show: enterView && !exitView,
         fullViewMode: fullViewMode
@@ -31,24 +45,36 @@ export default {
     }
 
     const chapterProgressBarClass = chI => {
-      const {progress} = props.chapters[chI]
+      const {progress} = chapters[chI]
       return {
-        'isCurrent': chI == props.curChI && progress > 0 && progress < 100,
+        'isCurrent': !fullViewMode || (chI == curChI.value && progress > 0 && progress < 100),
         'hasBM': mainBM.chI && mainBM.chI === chI,
-        'empty': chI >= props.curChI && progress < 100
+        'empty': chI >= curChI.value && progress < 100
       }
     }
 
-    return {mainBM, navBarClass, chapterProgressBarClass}
+    const jumpToChapter = chI => {
+      if (curChI.value == chI) return
+      const targetScroll = chapters[chI].top
+      window.scrollTo({top: targetScroll})
+      onScroll(null, targetScroll)
+    }
+
+    return {
+      chapters, curChI,
+      mainBM, fullViewMode, navBarClass, chapterProgressBarClass,
+      jumpToChapter
+    }
   }
 }
 </script>
 
 <style lang="scss">
-$bm_color: #9cdddd;
-$bm_darken_color: #22a5a5;
 $bar_color: #777777;
 $bar_darken_color: #333333;
+
+$ao3_red: #900;
+$ao3_grey: #a7a7a7;
 
 .navbar {
   position: fixed;
@@ -68,6 +94,15 @@ $bar_darken_color: #333333;
     border-bottom: none;
   }
 
+  &.fullViewMode .chapter-progress__bar {
+    cursor: pointer;
+
+    &:hover {
+      height: 100%;
+      .chapter-info { display: inline-block;}
+    }
+  }
+
   .chapter-progress {
     display: flex;
     background-color: #FFFFFF;
@@ -76,20 +111,26 @@ $bar_darken_color: #333333;
     .chapter-progress__bar {
       position: relative;
       bottom: 0;
-      background-color: $bar_darken_color;
       box-sizing: border-box;
       transition: height 0.2s, flex 0.2s;
       height: 3px;
       flex: 1;
+      background-color: $bar_darken_color;
 
-      &:not(:last-child) {
-        margin-right: 1px;
-      }
+      &:not(:last-child) { margin-right: 1px;}
+
+      // &:hover {
+      //   height: 100%;
+      //   .chapter-info { display: inline-block;}
+      // }
       
+      &.empty { background-color: $bar_color; }
+
       &.isCurrent {
         flex: 200px;
         height: 100%;
-        background-color: $bar_color;
+        background-color: $ao3_grey;
+        cursor: default;
 
         .progress {
           position: absolute;
@@ -100,21 +141,16 @@ $bar_darken_color: #333333;
         }
       }
 
-      &.hasBM { border-bottom: 3px solid $bm_color; }
-
-      &.empty { background-color: $bar_color; }
+      &.hasBM { border-bottom: 3px solid $ao3_red; }
 
       & > span {
         position: absolute;
-        bottom: 0;
-        transform: translateX(-50%);
-        width: 3px;
-        height: 3px;
-        background-color: $bm_color;
-        font-size: 10px;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 4px;
+        height: 100%;
+        background-color: red;
       }
-
-      &:hover .chapter-info { display: inline-block;}
       
       .chapter-info {
         position: absolute;

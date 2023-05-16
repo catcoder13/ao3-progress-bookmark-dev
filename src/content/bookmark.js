@@ -1,12 +1,15 @@
 import {reactive} from 'vue'
 import { updateBookmarkStore, removeBookmarkStore } from './store'
+import { workId } from './static'
+const mainBM = reactive({chI: null, perc: null, tooClose: false, chID: null, link: null, fwLink: null})
 
-const mainBM = reactive({chI: null, perc: null, tooClose: false})
-
-const updateBookmark = (chI, perc) => {
-  updateBookmarkStore(chI, perc)
+const updateBookmark = (chI, perc, chID) => {
+  updateBookmarkStore(chI, perc, chID)
   mainBM.chI = chI
   mainBM.perc = perc
+  mainBM.chID = chID
+  mainBM.link = `/works/${workId}/chapters/${chID}`
+  mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
   mainBM.tooClose = true
 }
 

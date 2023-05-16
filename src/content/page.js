@@ -17,18 +17,18 @@ if (chapterDoms.length) { // multi chapter
   chapterDoms.forEach(ch => {
     const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
     chaptersRef[chIndex] = reactive({
-      top: -1, height: 0, progress: 0, id: chapterId,
+      top: -1, height: 0, progress: 0,
       title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim(),
-      dom: ch,
-      // percBM: reactive([])
+      chID: ch.querySelector('.title a').getAttribute('href').match(/\/works\/\d+\/chapters\/(\d+)/)[1],
+      dom: ch
     })
   })
 } else { // one shot
   chaptersRef[0] = reactive({
-    top: -1, height: 0, progress: 0, id: chapterId,
+    top: -1, height: 0, progress: 0,
     title: mainContent.querySelector('.title').innerText,
-    dom: mainContent.querySelector('#chapters'),
-    // percBM: reactive([])
+    chID: chapterId,
+    dom: mainContent.querySelector('#chapters')
   })
 }
 
@@ -37,13 +37,16 @@ console.log('chapters', chapters)
 
 
 if (localStore.works[workId]) {
-  const {chI, perc} = localStore.works[workId]
+  const {chI, perc, chID} = localStore.works[workId]
   mainBM.chI = chI
   mainBM.perc = perc
+  mainBM.chID = chID
+  mainBM.link = `/works/${workId}/chapters/${chID}`
+  mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
 }
 
-const onScroll = () => {
-  const scrollBottom = window.scrollY + window.innerHeight
+const onScroll = (e, manualY) => {
+  const scrollBottom = (manualY || window.scrollY) + window.innerHeight
   let curChInView = chapterDoms.length > 0 ? curChI.value : 0
   
   if (fullViewMode) {
@@ -57,8 +60,6 @@ const onScroll = () => {
   const triggerHorizon = chapters[curChInView].top + window.innerHeight / 2
   chapters[curChInView].progress = (Math.min(1, Math.max(0, (scrollBottom - triggerHorizon) / chapters[curChInView].height)) * 100).toFixed(0)
   curChI.value = curChInView
-
-  // inViewBM.value = chapters[curChInView].percBM.some(bm => bm.)
 }
 
 const onResize = () => {
@@ -77,4 +78,4 @@ onResize()
 
 
 
-export {chapters, curChI}
+export {chapters, curChI, onScroll}

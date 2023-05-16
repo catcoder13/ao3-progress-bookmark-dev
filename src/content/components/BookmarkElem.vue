@@ -1,15 +1,20 @@
 <template>
 <div class="perc-bm" :class="{tooClose: mainBM.tooClose}" :style="{top: `${pos}px`}">
-  <div class="cross" @click="removeBookmark">&#10006;</div>
+  <div title="Click to remove bookmark" class="cross" @click="removeBookmark">
+    <BookmarkIcon :mode="0" class="icon"></BookmarkIcon>
+  </div>
   <span class="info">Chapter {{parseInt(mainBM.chI) + 1}}<br />{{ (mainBM.perc * 100).toFixed(2) }}%</span>
 </div>
 </template>
 
 <script>
 import {mainBM, removeBookmark} from '../bookmark'
+import BookmarkIcon from './BookmarkIcon.vue'
 import { computed } from 'vue'
+
 export default {
   props: ['chapters'],
+  components: {BookmarkIcon},
   setup (p) {
     const pos = computed(() => p.chapters[mainBM.chI].top + p.chapters[mainBM.chI].height * mainBM.perc)
 
@@ -20,6 +25,7 @@ export default {
 
 <style lang="scss">
 $bm_blue: #3caaaa;
+$ao3_red: #900;
 
 .perc-bm {
   position: absolute;
@@ -29,25 +35,22 @@ $bm_blue: #3caaaa;
   transform: translate(-50%, -50%);
 
   &.tooClose {
-    &::before { display: block; border-bottom: 2px dashed red; }
+    &::before { display: block; }
 
-    .cross { 
-      background-color: red;
-      font-size: 10px;
-    }
+    .cross::before { display: block;}
   }
 
   &::before {
     content: '';
     position: absolute;
-    right: 0;
-    width: 100px;
+    right: 15px;
+    width: 70px;
     display: none;
-    border-bottom: 2px dashed green;
+    border-bottom: 2px dashed $ao3_red;
     opacity: 0.5;
   }
 
-  &.canBookmarkPerc .cross {
+  &.canBookmarkPerc .cross .icon {
     opacity: 1;
   }
 
@@ -56,24 +59,36 @@ $bm_blue: #3caaaa;
     right: 0;
     transform: translateY(-50%);
     z-index: 1;
-    border-radius: 50%;
-    width: 15px;
-    height: 15px;
-    background-color: $bm_blue;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
-    line-height: 15px;
-    font-size: 0px;
-    color: #ffffff;
-    text-align: center;
-    opacity: 0.3;
-
+    overflow: hidden;
+    
+    .icon {
+      width: 100%;
+      height: 100%;
+      opacity: 0.3; 
+      transition: opacity 0.2s;
+    }
+    
+    &::before {
+      content: '\2573';
+      position: absolute;
+      top: 50%;
+      left: 4px;
+      transform: translateY(-50%);
+      color: #FFF;
+      font-size: 9px;
+      display: none;
+    }
+    
     &:hover {
-      opacity: 1;
-      font-size: 10px;
-      background-color: red;
+      .icon { opacity: 1; }
 
+      &::before { display: block;}
+      
       & ~ .info {display: block;}
-    } 
+    }
   }
 
   .info {
