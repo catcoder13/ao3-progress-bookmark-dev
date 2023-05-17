@@ -1,30 +1,28 @@
 <template v-if="chapters">
-  <NavBar></NavBar>
+  <IpbNavbar></IpbNavbar>
 
-  <div class="toolbar" v-if="!canBookmarkPerc">
-    <div class="item bookmark" :class="{selected: canBookmarkPerc}" @click="toggleBookmarkEdit" :style="{top:0}">
-      <BookmarkIcon class="icon" :mode="1"></BookmarkIcon>
-      <span class="item-desc">Update bookmark</span>
+  <div class="ipb-toolbar" v-if="!canBookmarkPerc">
+    <div class="ipb-toolbar__item" @click="toggleBookmarkEdit" :style="{top:0}">
+      <IpbIcon type="bookmark" fill="#FFF"></IpbIcon>
+      <b class="ipb-toolbar__item-desc">Update bookmark</b>
     </div>
-    <div v-if="mainBM.chI" class="item skip" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}"
+    <div v-if="mainBM.chI" class="ipb-toolbar__item" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}"
       @click="jumpToBookmark" :style="{top: 'calc(30px + 4px)'}">
-      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-        <path fill="#FFF" d="M21.64136,73.76636,12.241,62.0769,27.25806,49.99976,12.241,37.9231l9.40039-11.68946L51.1936,49.99976ZM87.759,49.99976,58.20728,26.23413l-9.4004,11.68848L63.82349,49.99976,48.80688,62.0769l9.4004,11.68946Z" />
-      </svg>
-
-      <span v-if="fullViewMode || mainBM.chI == curChI" class="item-desc">Jump to bookmark</span>
-      <div class="item-desc" v-else>
-        <span>Jump to bookmark</span>
-        <span class="warning">Bookmark is located in <b>Chapter {{ parseInt(mainBM.chI) + 1 }}</b></span>
-        <a :href="mainBM.link" class="jumpBtn">Visit Chapter {{ parseInt(mainBM.chI) + 1 }}</a>
-        <a :href="mainBM.fwLink" class="jumpBtn">Visit Entire Work</a>
+      <IpbIcon type="jump" fill="#FFF"></IpbIcon>
+      <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
+      <div v-else class="ipb-toolbar__item-desc">
+        <b>Jump to bookmark</b>
+        <span>You are currently at <b>Chapter {{ parseInt(curChI) + 1 }}</b></span>
+        <span class="ipb-warning">Bookmark is located at <b>Chapter {{ parseInt(mainBM.chI) + 1 }}</b></span>
+        <a :href="mainBM.link">Visit Chapter {{ parseInt(mainBM.chI) + 1 }}</a>
+        <a :href="mainBM.fwLink">Visit Entire Work</a>
       </div>
     </div>
   </div>
   
-  <BookmarkEditor v-if="canBookmarkPerc" :chapters="chapters" @finish="onBookmarkEnd"></BookmarkEditor>
+  <IpbEditor v-if="canBookmarkPerc" :chapters="chapters" @finish="onBookmarkEnd"></IpbEditor>
   
-  <BookmarkElem :class="{highlight: bmFocusCountDown, canBookmarkPerc}" v-if="canShowBookmark" :chapters="chapters"></BookmarkElem>
+  <IpbBookmark :class="{highlight: bmFocusCountDown, canBookmarkPerc}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
 </template>
 
 <script>
@@ -33,16 +31,16 @@ import {clearLocalStorage} from './store'
 import {chapters, curChI, onScroll} from './page'
 import { mainBM } from './bookmark'
 
-import NavBar from './components/NavBar.vue'
-import BookmarkElem from './components/BookmarkElem.vue'
-import BookmarkEditor from './components/BookmarkEditor.vue'
-import BookmarkIcon from './components/BookmarkIcon.vue'
+import IpbNavbar from './components/IpbNavbar.vue'
+import IpbBookmark from './components/IpbBookmark.vue'
+import IpbEditor from './components/IpbEditor.vue'
 
 import { fullViewMode, mainContent } from './static'
+import IpbIcon from './components/IpbIcon.vue'
 
 export default {
   name: 'App',
-  components: {NavBar, BookmarkElem, BookmarkEditor, BookmarkIcon},
+  components: { IpbNavbar, IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
     const canBookmarkPerc = ref(false)
@@ -102,7 +100,7 @@ $ao3_red: #900;
   font-family: sans-serif;
   font-size: 17px;
 
-  .toolbar {
+  .ipb-toolbar {
     position: fixed;
     z-index: 99;
     top: 50%;
@@ -111,7 +109,7 @@ $ao3_red: #900;
     text-align: right;
     height: 60px;
 
-    .item {
+    .ipb-toolbar__item {
       position: absolute;
       right: 0;
       transform: translateX(100%);
@@ -125,7 +123,7 @@ $ao3_red: #900;
 
       & > * { vertical-align: middle; background-color: $ao3_red; }
 
-      .icon {
+      .ipb-icon {
         position: absolute;
         top: 0;
         left: -30px;
@@ -136,11 +134,10 @@ $ao3_red: #900;
         padding: 5px;
       }
 
-      .item-desc {
+      .ipb-toolbar__item-desc {
         display: inline-block;
         color: #FFF;
         font-size: 13px;
-        font-weight: 700;
         vertical-align: top;
         white-space: nowrap;
         padding: 9px 5px 9px 0;
@@ -153,27 +150,25 @@ $ao3_red: #900;
 
         & > * { background-color: #555; }
 
-        .item-desc { 
+        .ipb-toolbar__item-desc { 
           padding: 9px;
           white-space: normal;
 
-          span:first-child {
-            display: inline-block;
-            white-space: nowrap;
-          }
-
-          span {
+          & > * {
             display: inline-block;
             margin-bottom: 5px;
-          }
-
-          span.warning {
-            color: #ffcdcd;
-            font-weight: 100;
             font-size: 12px;
+
+            &:first-child {
+              white-space: nowrap;
+              margin-bottom: 10px;
+              font-size: 13px;
+            }
           }
 
-          a.jumpBtn {
+          span.ipb-warning { color: #ffcdcd; }
+
+          a {
             cursor: pointer;
             display: block;
             transform: scale(0.95);
@@ -184,15 +179,16 @@ $ao3_red: #900;
             margin-bottom: 5px;
             transition: transform 0.2s;
             white-space: nowrap;
+            font-weight: 700;
 
             &:hover { transform: scale(1); }
           }
         }
       }
     }
-  } // .toolbar
+  } // .ipb-toolbar
 
-  .perc-bm.highlight:not(.tooClose) .cross svg { animation: bookmarkFade 0.5s 4 alternate; }
+  .ipb-bookmark.highlight:not(.tooClose) .ipb-icon { animation: bookmarkFade 0.5s 4 alternate; }
 } // ao3-in-page-bookmark
 
 #workskin {

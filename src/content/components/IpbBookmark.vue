@@ -1,20 +1,20 @@
 <template>
-<div class="perc-bm" :class="{tooClose: mainBM.tooClose}" :style="{top: `${pos}px`}">
-  <div title="Click to remove bookmark" class="cross" @click="removeBookmark">
-    <BookmarkIcon :mode="0" class="icon"></BookmarkIcon>
+<div class="ipb-bookmark" :class="{tooClose: mainBM.tooClose}" :style="{top: `${pos}px`}">
+  <div title="Click to remove bookmark" class="ipb-bookmark__icon" @click="removeBookmark">
+    <IpbIcon></IpbIcon>
   </div>
-  <span class="info">Chapter {{parseInt(mainBM.chI) + 1}}<br />{{ (mainBM.perc * 100).toFixed(2) }}%</span>
+  <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}}<br />{{ (mainBM.perc * 100).toFixed(2) }}%</span>
 </div>
 </template>
 
 <script>
 import {mainBM, removeBookmark} from '../bookmark'
-import BookmarkIcon from './BookmarkIcon.vue'
 import { computed } from 'vue'
+import IpbIcon from './IpbIcon.vue'
 
 export default {
   props: ['chapters'],
-  components: {BookmarkIcon},
+  components: { IpbIcon },
   setup (p) {
     const pos = computed(() => p.chapters[mainBM.chI].top + p.chapters[mainBM.chI].height * mainBM.perc)
 
@@ -27,7 +27,7 @@ export default {
 $bm_blue: #3caaaa;
 $ao3_red: #900;
 
-.perc-bm {
+.ipb-bookmark {
   position: absolute;
   width: 100%;
   max-width: 1130px;
@@ -37,7 +37,7 @@ $ao3_red: #900;
   &.tooClose {
     &::before { display: block; }
 
-    .cross::before { display: block;}
+    .ipb-bookmark__icon::before { display: block;}
   }
 
   &::before {
@@ -50,11 +50,11 @@ $ao3_red: #900;
     opacity: 0.5;
   }
 
-  &.canBookmarkPerc .cross .icon {
+  &.canBookmarkPerc .ipb-bookmark__icon .ipb-icon {
     opacity: 1;
   }
 
-  .cross {
+  .ipb-bookmark__icon {
     position: absolute;
     right: 0;
     transform: translateY(-50%);
@@ -64,7 +64,7 @@ $ao3_red: #900;
     cursor: pointer;
     overflow: hidden;
     
-    .icon {
+    .ipb-icon {
       width: 100%;
       height: 100%;
       opacity: 0.3; 
@@ -80,18 +80,19 @@ $ao3_red: #900;
       color: #FFF;
       font-size: 9px;
       display: none;
+      transition: opacity 0.2s;
     }
     
     &:hover {
-      .icon { opacity: 1; }
+      .ipb-icon { opacity: 1; }
 
       &::before { display: block;}
       
-      & ~ .info {display: block;}
+      & ~ .ipb-bookmark__info {display: block;}
     }
   }
 
-  .info {
+  .ipb-bookmark__info {
     display: none;
     right: 0;
     position: absolute;

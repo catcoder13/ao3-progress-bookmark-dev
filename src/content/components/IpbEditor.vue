@@ -1,11 +1,11 @@
 <template>
-  <div class="perc-bookmark-indicator" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
-    <div class="perc-bookmark-indicator__content">
-      <span v-if="editBM.invalid" class="perc-bookmark-indicator__info">Out of bookmark region</span>
-      <span v-else-if="mainBM.tooClose" class="perc-bookmark-indicator__info">Update bookmark</span>
-      <span v-else class="perc-bookmark-indicator__info">Update bookmark</span>
+  <div class="ipb-editor" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
+    <div class="ipb-editor__window">
+      <span v-if="editBM.invalid" class="ipb-editor__window__info">Out of bookmark region</span>
+      <span v-else-if="mainBM.tooClose" class="ipb-editor__window__info">Update bookmark</span>
+      <span v-else class="ipb-editor__window__info">Update bookmark</span>
 
-      <div class="perc-bookmark-indicator__button">
+      <div class="ipb-editor__window__button-group">
         <template v-if="!editBM.invalid">
           <span v-if="!mainBM.tooClose" class="add" @click="onPercBMAddClick">Bookmark</span>
           <span v-else class="remove" @click="onPercBookmarkRemoveClick">Remove</span>
@@ -13,25 +13,25 @@
         <span class="done" @click="onPercBMDoneClick">Done</span>
       </div>
       
-      <span v-if="editBM.invalid" class="remark">-</span>
-      <span v-else-if="mainBM.tooClose" class="remark">Chapter {{parseInt(mainBM.chI) + 1}} | progress: {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-      <span v-else class="remark">Chapter {{parseInt(editBM.chI) + 1}} | progress: {{ (editBM.precise * 100).toFixed(2) }}%</span>
+      <span v-if="editBM.invalid" class="ipb-editor__window__remark">-</span>
+      <span v-else-if="mainBM.tooClose" class="ipb-editor__window__remark">Chapter {{parseInt(mainBM.chI) + 1}} | progress: {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+      <span v-else class="ipb-editor__window__remark">Chapter {{parseInt(editBM.chI) + 1}} | progress: {{ (editBM.precise * 100).toFixed(2) }}%</span>
     </div>
     
-    <div class="icon"><BookmarkIcon :mode="0"></BookmarkIcon></div>
+    <div class="ipb-editor__mark"><IpbIcon></IpbIcon></div>
   </div>
 </template>
 
 <script>
 import { onMounted, onUnmounted, watch, reactive } from 'vue'
 import { updateBookmark, removeBookmark, mainBM } from '../bookmark'
-import BookmarkIcon from './BookmarkIcon.vue'
-import { mousePos } from '../cursor'
+import { mousePos } from '../mousePos'
+import IpbIcon from './IpbIcon.vue'
 
 export default {
   props: ['chapters'],
   emits: ['finish'],
-  components: {BookmarkIcon},
+  components: { IpbIcon },
   setup (p, {emit}) {
     const editBM = reactive({ y: window.innerHeight / 2, precise: 0, invalid: 0 })
 
@@ -124,7 +124,7 @@ $green: #67f751;
 $red: #fe4141;
 $ao3_red: #900;
 
-.perc-bookmark-indicator {
+.ipb-editor {
   position: fixed;
   z-index: 2;
   left: 50%;
@@ -143,10 +143,10 @@ $ao3_red: #900;
   &.outOfRange,
   &.tooCloseToBM {
     &::before,
-    .icon { display: none;}
+    .ipb-editor__mark { display: none;}
   }
 
-  .perc-bookmark-indicator__content {
+  .ipb-editor__window {
     pointer-events: all;
     position: relative;
     box-sizing: border-box;
@@ -176,7 +176,7 @@ $ao3_red: #900;
     
   }
 
-  .icon {
+  .ipb-editor__mark {
     position: absolute;
     top: 50%;
     right: 0;
@@ -192,18 +192,18 @@ $ao3_red: #900;
     }
   }
 
-  .perc-bookmark-indicator__info {
+  .ipb-editor__window__info {
     display: block;
     font-size: 14px;
     font-weight: 700;
   }
 
-  .remark {
+  .ipb-editor__window__remark {
     font-size: 13px;
     font-weight: 700;
   }
 
-  .perc-bookmark-indicator__button {
+  .ipb-editor__window__button-group {
     span {
       display: inline-block;
       cursor: pointer;

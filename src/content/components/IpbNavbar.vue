@@ -1,39 +1,44 @@
 <template>
-  <div class="navbar" :class="navBarClass()">
-    <div class="chapter-progress">
-      <template v-if="fullViewMode && Object.keys(chapters).length > 1">
-        <div class="chapter-progress__bar" v-for="({progress}, chI) in chapters" :key="chI"
-          @click="() => jumpToChapter(chI)"
-          :class="chapterProgressBarClass(chI)" :title="`Chapter ${parseInt(chI) + 1} : ${chapters[chI].title}`">
-          <div class="progress" v-if="chI == curChI" :style="{width: `${progress}%`}"></div>
-          <span v-if="chI == curChI && mainBM.chI && mainBM.chI == curChI && progress > 0 && progress < 100"
-            :style="{left: `${mainBM.perc * 100}%`}"
-            :title="`Bookmarked at Chapter ${parseInt(chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
-          <!-- <div class="chapter-info">
-            Chapter {{parseInt(chI) + 1}}: {{chapters[chI].title}}
-          </div> -->
-        </div>
-      </template>
-      <div v-else class="chapter-progress__bar isCurrent">
-        <div class="progress" :style="{width: `${chapters[curChI].progress}%`}"></div>
-        <span v-if="mainBM.chI == curChI" :style="{left: `${mainBM.perc * 100}%`}"
-          :title="`Bookmarked at Chapter ${parseInt(mainBM.chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
-          <!-- <div class="chapter-info">
-            Chapter {{parseInt(chI) + 1}}: {{chapters[chI].title}}
-          </div> -->
-        </div>
+  <div class="ipb-navbar" :class="navBarClass()">
+    <template v-if="fullViewMode && Object.keys(chapters).length > 1">
+      <div class="ipb-navbar__bar" v-for="({progress}, chI) in chapters" :key="chI"
+        @click="() => jumpToChapter(chI)"
+        :class="navbarBarClass(chI)" :title="`Chapter ${parseInt(chI) + 1} : ${chapters[chI].title}`">
+        <div class="progress" v-if="chI == curChI" :style="{width: `${progress}%`}"></div>
+        <span v-if="chI == curChI && mainBM.chI && mainBM.chI == curChI && progress > 0 && progress < 100"
+          :style="{left: `${mainBM.perc * 100}%`}"
+          :title="`Bookmarked at Chapter ${parseInt(chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
+      </div>
+    </template>
+    <div v-else class="ipb-navbar__bar isCurrent">
+      <div class="progress" :style="{width: `${chapters[curChI].progress}%`}"></div>
+      <span v-if="mainBM.chI == curChI" :style="{left: `${mainBM.perc * 100}%`}"
+        :title="`Bookmarked at Chapter ${parseInt(mainBM.chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
     </div>
+    
+    <!-- <div class="chapter-info">
+      Chapter {{parseInt(chI) + 1}}: {{chapters[chI].title}}
+    </div> -->
   </div>
+  <div>{{ hoveredChI }}</div>
 </template>
 
 <script>
+import { computed } from 'vue'
 import { mainBM } from '../bookmark'
 import { chapters, curChI, onScroll } from '../page'
 import {fullViewMode} from '../static'
-import {mousePos} from '../cursor'
+import {mousePos} from '../mousePos'
 
 export default {
   setup () {
+    const hoveredChI = computed(() =>{
+      if (mousePos.y > 20) return null
+
+      const navWidth = window.innerWidth / Object.keys(chapters).length
+      return Math.floor(mousePos.x / navWidth)
+    })
+
     const navBarClass = () => {
       const chIs = Object.keys(chapters)
       const enterView = chIs[0] < curChI.value || chapters[curChI.value].progress > 0
@@ -44,7 +49,7 @@ export default {
       }
     }
 
-    const chapterProgressBarClass = chI => {
+    const navbarBarClass = chI => {
       const {progress} = chapters[chI]
       return {
         'isCurrent': !fullViewMode || (chI == curChI.value && progress > 0 && progress < 100),
@@ -61,8 +66,8 @@ export default {
     }
 
     return {
-      chapters, curChI,
-      mainBM, fullViewMode, navBarClass, chapterProgressBarClass,
+      chapters, curChI, hoveredChI,
+      mainBM, fullViewMode, navBarClass, navbarBarClass,
       jumpToChapter
     }
   }
@@ -76,25 +81,25 @@ $bar_darken_color: #333333;
 $ao3_red: #900;
 $ao3_grey: #a7a7a7;
 
-.navbar {
+.ipb-navbar {
   position: fixed;
   z-index: 99;
   top: 0;
   left: 0;
   width: 100%;
 
-  &:not(.show) .chapter-progress .chapter-progress__bar.isCurrent {
+  &:not(.show) > div .ipb-navbar__bar.isCurrent {
     flex: 1;
     height: 3px;
   }
 
-  &:not(.fullViewMode) .chapter-progress .chapter-progress__bar,
-  &:not(.fullViewMode) .chapter-progress .chapter-progress__bar.hasBM,
-  &.fullViewMode .chapter-progress .chapter-progress__bar.isCurrent.hasBM {
+  &:not(.fullViewMode) > div .ipb-navbar__bar,
+  &:not(.fullViewMode) > div .ipb-navbar__bar.hasBM,
+  &.fullViewMode > div .ipb-navbar__bar.isCurrent.hasBM {
     border-bottom: none;
   }
 
-  &.fullViewMode .chapter-progress__bar {
+  &.fullViewMode .ipb-navbar__bar {
     cursor: pointer;
 
     &:hover {
@@ -103,12 +108,12 @@ $ao3_grey: #a7a7a7;
     }
   }
 
-  .chapter-progress {
+  // & > div {
     display: flex;
     background-color: #FFFFFF;
     height: 7px;
 
-    .chapter-progress__bar {
+    .ipb-navbar__bar {
       position: relative;
       bottom: 0;
       box-sizing: border-box;
@@ -152,19 +157,20 @@ $ao3_grey: #a7a7a7;
         background-color: red;
       }
       
-      .chapter-info {
-        position: absolute;
-        left: 0;
-        top: 6px;
-        display: none;
-        font-size: 12px;
-        line-height: 1;
-        padding: 4px 10px;
-        box-sizing: border-box;
-        background-color: rgba(#FFFFFF, 0.5);
-        pointer-events: none;
-      }
+      // .chapter-info {
+      //   position: absolute;
+      //   left: 0;
+      //   top: 6px;
+      //   display: none;
+      //   font-size: 12px;
+      //   line-height: 1;
+      //   padding: 4px 10px;
+      //   box-sizing: border-box;
+      //   background-color: rgba(#FFFFFF, 0.5);
+      //   pointer-events: none;
+      // }
     } // chapter-progress__bar
-  }
+  // }
+
 } // navbar
 </style>
