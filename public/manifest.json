@@ -21,7 +21,10 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://archiveofourown.org/works/*"],
+      "matches": [
+        "https://archiveofourown.org/works/*",
+        "https://archiveofourown.org/chapters/*"
+      ],
       "css": ["css/content.css"],
       "js": ["js/chunk-vendors.js", "js/content.js"]
     }

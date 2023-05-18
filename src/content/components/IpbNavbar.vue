@@ -1,74 +1,103 @@
 <template>
-  <div class="ipb-navbar" :class="navBarClass()">
-    <template v-if="fullViewMode && Object.keys(chapters).length > 1">
-      <div class="ipb-navbar__bar" v-for="({progress}, chI) in chapters" :key="chI"
-        @click="() => jumpToChapter(chI)"
-        :class="navbarBarClass(chI)" :title="`Chapter ${parseInt(chI) + 1} : ${chapters[chI].title}`">
-        <div class="progress" v-if="chI == curChI" :style="{width: `${progress}%`}"></div>
-        <span v-if="chI == curChI && mainBM.chI && mainBM.chI == curChI && progress > 0 && progress < 100"
-          :style="{left: `${mainBM.perc * 100}%`}"
-          :title="`Bookmarked at Chapter ${parseInt(chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
+  <div class="ipb-navbar">
+      <div :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
+        @click="() => jumpToChapter(chI)" @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
+        <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${chapters[chI].progress}%`}"></span>
+        <template v-if="mainBM.chI && mainBM.chI == chI">
+          <span class="ipb-navbar__bar__bm" :style="{left: `${mainBM.perc * 100}%`}"
+            :title="`Bookmarked at Chapter ${parseInt(chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
+        </template>
       </div>
-    </template>
-    <div v-else class="ipb-navbar__bar isCurrent">
-      <div class="progress" :style="{width: `${chapters[curChI].progress}%`}"></div>
-      <span v-if="mainBM.chI == curChI" :style="{left: `${mainBM.perc * 100}%`}"
-        :title="`Bookmarked at Chapter ${parseInt(mainBM.chI) + 1} | progress: ${(mainBM.perc * 100).toFixed(2)}%`"></span>
-    </div>
-    
-    <!-- <div class="chapter-info">
-      Chapter {{parseInt(chI) + 1}}: {{chapters[chI].title}}
-    </div> -->
   </div>
-  <div>{{ hoveredChI }}</div>
+
+  <div v-if="approxChI != null" class="ipb-navbar-info" :style="{top: `${infoPos.y}px`, left: `${infoPos.x}px`, opacity: hoveredChI != null ? 1 : 0.9 }">
+    <b class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
+    <span v-if="navbarTitle(approxChI)" class="ipb-title">{{ navbarTitle(approxChI) }}</span>
+    <div class="ipb-bm-note" v-if="mainBM.chI != null && mainBM.chI == approxChI">
+      <IpbIcon></IpbIcon>
+      <span>Bookmarked at {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+    </div>
+    <template v-if="hoveredChI != null">
+      <span class="ipb-desc" v-if="fullViewMode">Click to scroll to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+      <span class="ipb-desc" v-else-if="hoveredChI != curChI">Click to visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+      <span class="ipb-desc" v-else>This page is Chapter {{ parseInt(hoveredChI) + 1 }}, click to scroll back to top.</span>
+    </template>
+  </div>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { mainBM } from '../bookmark'
 import { chapters, curChI, onScroll } from '../page'
-import {fullViewMode} from '../static'
+import {chapterInfos, fullViewMode, workId} from '../static'
 import {mousePos} from '../mousePos'
+import IpbIcon from './IpbIcon.vue'
 
 export default {
-  setup () {
-    const hoveredChI = computed(() =>{
-      if (mousePos.y > 20) return null
+  props: ['bmInProgress'],
+  components: { IpbIcon },
+  setup(p) {
+    const inView = ref(true)
+    const hoveredChI = ref(null)
 
-      const navWidth = window.innerWidth / Object.keys(chapters).length
+    const approxChI = computed(() => {
+      if (p.bmInProgress || !inView.value || chapterInfos.length === 1 || mousePos.y > 50 || mousePos.y <= 0) return null
+      
+      if (hoveredChI.value) return hoveredChI.value
+
+      const navWidth = window.innerWidth / chapterInfos.length
       return Math.floor(mousePos.x / navWidth)
     })
 
-    const navBarClass = () => {
-      const chIs = Object.keys(chapters)
-      const enterView = chIs[0] < curChI.value || chapters[curChI.value].progress > 0
-      const exitView = chapters[chIs[chIs.length - 1]].progress == 100
+    const infoPos = computed(() => {
+      if (p.bmInProgress || approxChI.value == null) return null
+      const x = mousePos.x + 200 > window.innerWidth ? window.innerWidth - 200 : mousePos.x
+      return { x, y: mousePos.y + 10 }
+    })
+
+    const navbarBarClass = chI => {
       return {
-        show: enterView && !exitView,
-        fullViewMode: fullViewMode
+        "ipb-navbar__bar": true,
+        "has-bm": mainBM.chI && mainBM.chI == chI,
+        "ipb-focus": approxChI.value == chI,
+        'ipb-one-chapter-only': chapterInfos.length === 1,
+        'ipb-current': curChI.value == chI && chapters[curChI.value].progress > 0 && chapters[curChI.value].progress < 100
       }
     }
 
-    const navbarBarClass = chI => {
-      const {progress} = chapters[chI]
-      return {
-        'isCurrent': !fullViewMode || (chI == curChI.value && progress > 0 && progress < 100),
-        'hasBM': mainBM.chI && mainBM.chI === chI,
-        'empty': chI >= curChI.value && progress < 100
-      }
+    const navbarTitle = chI => {
+      const chString = `Chapter ${parseInt(chI) + 1}`
+      const chTitle = chapterInfos[chI].title;
+      if (chString == chTitle) return ''
+
+      return chTitle
     }
 
     const jumpToChapter = chI => {
-      if (curChI.value == chI) return
-      const targetScroll = chapters[chI].top
-      window.scrollTo({top: targetScroll})
-      onScroll(null, targetScroll)
+      if (fullViewMode || approxChI.value == curChI.value) {
+        const targetScroll = chapters[chI].top;
+        window.scrollTo({ top: targetScroll, behavior: "smooth" })
+        // if (chapters[chI].top > window.scrollY && chapters[chI].top < window.scrollY + window.innerHeight) {
+        //   window.scrollTo({top: targetScroll, behavior: 'smooth'})
+        // } else window.scrollTo({top: targetScroll})
+        onScroll(null, targetScroll)
+      }
+      else {
+        window.location.href = `/works/${workId}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
+      }
     }
 
+    document.addEventListener('mouseenter', () => {
+      inView.value = true
+    })
+    document.addEventListener('mouseleave', () => {
+      inView.value = false
+    })
+
     return {
-      chapters, curChI, hoveredChI,
-      mainBM, fullViewMode, navBarClass, navbarBarClass,
-      jumpToChapter
+      chapters, chapterInfos, curChI, approxChI, hoveredChI,
+      infoPos, mainBM, fullViewMode,
+      navbarBarClass, navbarTitle, jumpToChapter
     }
   }
 }
@@ -87,90 +116,101 @@ $ao3_grey: #a7a7a7;
   top: 0;
   left: 0;
   width: 100%;
+  height: auto;
+  // background-color: #FFF;
+  display: flex;
 
-  &:not(.show) > div .ipb-navbar__bar.isCurrent {
-    flex: 1;
+  .ipb-navbar__bar {
+    position: relative;
+    bottom: 0;
+    box-sizing: border-box;
+    transition: height 0.2s, flex 0.2s;
     height: 3px;
-  }
+    flex: 1;
+    background-color: $bar_color;
+    transition: flex 0.5s height 0.2s filter 0.2s;
+    opacity: 0.6;
 
-  &:not(.fullViewMode) > div .ipb-navbar__bar,
-  &:not(.fullViewMode) > div .ipb-navbar__bar.hasBM,
-  &.fullViewMode > div .ipb-navbar__bar.isCurrent.hasBM {
-    border-bottom: none;
-  }
+    &.ipb-current { opacity: 1; height: 6px; }
 
-  &.fullViewMode .ipb-navbar__bar {
-    cursor: pointer;
+    &:not(:last-child) { border-right: 1px solid #FFF; }
 
-    &:hover {
+    &.has-bm { background-color: #e84f4f; }
+
+    &.ipb-one-chapter-only { height: 8px; }
+
+    &.ipb-focus {
+      height: 20px;
+      flex: 200px;
+      cursor: pointer;
+      opacity: 1;
+
+      &:hover { filter:brightness(50%); }
+    }
+
+    .ipb-navbar__bar__progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
       height: 100%;
-      .chapter-info { display: inline-block;}
+      background-color: $bar_darken_color;
+    }
+
+    &.has-bm .ipb-navbar__bar__progress-bar { background-color: $ao3_red; }
+
+    .ipb-navbar__bar__bm {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 100%;
+      box-sizing: border-box;
+      background-color: $ao3_red;
+      border-left: 3px solid $ao3_red;
+      border-right: 3px solid #e84f4f;
+    }
+  } // chapter-progress__bar
+
+} // navbar
+
+.ipb-navbar-info {
+  position: fixed;
+  z-index: 100;
+  background-color: #eee;
+  padding: 10px;
+  font-size: 14px;
+  transition: opacity 0.2s;
+  max-width: 200px;
+  
+  & > * { 
+    display: block; 
+    
+    &:not(:last-child) { padding-bottom: 10px; }
+  }
+  
+  .ipb-heading { padding-bottom: 0; }
+
+  .ipb-title {
+    font-size: 13px;
+    color: #444;
+  }
+
+  .ipb-bm-note {
+    font-size: 12px;
+
+    & > * { display: inline-block; vertical-align: middle;}
+
+    .ipb-icon {
+      width: 17px; height: 17px;
+      padding-right: 5px;
     }
   }
 
-  // & > div {
-    display: flex;
-    background-color: #FFFFFF;
-    height: 7px;
+  .ipb-desc {
+    font-size: 11px;
+    font-style: italic;
+    color: #555;
 
-    .ipb-navbar__bar {
-      position: relative;
-      bottom: 0;
-      box-sizing: border-box;
-      transition: height 0.2s, flex 0.2s;
-      height: 3px;
-      flex: 1;
-      background-color: $bar_darken_color;
-
-      &:not(:last-child) { margin-right: 1px;}
-
-      // &:hover {
-      //   height: 100%;
-      //   .chapter-info { display: inline-block;}
-      // }
-      
-      &.empty { background-color: $bar_color; }
-
-      &.isCurrent {
-        flex: 200px;
-        height: 100%;
-        background-color: $ao3_grey;
-        cursor: default;
-
-        .progress {
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          background-color: $bar_darken_color;
-        }
-      }
-
-      &.hasBM { border-bottom: 3px solid $ao3_red; }
-
-      & > span {
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 4px;
-        height: 100%;
-        background-color: red;
-      }
-      
-      // .chapter-info {
-      //   position: absolute;
-      //   left: 0;
-      //   top: 6px;
-      //   display: none;
-      //   font-size: 12px;
-      //   line-height: 1;
-      //   padding: 4px 10px;
-      //   box-sizing: border-box;
-      //   background-color: rgba(#FFFFFF, 0.5);
-      //   pointer-events: none;
-      // }
-    } // chapter-progress__bar
-  // }
-
-} // navbar
+  }
+} // ipb-navbar-info
 </style>

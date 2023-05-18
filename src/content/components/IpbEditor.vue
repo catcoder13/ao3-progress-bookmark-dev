@@ -1,24 +1,51 @@
 <template>
   <div class="ipb-editor" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
     <div class="ipb-editor__window">
-      <span v-if="editBM.invalid" class="ipb-editor__window__info">Out of bookmark region</span>
-      <span v-else-if="mainBM.tooClose" class="ipb-editor__window__info">Update bookmark</span>
-      <span v-else class="ipb-editor__window__info">Update bookmark</span>
-
-      <div class="ipb-editor__window__button-group">
-        <template v-if="!editBM.invalid">
-          <span v-if="!mainBM.tooClose" class="add" @click="onPercBMAddClick">Bookmark</span>
-          <span v-else class="remove" @click="onPercBookmarkRemoveClick">Remove</span>
-        </template>
-        <span class="done" @click="onPercBMDoneClick">Done</span>
-      </div>
+      <template v-if="editBM.invalid">
+        <span class="ipb-editor__window__header">Out of bookmark region</span>
+        <div class="ipb-editor__window__button-group">
+            <span class="done" @click="onPercBMDoneClick">Done</span>
+        </div>
+        <span class="ipb-editor__window__remark">-</span>
+      </template>
       
-      <span v-if="editBM.invalid" class="ipb-editor__window__remark">-</span>
-      <span v-else-if="mainBM.tooClose" class="ipb-editor__window__remark">Chapter {{parseInt(mainBM.chI) + 1}} | progress: {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-      <span v-else class="ipb-editor__window__remark">Chapter {{parseInt(editBM.chI) + 1}} | progress: {{ (editBM.precise * 100).toFixed(2) }}%</span>
+      <template v-else-if="mainBM.chI != null">
+
+        <template v-if="mainBM.tooClose">
+          <span class="ipb-editor__window__header">Remove bookmark</span>
+          <div class="ipb-editor__window__button-group">
+            <span class="add" @click="onPercBookmarkRemoveClick">Remove</span>
+            <span class="done" @click="onPercBMDoneClick">Done</span>
+          </div>
+          <div class="ipb-editor__window__remark">
+            <span>Remove from: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+          </div>
+        </template>
+
+        <template v-else>
+          <span class="ipb-editor__window__header">Change bookmark location</span>
+          <div class="ipb-editor__window__button-group">
+            <span class="add" @click="onPercBMAddClick">Change</span>
+            <span class="done" @click="onPercBMDoneClick">Done</span>
+          </div>
+          <div class="ipb-editor__window__remark">
+            <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+            <span>New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
+          </div>
+        </template>
+      </template>
+      
+      <template v-else>
+        <span class="ipb-editor__window__header">Add a new bookmark</span>
+        <div class="ipb-editor__window__button-group">
+            <span class="add" @click="onPercBMAddClick">Add</span>
+            <span class="done" @click="onPercBMDoneClick">Done</span>
+        </div>
+        <span class="ipb-editor__window__remark">New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
+      </template>
     </div>
     
-    <div class="ipb-editor__mark"><IpbIcon></IpbIcon></div>
+    <div class="ipb-editor__mark"><IpbIcon type="location"></IpbIcon></div>
   </div>
 </template>
 
@@ -33,7 +60,7 @@ export default {
   emits: ['finish'],
   components: { IpbIcon },
   setup (p, {emit}) {
-    const editBM = reactive({ y: window.innerHeight / 2, precise: 0, invalid: 0 })
+    const editBM = reactive({ y: window.innerHeight / 2, perc: 0, invalid: 0 })
 
     const onMouseMove = (e, posY = editBM.y) => {
       const clickedY = window.scrollY + posY
@@ -57,18 +84,14 @@ export default {
 
       if (newPerc > 0 && newPerc < 1) {
         editBM.invalid = 0
-        // if cursor is too close to one of the existing perc bm
-        mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.001
-
+        // check if cursor is too close to one of the existing perc bm
+        mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.005
         editBM.chI = hoverCH
-        editBM.precise = newPerc
+        editBM.perc = newPerc
 
-        if (mainBM.tooClose) console.log('too close to existing bm')
-
-      } else {
+      } else { // exceed bookmark area
         mainBM.tooClose = false
         editBM.invalid = 1
-        console.log('exceed perc bookmark area')
       }
     } // onMouseMove
     
@@ -88,7 +111,7 @@ export default {
 
     const onPercBMAddClick = () => {
       if (editBM.invalid || mainBM.tooClose) return
-      updateBookmark(editBM.chI, editBM.precise, p.chapters[editBM.chI].chID)
+      updateBookmark(editBM.chI, editBM.perc)
     }
 
     const onPercBookmarkRemoveClick = () => {
@@ -151,8 +174,8 @@ $ao3_red: #900;
     position: relative;
     box-sizing: border-box;
     float: right;
-    width: 210px;
-    height: 96px;
+    width: 220px;
+    height: 105px;
     margin-right: 50px;
     padding: 10px;
     background-color: grey;
@@ -181,10 +204,10 @@ $ao3_red: #900;
     top: 50%;
     right: 0;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     
-    svg {
+    .ipb-icon {
       position: absolute;
       top: 0;
       left: 0;
@@ -192,7 +215,7 @@ $ao3_red: #900;
     }
   }
 
-  .ipb-editor__window__info {
+  .ipb-editor__window__header {
     display: block;
     font-size: 14px;
     font-weight: 700;
@@ -200,7 +223,12 @@ $ao3_red: #900;
 
   .ipb-editor__window__remark {
     font-size: 13px;
-    font-weight: 700;
+    white-space: nowrap;
+
+    span {
+      display: block;
+      white-space: nowrap;
+    }
   }
 
   .ipb-editor__window__button-group {
@@ -216,7 +244,7 @@ $ao3_red: #900;
       width: 115px;
       font-size: 14px;
       font-weight: 800;
-      color:#333333;
+      color:#FFF;
       padding: 8px 0;
       text-align: center;
 
@@ -224,9 +252,9 @@ $ao3_red: #900;
         transform: scale(1);
       }
 
-      &.add { background-color: $green; }
-      &.remove { background-color: $red; }
-      &.done { width: 55px;}
+      &.add { background-color: $ao3_red; }
+      // &.remove { background-color: $red; }
+      &.done { width: 55px; color: #333; }
     }
   }
 }

@@ -1,10 +1,10 @@
 <template v-if="chapters">
-  <IpbNavbar></IpbNavbar>
+  <IpbNavbar :bmInProgress="bmInProgress"></IpbNavbar>
 
-  <div class="ipb-toolbar" v-if="!canBookmarkPerc">
+  <div class="ipb-toolbar" v-if="!bmInProgress">
     <div class="ipb-toolbar__item" @click="toggleBookmarkEdit" :style="{top:0}">
       <IpbIcon type="bookmark" fill="#FFF"></IpbIcon>
-      <b class="ipb-toolbar__item-desc">Update bookmark</b>
+      <b class="ipb-toolbar__item-desc">{{mainBM.chI ? 'Change bookmark location' : 'Add a new bookmark'}}</b>
     </div>
     <div v-if="mainBM.chI" class="ipb-toolbar__item" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}"
       @click="jumpToBookmark" :style="{top: 'calc(30px + 4px)'}">
@@ -12,17 +12,18 @@
       <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
       <div v-else class="ipb-toolbar__item-desc">
         <b>Jump to bookmark</b>
-        <span>You are currently at <b>Chapter {{ parseInt(curChI) + 1 }}</b></span>
-        <span class="ipb-warning">Bookmark is located at <b>Chapter {{ parseInt(mainBM.chI) + 1 }}</b></span>
-        <a :href="mainBM.link">Visit Chapter {{ parseInt(mainBM.chI) + 1 }}</a>
-        <a :href="mainBM.fwLink">Visit Entire Work</a>
+        <span>You are currently at Chapter {{ parseInt(curChI) + 1 }}'s <b>single chapter page.</b></span>
+        <span class="ipb-warning">Bookmark is located at <b>Chapter {{ parseInt(mainBM.chI) + 1 }}.</b></span>
+        <span>Visit Chapter {{ parseInt(mainBM.chI) + 1 }}:</span>
+        <a :href="mainBM.link">Single chapter page</a>
+        <a :href="mainBM.fwLink">Entire Work page</a>
       </div>
     </div>
   </div>
   
-  <IpbEditor v-if="canBookmarkPerc" :chapters="chapters" @finish="onBookmarkEnd"></IpbEditor>
+  <IpbEditor v-if="bmInProgress" :chapters="chapters" @finish="onBookmarkEnd"></IpbEditor>
   
-  <IpbBookmark :class="{highlight: bmFocusCountDown, canBookmarkPerc}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
+  <IpbBookmark :class="{highlight: bmFocusCountDown, bmInProgress}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
 </template>
 
 <script>
@@ -43,19 +44,19 @@ export default {
   components: { IpbNavbar, IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
-    const canBookmarkPerc = ref(false)
+    const bmInProgress = ref(false)
 
     const bmFocusCountDown = ref(0)
 
     const toggleBookmarkEdit = e => {
-      canBookmarkPerc.value = !canBookmarkPerc.value
-      mainContent.classList.toggle('bmInProgress', canBookmarkPerc.value)
+      bmInProgress.value = !bmInProgress.value
+      mainContent.classList.toggle('bmInProgress', bmInProgress.value)
     } // toggleBookmarkEdit
 
     const onBookmarkEnd = () => {
       console.log('on bookmark end')
       mainContent.classList.toggle('bmInProgress', false)
-      canBookmarkPerc.value = false
+      bmInProgress.value = false
     }
 
     const canShowBookmark = computed(() => {
@@ -72,8 +73,13 @@ export default {
         return
       }
       const {top, height} = chapters[mainBM.chI]
-      const targetScroll = top + height * mainBM.perc - window.innerHeight / 2 + 90
-      window.scrollTo({top: targetScroll})
+      const bmPos = top + height * mainBM.perc
+      const targetScroll = bmPos - window.innerHeight / 2 + 90
+
+      window.scrollTo({top: targetScroll, behavior: 'smooth'})
+      // if (bmPos > window.scrollY && bmPos < window.scrollY + window.innerHeight) {
+      //   window.scrollTo({top: targetScroll, behavior: 'smooth'})
+      // } else window.scrollTo({top: targetScroll})
       onScroll(null, targetScroll)
 
       bmFocusCountDown.value = true
@@ -85,7 +91,7 @@ export default {
 
     return {
       chapters, mainBM, curChI, bmFocusCountDown, fullViewMode,
-      showToolbar, canBookmarkPerc, canShowBookmark,
+      showToolbar, bmInProgress, canShowBookmark,
       toggleBookmarkEdit, onBookmarkEnd, jumpToBookmark,
       clearLocalStorage
     }
@@ -114,13 +120,14 @@ $ao3_red: #900;
       right: 0;
       transform: translateX(100%);
       height: 30px;
+      pointer-events: all;
       cursor: pointer;
       font-size: 12px;
       transition: transform 0.2s;
       opacity: 0.6;
 
       &:hover { transform: translateX(0); opacity: 1;}
-
+      &:active {background-color: green;}
       & > * { vertical-align: middle; background-color: $ao3_red; }
 
       .ipb-icon {
@@ -166,12 +173,12 @@ $ao3_red: #900;
             }
           }
 
-          span.ipb-warning { color: #ffcdcd; }
+          span.ipb-warning { color: #ffcdcd; white-space: nowrap; }
 
           a {
             cursor: pointer;
             display: block;
-            transform: scale(0.95);
+            transform: scale(0.97);
             background-color: #eee;
             border-radius: 10px;
             color: #333;

@@ -1,6 +1,6 @@
 import { reactive } from "vue"
 
-const mousePos = reactive({x: 0, y: 0})
+const mousePos = reactive({x: window.innerWidth / 2, y:  window.innerHeight / 2})
 
 
 const onMouseMove = e => {

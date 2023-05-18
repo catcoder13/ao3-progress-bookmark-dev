@@ -1,7 +1,7 @@
 <template>
 <div class="ipb-bookmark" :class="{tooClose: mainBM.tooClose}" :style="{top: `${pos}px`}">
   <div title="Click to remove bookmark" class="ipb-bookmark__icon" @click="removeBookmark">
-    <IpbIcon></IpbIcon>
+    <IpbIcon type="location"></IpbIcon>
   </div>
   <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}}<br />{{ (mainBM.perc * 100).toFixed(2) }}%</span>
 </div>
@@ -37,7 +37,8 @@ $ao3_red: #900;
   &.tooClose {
     &::before { display: block; }
 
-    .ipb-bookmark__icon::before { display: block;}
+    .ipb-bookmark__icon::before { opacity: 1; }
+    &.bmInProgress .ipb-bookmark__icon .ipb-icon { opacity: 0.3; }
   }
 
   &::before {
@@ -50,17 +51,15 @@ $ao3_red: #900;
     opacity: 0.5;
   }
 
-  &.canBookmarkPerc .ipb-bookmark__icon .ipb-icon {
-    opacity: 1;
-  }
+  &.bmInProgress .ipb-bookmark__icon .ipb-icon { opacity: 1; }
 
   .ipb-bookmark__icon {
     position: absolute;
     right: 0;
     transform: translateY(-50%);
     z-index: 1;
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     cursor: pointer;
     overflow: hidden;
     
@@ -72,21 +71,22 @@ $ao3_red: #900;
     }
     
     &::before {
-      content: '\2573';
+      content: '\2613';
       position: absolute;
-      top: 50%;
+      top: 0;
       left: 4px;
-      transform: translateY(-50%);
-      color: #FFF;
-      font-size: 9px;
-      display: none;
-      transition: opacity 0.2s;
+      color: $ao3_red;
+      text-shadow: 0px 0px 3px #FFF;
+      font-size: 25px;
+      font-weight: 700;
+      line-height: 1;
+      opacity: 0;
     }
     
     &:hover {
-      .ipb-icon { opacity: 1; }
+      // .ipb-icon { opacity: 1; }
 
-      &::before { display: block;}
+      &::before {  opacity: 1; }
       
       & ~ .ipb-bookmark__info {display: block;}
     }

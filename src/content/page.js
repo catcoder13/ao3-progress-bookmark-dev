@@ -1,5 +1,5 @@
 import {reactive, ref} from 'vue'
-import {fullViewMode, workId, chapterId, mainContent, chapterDoms} from './static'
+import {fullViewMode, workId, mainContent, chapterDoms} from './static'
 import { localStore } from './store'
 import { mainBM } from './bookmark'
 
@@ -16,20 +16,10 @@ if (chapterDoms.length) { // multi chapter
 
   chapterDoms.forEach(ch => {
     const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-    chaptersRef[chIndex] = reactive({
-      top: -1, height: 0, progress: 0,
-      title: ch.querySelector('.title').innerHTML.replace(/<a[^>]*>(.*?)<\/a>(?:\s*:\s*)?(.*)/, '$2').trim(),
-      chID: ch.querySelector('.title a').getAttribute('href').match(/\/works\/\d+\/chapters\/(\d+)/)[1],
-      dom: ch
-    })
+    chaptersRef[chIndex] = reactive({ top: -1, height: 0, progress: 0, dom: ch })
   })
 } else { // one shot
-  chaptersRef[0] = reactive({
-    top: -1, height: 0, progress: 0,
-    title: mainContent.querySelector('.title').innerText,
-    chID: chapterId,
-    dom: mainContent.querySelector('#chapters')
-  })
+  chaptersRef[0] = reactive({ top: -1, height: 0, progress: 0, dom: mainContent.querySelector('#chapters') })
 }
 
 chapters = chaptersRef
@@ -41,7 +31,7 @@ if (localStore.works[workId]) {
   mainBM.chI = chI
   mainBM.perc = perc
   mainBM.chID = chID
-  mainBM.link = `/works/${workId}/chapters/${chID}`
+  mainBM.link = `/works/${workId}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
   mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
 }
 
@@ -49,7 +39,7 @@ const onScroll = (e, manualY) => {
   const scrollBottom = (manualY || window.scrollY) + window.innerHeight
   let curChInView = chapterDoms.length > 0 ? curChI.value : 0
   
-  if (fullViewMode) {
+  if (chapterDoms.length > 1) { // if the page is fullViewMode
     curChInView = Object.keys(chapters).filter(chI => {
       const trigger = chapters[chI].top + window.innerHeight / 2
       return trigger < scrollBottom
