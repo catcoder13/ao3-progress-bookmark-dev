@@ -18,7 +18,7 @@
             <span class="done" @click="onPercBMDoneClick">Done</span>
           </div>
           <div class="ipb-editor__window__remark">
-            <span>Remove from: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+            <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
           </div>
         </template>
 

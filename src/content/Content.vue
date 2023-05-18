@@ -41,7 +41,9 @@ import IpbIcon from './components/IpbIcon.vue'
 
 export default {
   name: 'App',
-  components: { IpbNavbar, IpbEditor, IpbBookmark, IpbIcon },
+  components: {
+    IpbNavbar,
+    IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
     const bmInProgress = ref(false)

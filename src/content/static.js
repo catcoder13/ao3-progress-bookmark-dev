@@ -18,14 +18,13 @@ const match2 = (window.location.href).match(/\/works\/(\d+)/)
 if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
   // workId not found on window.location.href, extract from dom element instead
   workId = mainContent.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)/)[1]
-} else if (match2) {
-  // pattern: https://archiveofourown.org/works/xxxxxxxxx/...
+} else if (match2) { // pattern: https://archiveofourown.org/works/xxxxxxxxx/...
   workId = match2[1]
 
   const urlParams = (new URLSearchParams(window.location.search)).get('view_full_work')
   fullViewMode = (urlParams && urlParams.toLowerCase() === 'true') ? 1 : 0
 } else {
-  console.log('url not match')
+  console.warn('url not match, workId not found')
 }
 
 console.log(fullViewMode, workId)
@@ -51,11 +50,10 @@ if (chapterListElem) {
   // one shot does not have chapter id
   chapterInfos = [{ chID: null, title: mainContent.querySelector('.title').innerText }]
 }
+
 console.log(chapterInfos)
 
-
-
-// identify user or guess
+// identify user or guest
 const iconHrefDom = document.querySelector('#greeting .icon a')
 const userName = iconHrefDom && iconHrefDom.getAttribute('href').split('/users/')[1].toLowerCase()
 console.log('user', userName)
