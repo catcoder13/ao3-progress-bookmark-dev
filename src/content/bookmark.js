@@ -1,5 +1,5 @@
 import {reactive} from 'vue'
-import { updateBookmarkStore, removeBookmarkStore } from './store'
+import { updateBookmarkStore, removeBookmarkStore, removeBookmarkStoreByWorkID } from './store'
 import { workId, chapterInfos } from './static'
 const mainBM = reactive({chI: null, perc: null, tooClose: false, chID: null, link: null, fwLink: null})
 
@@ -20,4 +20,9 @@ const removeBookmark = () => {
   removeBookmarkStore() // delete store record
 }
 
-export {updateBookmark, removeBookmark, mainBM}
+const removeBookmarkByWorkID = wID => {
+  if (wID == workId) removeBookmark()
+  else removeBookmarkStoreByWorkID(wID)
+}
+
+export {updateBookmark, removeBookmark, removeBookmarkByWorkID, mainBM}

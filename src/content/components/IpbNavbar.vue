@@ -9,13 +9,13 @@
       </div>
   </div>
 
-  <div v-if="approxChI != null" class="ipb-navbar-info" :style="{top: `${infoPos.y}px`, left: `${infoPos.x}px`, opacity: hoveredChI != null ? 1 : 0.9 }">
+  <div v-if="infoPos != null" class="ipb-navbar-info" :style="{top: `${infoPos.y}px`, left: `${infoPos.x}px`, opacity: hoveredChI != null ? 1 : 0.9 }">
     <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
     <b class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
     <span v-if="navbarTitle(approxChI)" class="ipb-title">{{ navbarTitle(approxChI) }}</span>
     
     <div class="ipb-bm-note" v-if="mainBM.chI != null && mainBM.chI == approxChI">
-      <IpbIcon></IpbIcon>
+      <IpbIcon @click="() => jumpToChapter(mainBM.chI)"></IpbIcon>
       <span>Bookmarked at {{ (mainBM.perc * 100).toFixed(2) }}%</span>
     </div>
 
@@ -123,6 +123,7 @@ $ao3_red: #900;
   width: 100%;
   height: auto;
   display: flex;
+  transition: opacity 0.2s;
 
   .ipb-navbar__bar {
     position: relative;
@@ -215,6 +216,10 @@ $ao3_red: #900;
     .ipb-icon {
       width: 17px; height: 17px;
       padding-right: 3px;
+
+      &:hover {
+        transform: scale(1.1);
+      }
     }
   }
 

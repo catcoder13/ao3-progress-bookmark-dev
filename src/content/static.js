@@ -5,10 +5,15 @@ const mainContent = document.querySelector('#workskin')
 const chapterDoms = mainContent.querySelectorAll('#chapters > .chapter')
 
 // initialise mainContent class name
-mainContent.classList.toggle('oneshot', chapterDoms.length === 0)
+const isOneShot = chapterDoms.length === 0
+mainContent.classList.toggle('oneshot', isOneShot)
 
 // retrieve work id and chapter id(if any)
 let workId = null
+const workName = mainContent.querySelector('.title').innerText
+const authorName = mainContent.querySelector('.byline a[rel=author]').innerText
+const authorLink = mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
+
 // let chapterId = null
 let fullViewMode = false
 
@@ -27,7 +32,7 @@ if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
   console.warn('url not match, workId not found')
 }
 
-console.log(fullViewMode, workId)
+console.log(fullViewMode, workId, workName, authorName, authorLink)
 
 const chapterListElem = document.getElementById('selected_id')
 let chapterInfos = null 
@@ -60,6 +65,7 @@ console.log('user', userName)
 
 export {
   userName,
-  workId, fullViewMode,
+  workId, workName, fullViewMode, isOneShot,
+  authorName, authorLink,
   mainContent, chapterDoms, chapterInfos
 }

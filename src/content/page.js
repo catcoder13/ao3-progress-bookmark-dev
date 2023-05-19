@@ -1,6 +1,6 @@
 import {reactive, ref} from 'vue'
 import {workId, mainContent, chapterDoms} from './static'
-import { localStore } from './store'
+import { store } from './store'
 import { mainBM } from './bookmark'
 
 let chapters = null
@@ -27,11 +27,12 @@ chapters = chaptersRef
 console.log('chapters', chapters)
 
 // setup existing bookmark
-if (localStore.works[workId]) {
-  const {chI, perc, chID} = localStore.works[workId]
+if (store.works[workId]) {
+  const {chI, perc, chID, isOneShot} = store.works[workId]
   mainBM.chI = chI
   mainBM.perc = perc
   mainBM.chID = chID
+  mainBM.isOneShot = isOneShot
   mainBM.link = `/works/${workId}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
   mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
 }

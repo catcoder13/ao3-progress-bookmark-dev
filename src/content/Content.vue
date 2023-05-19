@@ -2,23 +2,33 @@
   <IpbNavbar :bmInProgress="bmInProgress"></IpbNavbar>
 
   <div class="ipb-toolbar" v-if="!bmInProgress">
-    <div class="ipb-toolbar__item" @click="toggleBookmarkEdit" :style="{top:0}">
-      <IpbIcon type="bookmark" fill="#FFF"></IpbIcon>
+
+    <div class="ipb-toolbar__item" @click="toggleBookmarkEdit" :style="{top: 'calc(30px + 4px)'}">
+      <IpbIcon type="location" fill="#FFF"></IpbIcon>
       <b class="ipb-toolbar__item-desc">{{mainBM.chI ? 'Change bookmark location' : 'Add a new bookmark'}}</b>
     </div>
+
     <div v-if="mainBM.chI" class="ipb-toolbar__item" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}"
-      @click="jumpToBookmark" :style="{top: 'calc(30px + 4px)'}">
+      @click="jumpToBookmark" :style="{top: 'calc(64px + 4px)'}">
       <IpbIcon type="jump" fill="#FFF"></IpbIcon>
       <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
       <div v-else class="ipb-toolbar__item-desc">
         <b>Jump to bookmark</b>
-        <span>You are currently at Chapter {{ parseInt(curChI) + 1 }}'s <b>single chapter page.</b></span>
-        <span class="ipb-warning">Bookmark is located at <b>Chapter {{ parseInt(mainBM.chI) + 1 }}.</b></span>
-        <span>Visit Chapter {{ parseInt(mainBM.chI) + 1 }}:</span>
-        <a :href="mainBM.link">Single chapter page</a>
-        <a :href="mainBM.fwLink">Entire Work page</a>
+        <!-- <span>You are currently at Chapter {{ parseInt(curChI) + 1 }}'s <b>single chapter page.</b></span> -->
+        <!-- <span class="ipb-warning">Bookmark is located at <b>Chapter {{ parseInt(mainBM.chI) + 1 }}.</b></span> -->
+        <span class="ipb-warning">Visit Chapter {{ parseInt(mainBM.chI) + 1 }} bookmark via:</span>
+        <div class="ipb-btn">
+          <a :href="mainBM.fwLink"><button>Entire Work</button></a>
+          <a :href="mainBM.link"><button>Chapter by chapter</button></a>
+        </div>
       </div>
     </div>
+
+    <div v-if="store.works" class="ipb-toolbar__item" :style="{cursor: 'default'}">
+      <IpbIcon type="bookmark" fill="#FFF" :style="{backgroundColor: Object.keys(store.works).length ? '#900' : '#555'}"></IpbIcon>
+      <IpbBMList :works="store.works"></IpbBMList>
+    </div>
+    
   </div>
   
   <IpbEditor v-if="bmInProgress" :chapters="chapters" @finish="onBookmarkEnd"></IpbEditor>
@@ -28,22 +38,20 @@
 
 <script>
 import {ref, computed} from 'vue'
-import {clearLocalStorage} from './store'
+import {clearLocalStorage, store} from './store'
 import {chapters, curChI, onScroll} from './page'
 import { mainBM } from './bookmark'
+import { fullViewMode, mainContent } from './static'
 
 import IpbNavbar from './components/IpbNavbar.vue'
 import IpbBookmark from './components/IpbBookmark.vue'
 import IpbEditor from './components/IpbEditor.vue'
-
-import { fullViewMode, mainContent } from './static'
+import IpbBMList from './components/IpbBMList.vue'
 import IpbIcon from './components/IpbIcon.vue'
 
 export default {
   name: 'App',
-  components: {
-    IpbNavbar,
-    IpbEditor, IpbBookmark, IpbIcon },
+  components: { IpbNavbar,IpbBMList, IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
     const bmInProgress = ref(false)
@@ -92,7 +100,7 @@ export default {
     }
 
     return {
-      chapters, mainBM, curChI, bmFocusCountDown, fullViewMode,
+      chapters, mainBM, curChI, store, bmFocusCountDown, fullViewMode,
       showToolbar, bmInProgress, canShowBookmark,
       toggleBookmarkEdit, onBookmarkEnd, jumpToBookmark,
       clearLocalStorage
@@ -111,28 +119,28 @@ $ao3_red: #900;
   .ipb-toolbar {
     position: fixed;
     z-index: 99;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 100px;
+    // transform: translateY(-50%);
     right: 0;
     text-align: right;
-    height: 60px;
+    // height: 60px;
 
     .ipb-toolbar__item {
       position: absolute;
       right: 0;
       transform: translateX(100%);
-      height: 30px;
+      min-height: 30px;
       pointer-events: all;
       cursor: pointer;
       font-size: 12px;
       transition: transform 0.2s;
       opacity: 0.6;
 
-      &:hover { transform: translateX(0); opacity: 1;}
+      &:hover { transform: translateX(0); opacity: 1; z-index: 1;}
       &:active {background-color: green;}
-      & > * { vertical-align: middle; background-color: $ao3_red; }
+      & > * { vertical-align: middle; }
 
-      .ipb-icon {
+      & > .ipb-icon {
         position: absolute;
         top: 0;
         left: -30px;
@@ -140,6 +148,7 @@ $ao3_red: #900;
         width: 20px;
         border-top-left-radius: 5px;
         border-bottom-left-radius: 5px;
+        background-color: $ao3_red; 
         padding: 5px;
       }
 
@@ -151,6 +160,7 @@ $ao3_red: #900;
         white-space: nowrap;
         padding: 9px 5px 9px 0;
         line-height: 12px;
+        background-color: $ao3_red; 
       }
 
       &.bmOnOtherCh {
@@ -177,24 +187,26 @@ $ao3_red: #900;
 
           span.ipb-warning { color: #ffcdcd; white-space: nowrap; }
 
-          a {
-            cursor: pointer;
-            display: block;
-            transform: scale(0.97);
-            background-color: #eee;
-            border-radius: 10px;
-            color: #333;
-            padding: 5px 10px;
-            margin-bottom: 5px;
-            transition: transform 0.2s;
+          .ipb-btn {
             white-space: nowrap;
-            font-weight: 700;
 
-            &:hover { transform: scale(1); }
+            a {
+              font-size: 11px;
+              text-decoration: none;
+              border-bottom: none;
+              cursor: pointer;
+              margin-right: 5px;
+
+              &:hover { filter: brightness(0.95); }
+
+              button {
+                cursor: pointer;
+              } 
+            }
           }
         }
       }
-    }
+    } // .ipb-toolbar__item
   } // .ipb-toolbar
 
   .ipb-bookmark.highlight:not(.tooClose) .ipb-icon { animation: bookmarkFade 0.5s 4 alternate; }

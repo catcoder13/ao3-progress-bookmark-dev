@@ -85,7 +85,7 @@ export default {
       if (newPerc > 0 && newPerc < 1) {
         editBM.invalid = 0
         // check if cursor is too close to one of the existing perc bm
-        mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.005
+        mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.003
         editBM.chI = hoverCH
         editBM.perc = newPerc
 
