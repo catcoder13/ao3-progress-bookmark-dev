@@ -5,13 +5,19 @@ const mainBM = reactive({chI: null, perc: null, tooClose: false, chID: null, lin
 
 watch(() => work.value,
 newWork => {
-  const {chI, perc, chID} = newWork
-  mainBM.chI = chI
-  mainBM.perc = perc
-  mainBM.chID = chID
-  // mainBM.isOneShot = isOneShot
-  mainBM.link = `/works/${workId}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
-  mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+  if (!newWork) {
+    mainBM.chI = null
+    mainBM.tooClose = false
+  } else {
+    const {chI, perc, chID} = newWork
+    mainBM.chI = chI
+    mainBM.perc = perc
+    mainBM.chID = chID
+    // mainBM.isOneShot = isOneShot
+    mainBM.link = `/works/${workId}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
+    mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+  }
+  
 })
 
 const updateBookmark = (chI, perc) => {

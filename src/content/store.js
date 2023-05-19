@@ -19,6 +19,11 @@ const initStoreData = () => {
     console.log('work loaded', work.value)
     console.log('all key loaded', allWorkKeys)
   })
+
+  chrome.storage.onChanged.addListener(obj => {
+    console.log('data change', obj)
+    work.value = obj[STORE_WORK_KEY] && obj[STORE_WORK_KEY].newValue
+  })
 }
 initStoreData()
 
