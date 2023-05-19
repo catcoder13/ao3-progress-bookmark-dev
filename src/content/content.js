@@ -8,4 +8,4 @@ ao3AssistDom.classList.add('ao3-in-page-bookmark')
 
 document.querySelector('body').appendChild(ao3AssistDom)
 
-createApp(Content).mount('#ao3-in-page-bookmark')
+if (document.getElementById('workskin')) createApp(Content).mount('#ao3-in-page-bookmark')

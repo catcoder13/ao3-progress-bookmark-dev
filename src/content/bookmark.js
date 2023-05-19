@@ -1,7 +1,18 @@
-import {reactive} from 'vue'
-import { updateBookmarkStore, removeBookmarkStore, removeBookmarkStoreByWorkID } from './store'
+import {reactive, watch} from 'vue'
+import { work, updateBookmarkStore, removeBookmarkStore } from './store'
 import { workId, chapterInfos } from './static'
 const mainBM = reactive({chI: null, perc: null, tooClose: false, chID: null, link: null, fwLink: null})
+
+watch(() => work.value,
+newWork => {
+  const {chI, perc, chID} = newWork
+  mainBM.chI = chI
+  mainBM.perc = perc
+  mainBM.chID = chID
+  // mainBM.isOneShot = isOneShot
+  mainBM.link = `/works/${workId}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
+  mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+})
 
 const updateBookmark = (chI, perc) => {
   updateBookmarkStore(chI, perc, chapterInfos[chI].chID)
@@ -15,14 +26,8 @@ const updateBookmark = (chI, perc) => {
 
 const removeBookmark = () => {
   mainBM.chI = null
-  // mainBM.perc = null
   mainBM.tooClose = false
   removeBookmarkStore() // delete store record
 }
 
-const removeBookmarkByWorkID = wID => {
-  if (wID == workId) removeBookmark()
-  else removeBookmarkStoreByWorkID(wID)
-}
-
-export {updateBookmark, removeBookmark, removeBookmarkByWorkID, mainBM}
+export {updateBookmark, removeBookmark, mainBM}

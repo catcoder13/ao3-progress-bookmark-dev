@@ -1,50 +1,44 @@
-import { reactive } from "vue"
-import { workId, workName, userName, authorName, authorLink, isOneShot } from "./static"
+import { ref } from "vue"
+import { workId, workName, authorName, authorLink, isOneShot } from "./static"
 
+const STORE_WORK_KEY = `AO3_IPB_WORK_${workId}`
+const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 
-const STORAGE_KEY_PREFIX = 'AO3_IPB_'
-const STORAGE_KEY = STORAGE_KEY_PREFIX + (userName ? 'user_' + userName : 'guest')
-// get localstorage data
-const storeRaw = JSON.parse(localStorage.getItem(STORAGE_KEY)) ||
-  {works: {}} // workID -> {chI, progressValue}
+const work = ref(null)
+let allWorkKeys = []
 
+const initStoreData = () => {
+  Promise.all([
+    chrome.storage.local.get(STORE_WORK_KEY),
+    chrome.storage.local.get(STORE_ALL_WORK_KEYS)
+  ]).then(([workObj, allKeys ]) => {
+    if (workObj[STORE_WORK_KEY]) work.value = workObj[STORE_WORK_KEY]
+    else console.log('no bookmark in this work yet')
 
-const store = reactive(storeRaw)
-
-console.log('store', store)
+    allWorkKeys = allKeys[STORE_ALL_WORK_KEYS] ? allKeys[STORE_ALL_WORK_KEYS] : []
+    console.log('work loaded', work.value)
+    console.log('all key loaded', allWorkKeys)
+  })
+}
+initStoreData()
 
 const updateBookmarkStore = (chI, perc, chID) => {
-  if (!store.works[workId]) store.works[workId] = {}
-  // update local store record
-  store.works[workId] = { chI, perc, chID, workName, authorName, authorLink, isOneShot }
-  console.log('update perc bm value on local storage', store)
-  updateLocalStorage()
-  // TODO: update remote store record
+  if (!allWorkKeys.some(wID => wID === workId)) allWorkKeys.push(workId)
+
+  chrome.storage.local.set({
+    [STORE_WORK_KEY]: { chI, perc, chID, workName, authorName, authorLink, isOneShot },
+    [STORE_ALL_WORK_KEYS]: allWorkKeys
+  })
+
+  // if (!allWorkKeys.some(wID => wID === workId)) allWorkKeys.push(workId)
+  // chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: allWorkKeys})
 }
 
 const removeBookmarkStore = () => {
-  // store.works[workId] = {}
-  delete store.works[workId]
-  updateLocalStorage()
+  chrome.storage.local.remove(STORE_WORK_KEY)
 
-  // TODO: delete remote store record
+  allWorkKeys = allWorkKeys.filter(wID => wID !== workId)
+  chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: allWorkKeys})
 }
 
-const removeBookmarkStoreByWorkID = wID => {
-  // store.works[wID] = {}
-  delete store.works[wID]
-  console.log('remove by wID', store.works)
-  updateLocalStorage()
-}
-
-const updateLocalStorage = () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store))
-  console.log('localstorage updated', JSON.parse(localStorage.getItem(STORAGE_KEY)))
-}
-
-const clearLocalStorage = () => {
-  localStorage.removeItem(STORAGE_KEY)
-  console.log(localStorage.getItem(STORAGE_KEY))
-}
-
-export {store, updateBookmarkStore, removeBookmarkStore, removeBookmarkStoreByWorkID, clearLocalStorage}
+export {work, updateBookmarkStore, removeBookmarkStore}

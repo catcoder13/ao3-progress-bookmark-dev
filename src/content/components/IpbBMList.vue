@@ -17,7 +17,6 @@
             <IpbIcon type="bookmark"></IpbIcon>
             <b>Chapter {{ parseInt(chI) + 1 }} | {{ (perc * 100).toFixed(2) }}%</b>
           </div>
-          <!-- <span class="ipb-btn-title">Visit bookmarked chapter via:</span> -->
           <div class="ipb-btn">
             <a v-if="isOneShot" :href="`/works/${workID}`"><button>Entire work</button></a>
             <template v-else>
@@ -142,10 +141,6 @@ $ao3_red: #900;
         .ipb-icon { width: 15px; height: 15px;}
         
       }
-
-      // .ipb-btn-title {
-      //   padding-bottom: 5px;
-      // }
 
       .ipb-btn {
         display: flex;

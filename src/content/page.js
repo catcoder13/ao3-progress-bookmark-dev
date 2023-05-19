@@ -1,7 +1,5 @@
 import {reactive, ref} from 'vue'
-import {workId, mainContent, chapterDoms} from './static'
-import { store } from './store'
-import { mainBM } from './bookmark'
+import {mainContent, chapterDoms} from './static'
 
 let chapters = null
 const chaptersRef = {}
@@ -20,22 +18,10 @@ if (chapterDoms.length) { // multi chapter
     chaptersRef[chIndex] = reactive({ top: -1, height: 0, progress: 0, dom: ch })
   })
 } else { // one shot
-  chaptersRef[0] = reactive({ top: -1, height: 0, progress: 0, dom: mainContent.querySelector('#chapters') })
+  chaptersRef[0] = reactive({ top: -1, height: 0, progress: 0, dom: mainContent && mainContent.querySelector('#chapters') })
 }
 
 chapters = chaptersRef
-console.log('chapters', chapters)
-
-// setup existing bookmark
-if (store.works[workId]) {
-  const {chI, perc, chID, isOneShot} = store.works[workId]
-  mainBM.chI = chI
-  mainBM.perc = perc
-  mainBM.chID = chID
-  mainBM.isOneShot = isOneShot
-  mainBM.link = `/works/${workId}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
-  mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
-}
 
 const onScroll = (e, manualY) => {
   const scrollBottom = (manualY || window.scrollY) + windowSize.height
@@ -64,12 +50,13 @@ const onResize = () => {
   windowSize.height = document.documentElement.clientHeight
   const chIs = Object.keys(chapters)
   chIs.forEach(chI => {
-    const {top, height} = chapters[chI].dom.getBoundingClientRect()
+    const {top, height} = (chapters[chI].dom && chapters[chI].dom.getBoundingClientRect()) || {top: 0, height: 0}
     chapters[chI].top = window.scrollY + top
     chapters[chI].height = height
   })
 
-  mainContentTop = window.scrollY + mainContent.getBoundingClientRect().top
+  mainContentTop = window.scrollY + (mainContent ? mainContent.getBoundingClientRect().top : 0)
+  // mainContentTop = window.scrollY + mainContent.getBoundingClientRect().top
 
   onScroll()
 }

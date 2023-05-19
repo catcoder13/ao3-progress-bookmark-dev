@@ -20,9 +20,9 @@
     </div>
 
     <template v-if="hoveredChI != null">
-      <span class="ipb-desc" v-if="fullViewMode">Click to scroll to the beginning of <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+      <span class="ipb-desc" v-if="fullViewMode">Click on the bar to scroll to the beginning of <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
       <span class="ipb-desc" v-else-if="hoveredChI != curChI">Click to visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
-      <span class="ipb-desc" v-else>This page is Chapter {{ parseInt(hoveredChI) + 1 }}, click to scroll to the beginning of this chapter.</span>
+      <span class="ipb-desc" v-else>Click on the bar to scroll to the beginning of this chapter.</span>
     </template>
   </div>
 </template>
@@ -168,6 +168,8 @@ $ao3_red: #900;
       transform: translate(-50%, -50%);
       height: 100%;
       box-sizing: border-box;
+      // transition: transform 0.2s;
+      // &:hover { transform: translate(-50%, -50%) scale(1.2); }
     }
   } // chapter-progress__bar
 

@@ -60,7 +60,7 @@ export default {
   emits: ['finish'],
   components: { IpbIcon },
   setup (p, {emit}) {
-    const editBM = reactive({ y: window.innerHeight / 2, perc: 0, invalid: 0 })
+    const editBM = reactive({ y: 100, perc: 0, invalid: 0 })
 
     const onMouseMove = (e, posY = editBM.y) => {
       const clickedY = window.scrollY + posY

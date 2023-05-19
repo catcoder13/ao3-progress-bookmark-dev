@@ -2,17 +2,19 @@
 // mainContent: one-shot title, one-shot chapter section
 // chapterDoms: multiple chapter work's chapter's titles, each chapter's section
 const mainContent = document.querySelector('#workskin')
-const chapterDoms = mainContent.querySelectorAll('#chapters > .chapter')
+if (!mainContent) console.warn('not in a work page')
+
+const chapterDoms = mainContent ? mainContent.querySelectorAll('#chapters > .chapter') : []
 
 // initialise mainContent class name
 const isOneShot = chapterDoms.length === 0
-mainContent.classList.toggle('oneshot', isOneShot)
+if (mainContent) mainContent.classList.toggle('oneshot', isOneShot)
 
 // retrieve work id and chapter id(if any)
 let workId = null
-const workName = mainContent.querySelector('.title').innerText
-const authorName = mainContent.querySelector('.byline a[rel=author]').innerText
-const authorLink = mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
+const workName = mainContent && mainContent.querySelector('.title').innerText
+const authorName = mainContent && mainContent.querySelector('.byline a[rel=author]').innerText
+const authorLink = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
 
 // let chapterId = null
 let fullViewMode = false
@@ -22,7 +24,7 @@ const match2 = (window.location.href).match(/\/works\/(\d+)/)
 
 if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
   // workId not found on window.location.href, extract from dom element instead
-  workId = mainContent.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)/)[1]
+  workId = mainContent && mainContent.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)/)[1]
 } else if (match2) { // pattern: https://archiveofourown.org/works/xxxxxxxxx/...
   workId = match2[1]
 
@@ -53,18 +55,17 @@ if (chapterListElem) {
   })
 } else {
   // one shot does not have chapter id
-  chapterInfos = [{ chID: null, title: mainContent.querySelector('.title').innerText }]
+  chapterInfos = [{ chID: null, title: mainContent && mainContent.querySelector('.title').innerText }]
 }
 
 console.log(chapterInfos)
 
-// identify user or guest
-const iconHrefDom = document.querySelector('#greeting .icon a')
-const userName = iconHrefDom && iconHrefDom.getAttribute('href').split('/users/')[1].toLowerCase()
-console.log('user', userName)
+// // identify user or guest
+// const iconHrefDom = document.querySelector('#greeting .icon a')
+// const userName = iconHrefDom && iconHrefDom.getAttribute('href').split('/users/')[1].toLowerCase()
+// console.log('user', userName)
 
 export {
-  userName,
   workId, workName, fullViewMode, isOneShot,
   authorName, authorLink,
   mainContent, chapterDoms, chapterInfos

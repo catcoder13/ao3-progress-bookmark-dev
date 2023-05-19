@@ -1,4 +1,4 @@
-<template v-if="chapters">
+<template v-if="chapters && mainContent">
   <IpbNavbar :bmInProgress="bmInProgress"></IpbNavbar>
 
   <div class="ipb-toolbar" v-if="!bmInProgress">
@@ -14,8 +14,6 @@
       <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
       <div v-else class="ipb-toolbar__item-desc">
         <b>Jump to bookmark</b>
-        <!-- <span>You are currently at Chapter {{ parseInt(curChI) + 1 }}'s <b>single chapter page.</b></span> -->
-        <!-- <span class="ipb-warning">Bookmark is located at <b>Chapter {{ parseInt(mainBM.chI) + 1 }}.</b></span> -->
         <span class="ipb-warning">Visit Chapter {{ parseInt(mainBM.chI) + 1 }} bookmark via:</span>
         <div class="ipb-btn">
           <a :href="mainBM.fwLink"><button>Entire Work</button></a>
@@ -24,10 +22,10 @@
       </div>
     </div>
 
-    <div v-if="store.works" class="ipb-toolbar__item" :style="{cursor: 'default'}">
+    <!-- <div v-if="store.works" class="ipb-toolbar__item" :style="{cursor: 'default'}">
       <IpbIcon type="bookmark" fill="#FFF" :style="{backgroundColor: Object.keys(store.works).length ? '#900' : '#555'}"></IpbIcon>
       <IpbBMList :works="store.works"></IpbBMList>
-    </div>
+    </div> -->
     
   </div>
   
@@ -38,7 +36,6 @@
 
 <script>
 import {ref, computed} from 'vue'
-import {clearLocalStorage, store} from './store'
 import {chapters, curChI, onScroll} from './page'
 import { mainBM } from './bookmark'
 import { fullViewMode, mainContent } from './static'
@@ -46,16 +43,14 @@ import { fullViewMode, mainContent } from './static'
 import IpbNavbar from './components/IpbNavbar.vue'
 import IpbBookmark from './components/IpbBookmark.vue'
 import IpbEditor from './components/IpbEditor.vue'
-import IpbBMList from './components/IpbBMList.vue'
 import IpbIcon from './components/IpbIcon.vue'
 
 export default {
   name: 'App',
-  components: { IpbNavbar,IpbBMList, IpbEditor, IpbBookmark, IpbIcon },
+  components: { IpbNavbar, IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
     const bmInProgress = ref(false)
-
     const bmFocusCountDown = ref(0)
 
     const toggleBookmarkEdit = e => {
@@ -84,7 +79,8 @@ export default {
       }
       const {top, height} = chapters[mainBM.chI]
       const bmPos = top + height * mainBM.perc
-      const targetScroll = bmPos - window.innerHeight / 2 + 90
+      // const targetScroll = bmPos - window.innerHeight / 2 + 90
+      const targetScroll = bmPos - window.innerHeight / 2
 
       window.scrollTo({top: targetScroll, behavior: 'smooth'})
       // if (bmPos > window.scrollY && bmPos < window.scrollY + window.innerHeight) {
@@ -100,10 +96,9 @@ export default {
     }
 
     return {
-      chapters, mainBM, curChI, store, bmFocusCountDown, fullViewMode,
-      showToolbar, bmInProgress, canShowBookmark,
-      toggleBookmarkEdit, onBookmarkEnd, jumpToBookmark,
-      clearLocalStorage
+      chapters, mainBM, curChI, bmFocusCountDown, fullViewMode,
+      showToolbar, bmInProgress, canShowBookmark, mainContent,
+      toggleBookmarkEdit, onBookmarkEnd, jumpToBookmark
     }
   }
 }
@@ -120,10 +115,8 @@ $ao3_red: #900;
     position: fixed;
     z-index: 99;
     top: 100px;
-    // transform: translateY(-50%);
     right: 0;
     text-align: right;
-    // height: 60px;
 
     .ipb-toolbar__item {
       position: absolute;
