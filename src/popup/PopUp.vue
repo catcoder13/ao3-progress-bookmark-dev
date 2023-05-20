@@ -12,16 +12,16 @@
         <div class="ipb-bm-list__item" v-for="({workName, authorName, authorLink, chI, chID, perc, isOneShot}, workID) in works" :key="workID">
           <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(workID)">&#10006;</span>
           <b class="ipb-bm-list__item__title">{{ workName }}</b>
-          <span class="ipb-author">by <a :href="authorLink">{{ authorName }}</a></span>
+          <span class="ipb-author">by <a @click="() => visitURL(authorLink)">{{ authorName }}</a></span>
           <div class="ipb-bm-record">
             <IpbIcon type="bookmark"></IpbIcon>
             <b>Chapter {{ parseInt(chI) + 1 }} | {{ (perc * 100).toFixed(2) }}%</b>
           </div>
           <div class="ipb-btn">
-            <a v-if="isOneShot" :href="`/works/${workID}`"><button>Entire work</button></a>
+            <button v-if="isOneShot" @click="() => visitURL(`/works/${workID}`)">Entire work</button>
             <template v-else>
-              <a :href="`/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`"><button>Entire work</button></a>
-              <a :href="`/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`"><button>Chapter by chapter</button></a>
+              <button @click="() => visitURL(`/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`)">Entire work</button>
+              <button @click="() => visitURL(`/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`)">Chapter by chapter</button>
             </template>
           </div>
         </div>
@@ -33,14 +33,23 @@
 
 <script>
 import IpbIcon from '@/content/components/IpbIcon.vue'
-
 import {works, removeWork, clearChromeStorage} from './works'
+
+const AO3_DOMAIN = "https://archiveofourown.org"
 
 export default {
   name: 'App',
   components: {IpbIcon},
   setup () {
-    return {works, removeWork, clearChromeStorage}
+    const visitURL = subURL => {
+      chrome.runtime.sendMessage(
+        {type: 'tab', url: AO3_DOMAIN + subURL},
+        res => {
+          console.log(res)
+        }
+      )
+    }
+    return {works, removeWork, visitURL, clearChromeStorage}
   }
 }
 </script>
@@ -136,6 +145,7 @@ body {
           color: #166fce;
           text-decoration: none;
           border-bottom: 1px dashed #166fce;
+          cursor: pointer;
 
           &:hover { border-bottom: 1px solid #166fce; }
         }
@@ -151,16 +161,12 @@ body {
         display: flex;
         font-size: 11px;
 
-        a {
-          text-decoration: none;
-          border-bottom: none;
+        button {
           margin-right: 5px;
+          cursor: pointer;
 
           &:hover {filter: brightness(0.95)};
-
-          button { cursor: pointer; }
         }
-        
       }
     }
   }

@@ -3,7 +3,7 @@
   <div title="Click to remove bookmark" class="ipb-bookmark__icon" @click="removeBookmark">
     <IpbIcon type="location"></IpbIcon>
   </div>
-  <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}}<br />{{ (mainBM.perc * 100).toFixed(2) }}%</span>
+  <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
 </div>
 </template>
 
@@ -35,21 +35,21 @@ $ao3_red: #900;
   transform: translate(-50%, -50%);
 
   &.tooClose {
-    &::before { display: block; }
+    // &::before { display: block; }
 
     .ipb-bookmark__icon::before { opacity: 1; }
     &.bmInProgress .ipb-bookmark__icon .ipb-icon { opacity: 0.3; }
   }
 
-  &::before {
-    content: '';
-    position: absolute;
-    right: 15px;
-    width: 70px;
-    display: none;
-    border-bottom: 2px dashed $ao3_red;
-    opacity: 0.5;
-  }
+  // &::before {
+  //   content: '';
+  //   position: absolute;
+  //   right: 15px;
+  //   width: 70px;
+  //   display: none;
+  //   border-bottom: 2px dashed $ao3_red;
+  //   opacity: 0.5;
+  // }
 
   &.bmInProgress .ipb-bookmark__icon .ipb-icon { opacity: 1; }
 

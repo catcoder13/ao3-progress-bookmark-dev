@@ -1,7 +1,10 @@
-import {reactive, watch} from 'vue'
+import {ref, reactive, watch} from 'vue'
 import { work, updateBookmarkStore, removeBookmarkStore } from './store'
 import { workId, chapterInfos } from './static'
+
 const mainBM = reactive({chI: null, perc: null, tooClose: false, chID: null, link: null, fwLink: null})
+
+const bmInProgress = ref(false)
 
 watch(() => work.value,
 newWork => {
@@ -36,4 +39,4 @@ const removeBookmark = () => {
   removeBookmarkStore() // delete store record
 }
 
-export {updateBookmark, removeBookmark, mainBM}
+export { updateBookmark, removeBookmark, mainBM, bmInProgress }

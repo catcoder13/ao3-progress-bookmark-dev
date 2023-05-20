@@ -4,7 +4,7 @@
       <template v-if="editBM.invalid">
         <span class="ipb-editor__window__header">Out of bookmark region</span>
         <div class="ipb-editor__window__button-group">
-            <span class="done" @click="onPercBMDoneClick">Done</span>
+            <span class="done" @click="onPercBMDoneClick">Cancel</span>
         </div>
         <span class="ipb-editor__window__remark">-</span>
       </template>
@@ -14,8 +14,8 @@
         <template v-if="mainBM.tooClose">
           <span class="ipb-editor__window__header">Remove bookmark</span>
           <div class="ipb-editor__window__button-group">
-            <span class="add" @click="onPercBookmarkRemoveClick">Remove</span>
-            <span class="done" @click="onPercBMDoneClick">Done</span>
+            <!-- <span class="add" @click="onPercBookmarkRemoveClick">Remove</span> -->
+            <span class="done" @click="onPercBMDoneClick">Cancel</span>
           </div>
           <div class="ipb-editor__window__remark">
             <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
@@ -25,8 +25,8 @@
         <template v-else>
           <span class="ipb-editor__window__header">Change bookmark location</span>
           <div class="ipb-editor__window__button-group">
-            <span class="add" @click="onPercBMAddClick">Change</span>
-            <span class="done" @click="onPercBMDoneClick">Done</span>
+            <!-- <span class="add" @click="onPercBMAddClick">Change</span> -->
+            <span class="done" @click="onPercBMDoneClick">Cancel</span>
           </div>
           <div class="ipb-editor__window__remark">
             <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
@@ -38,14 +38,14 @@
       <template v-else>
         <span class="ipb-editor__window__header">Add a new bookmark</span>
         <div class="ipb-editor__window__button-group">
-            <span class="add" @click="onPercBMAddClick">Add</span>
-            <span class="done" @click="onPercBMDoneClick">Done</span>
+            <!-- <span class="add" @click="onPercBMAddClick">Add</span> -->
+            <span class="done" @click="onPercBMDoneClick">Cancel</span>
         </div>
         <span class="ipb-editor__window__remark">New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
       </template>
     </div>
     
-    <div class="ipb-editor__mark"><IpbIcon type="location"></IpbIcon></div>
+    <div class="ipb-editor__mark" @click="onPercBMAddClick"><IpbIcon type="location"></IpbIcon></div>
   </div>
 </template>
 
@@ -98,20 +98,19 @@ export default {
     watch(() => mousePos.y, newPosY => onMouseMove(null, newPosY))
 
     onMounted(() => {
-      console.log('on mounted')
       document.addEventListener('scroll', onMouseMove)
       onMouseMove()
     }) // on mounted
 
     onUnmounted(() => {
-      console.log('on unmounted')
-      mainBM.tooClose = false
       document.removeEventListener('scroll', onMouseMove)
+      mainBM.tooClose = false
     })
 
     const onPercBMAddClick = () => {
       if (editBM.invalid || mainBM.tooClose) return
-      updateBookmark(editBM.chI, editBM.perc)
+      updateBookmark(editBM.chI, editBM.perc.toFixed(5))
+      onPercBMDoneClick()
     }
 
     const onPercBookmarkRemoveClick = () => {
@@ -120,9 +119,9 @@ export default {
     }
 
     const onPercBMDoneClick = () => {
-      mainBM.tooClose = false
-      document.removeEventListener('mousemove', onMouseMove)
+      // document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('scroll', onMouseMove)
+      mainBM.tooClose = false
       emit('finish')
     }
 
@@ -149,7 +148,7 @@ $ao3_red: #900;
 
 .ipb-editor {
   position: fixed;
-  z-index: 2;
+  z-index: 100;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -186,26 +185,27 @@ $ao3_red: #900;
     }
   }
 
-  &::before {
-    content: '';
-    position: absolute;
-    width: 70px;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 20px;
-    display: block;
-    border-bottom: 2px dashed $ao3_red;
-    pointer-events: none;
-    
-  }
+  // &::before {
+  //   content: '';
+  //   position: absolute;
+  //   width: 70px;
+  //   top: 50%;
+  //   transform: translateY(-50%);
+  //   right: 20px;
+  //   display: block;
+  //   border-bottom: 2px dashed $ao3_red;
+  //   pointer-events: none;
+  // }
 
   .ipb-editor__mark {
     position: absolute;
     top: 50%;
-    right: 0;
+    right: -8px;
     transform: translateY(-50%);
-    width: 25px;
-    height: 25px;
+    width: 40px;
+    height: 40px;
+    pointer-events: all;
+    cursor: pointer;
     
     .ipb-icon {
       position: absolute;

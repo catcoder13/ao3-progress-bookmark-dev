@@ -1,6 +1,5 @@
 <template v-if="chapters && mainContent">
-  <IpbNavbar :bmInProgress="bmInProgress"></IpbNavbar>
-
+  <!-- <IpbNavbar :bmInProgress="bmInProgress"></IpbNavbar> -->
   <div class="ipb-toolbar" v-if="!bmInProgress">
 
     <div class="ipb-toolbar__item" @click="toggleBookmarkEdit" :style="{top: 'calc(30px + 4px)'}">
@@ -14,19 +13,13 @@
       <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
       <div v-else class="ipb-toolbar__item-desc">
         <b>Jump to bookmark</b>
-        <span class="ipb-warning">Visit Chapter {{ parseInt(mainBM.chI) + 1 }} bookmark via:</span>
+        <span class="ipb-warning">Locate bookmark at chapter {{ parseInt(mainBM.chI) + 1 }} via:</span>
         <div class="ipb-btn">
           <a :href="mainBM.fwLink"><button>Entire Work</button></a>
           <a :href="mainBM.link"><button>Chapter by chapter</button></a>
         </div>
       </div>
     </div>
-
-    <!-- <div v-if="store.works" class="ipb-toolbar__item" :style="{cursor: 'default'}">
-      <IpbIcon type="bookmark" fill="#FFF" :style="{backgroundColor: Object.keys(store.works).length ? '#900' : '#555'}"></IpbIcon>
-      <IpbBMList :works="store.works"></IpbBMList>
-    </div> -->
-    
   </div>
   
   <IpbEditor v-if="bmInProgress" :chapters="chapters" @finish="onBookmarkEnd"></IpbEditor>
@@ -36,26 +29,35 @@
 
 <script>
 import {ref, computed} from 'vue'
-import {chapters, curChI, onScroll} from './page'
-import { mainBM } from './bookmark'
+import {chapters, curChI, onScroll, view} from './page'
+import { mainBM, bmInProgress } from './bookmark'
 import { fullViewMode, mainContent } from './static'
 
-import IpbNavbar from './components/IpbNavbar.vue'
+// import IpbNavbar from './components/IpbNavbar.vue'
 import IpbBookmark from './components/IpbBookmark.vue'
 import IpbEditor from './components/IpbEditor.vue'
 import IpbIcon from './components/IpbIcon.vue'
 
 export default {
   name: 'App',
-  components: { IpbNavbar, IpbEditor, IpbBookmark, IpbIcon },
+  components: {
+    // IpbNavbar,
+    IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
-    const bmInProgress = ref(false)
+    // const bmInProgress = ref(false)
     const bmFocusCountDown = ref(0)
 
     const toggleBookmarkEdit = e => {
       bmInProgress.value = !bmInProgress.value
       mainContent.classList.toggle('bmInProgress', bmInProgress.value)
+
+      const bmAreaTop = chapters[Object.keys(chapters)[0]].dom.getBoundingClientRect().y
+      console.log('bmAreaTop', bmAreaTop)
+      if (bmAreaTop > window.innerHeight / 2) {
+        window.scrollTo({ top: window.scrollY + bmAreaTop - window.innerHeight / 2, behavior: 'smooth' })
+      }
+      
     } // toggleBookmarkEdit
 
     const onBookmarkEnd = () => {

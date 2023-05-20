@@ -58,7 +58,7 @@ if (chapterListElem) {
   chapterInfos = [{ chID: null, title: mainContent && mainContent.querySelector('.title').innerText }]
 }
 
-console.log(chapterInfos)
+// console.log(chapterInfos)
 
 // // identify user or guest
 // const iconHrefDom = document.querySelector('#greeting .icon a')

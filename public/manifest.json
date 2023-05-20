@@ -6,19 +6,16 @@
   "icons":  {
     "128": "imgs/bavy_w.png"
   },
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["storage"],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "128": "imgs/bavy.png"
+      "128": "imgs/bavy_w.png"
     }
   },
-  "host_permissions": [
-    "https://archiveofourown.org/works/*"
-  ],
   "content_scripts": [
     {
       "matches": [
