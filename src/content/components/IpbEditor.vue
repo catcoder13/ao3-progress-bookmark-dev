@@ -1,66 +1,33 @@
 <template>
   <div class="ipb-editor" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
-    <div class="ipb-editor__window">
-      <template v-if="editBM.invalid">
-        <span class="ipb-editor__window__header">Out of bookmark region</span>
-        <div class="ipb-editor__window__button-group">
-            <span class="done" @click="onPercBMDoneClick">Cancel</span>
-        </div>
-        <span class="ipb-editor__window__remark">-</span>
-      </template>
-      
-      <template v-else-if="mainBM.chI != null">
-
-        <template v-if="mainBM.tooClose">
-          <span class="ipb-editor__window__header">Remove bookmark</span>
-          <div class="ipb-editor__window__button-group">
-            <!-- <span class="add" @click="onPercBookmarkRemoveClick">Remove</span> -->
-            <span class="done" @click="onPercBMDoneClick">Cancel</span>
-          </div>
-          <div class="ipb-editor__window__remark">
-            <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-          </div>
-        </template>
-
-        <template v-else>
-          <span class="ipb-editor__window__header">Change bookmark location</span>
-          <div class="ipb-editor__window__button-group">
-            <!-- <span class="add" @click="onPercBMAddClick">Change</span> -->
-            <span class="done" @click="onPercBMDoneClick">Cancel</span>
-          </div>
-          <div class="ipb-editor__window__remark">
-            <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-            <span>New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
-          </div>
-        </template>
-      </template>
-      
-      <template v-else>
-        <span class="ipb-editor__window__header">Add a new bookmark</span>
-        <div class="ipb-editor__window__button-group">
-            <!-- <span class="add" @click="onPercBMAddClick">Add</span> -->
-            <span class="done" @click="onPercBMDoneClick">Cancel</span>
-        </div>
-        <span class="ipb-editor__window__remark">New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
-      </template>
+    <div class="ipb-editor__button-group">
+        <span class="done" @click="onPercBMDoneClick">Cancel</span>
     </div>
-    
+
+    <div class="ipb-editor__remark">
+      <span v-if="editBM.invalid">Out of bookmark region</span>
+      <template v-else-if="mainBM.chI != null">
+        <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+        <span>New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
+      </template>
+      <span v-else :style="{opacity: 0.6}">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+    </div>
+
     <div class="ipb-editor__mark" @click="onPercBMAddClick"><IpbIcon type="location"></IpbIcon></div>
   </div>
 </template>
 
 <script>
 import { onMounted, onUnmounted, watch, reactive } from 'vue'
-import { updateBookmark, removeBookmark, mainBM } from '../bookmark'
+import { updateBookmark, onBookmarkEnd, mainBM } from '../bookmark'
 import { mousePos } from '../mousePos'
 import IpbIcon from './IpbIcon.vue'
 
 export default {
   props: ['chapters'],
-  emits: ['finish'],
   components: { IpbIcon },
   setup (p, {emit}) {
-    const editBM = reactive({ y: 100, perc: 0, invalid: 0 })
+    const editBM = reactive({ y: mousePos.y, perc: 0, invalid: 0 })
 
     const onMouseMove = (e, posY = editBM.y) => {
       const clickedY = window.scrollY + posY
@@ -85,12 +52,11 @@ export default {
       if (newPerc > 0 && newPerc < 1) {
         editBM.invalid = 0
         // check if cursor is too close to one of the existing perc bm
-        mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.003
+        // mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.003
         editBM.chI = hoverCH
         editBM.perc = newPerc
 
       } else { // exceed bookmark area
-        mainBM.tooClose = false
         editBM.invalid = 1
       }
     } // onMouseMove
@@ -104,37 +70,29 @@ export default {
 
     onUnmounted(() => {
       document.removeEventListener('scroll', onMouseMove)
-      mainBM.tooClose = false
     })
 
     const onPercBMAddClick = () => {
-      if (editBM.invalid || mainBM.tooClose) return
+      if (editBM.invalid) return
       updateBookmark(editBM.chI, editBM.perc.toFixed(5))
       onPercBMDoneClick()
     }
 
-    const onPercBookmarkRemoveClick = () => {
-      if (!mainBM.tooClose) return
-      removeBookmark()
-    }
 
     const onPercBMDoneClick = () => {
-      // document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('scroll', onMouseMove)
-      mainBM.tooClose = false
-      emit('finish')
+      onBookmarkEnd()
     }
 
     const percBookmarkIndicatorClass = () => {
       return {
-        'outOfRange': editBM.invalid === 1,
-        'tooCloseToBM': mainBM.tooClose
+        'outOfRange': editBM.invalid === 1
       }
     }
 
     return { 
       editBM, mainBM,
-      onPercBMAddClick, onPercBookmarkRemoveClick, onPercBMDoneClick, percBookmarkIndicatorClass
+      onPercBMAddClick, onPercBMDoneClick, percBookmarkIndicatorClass
     }
   }
 }
@@ -162,9 +120,7 @@ $ao3_red: #900;
   pointer-events: none;
 
   &.outOfRange > div { background-color: rgba(grey, 0.5);}
-  &.outOfRange,
-  &.tooCloseToBM {
-    &::before,
+  &.outOfRange {
     .ipb-editor__mark { display: none;}
   }
 
@@ -184,18 +140,6 @@ $ao3_red: #900;
       padding-bottom: 5px;
     }
   }
-
-  // &::before {
-  //   content: '';
-  //   position: absolute;
-  //   width: 70px;
-  //   top: 50%;
-  //   transform: translateY(-50%);
-  //   right: 20px;
-  //   display: block;
-  //   border-bottom: 2px dashed $ao3_red;
-  //   pointer-events: none;
-  // }
 
   .ipb-editor__mark {
     position: absolute;

@@ -1,39 +1,34 @@
 <template>
-  <div class="ipb-navbar-content" ref="navbarElemRef">
-  <!-- <div class="ipb-navbar" :style="navbarStyle"> -->
-      <div :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
-        @click="() => jumpToChapter(chI)" @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
-        <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${chapters[chI].progress}%`}"></span>
-        <template v-if="mainBM.chI != null && mainBM.chI == chI">
-          <IpbIcon class="ipb-navbar__bar__bm" type="location" fill="#000" :style="{left: `${mainBM.perc * 100}%`}"></IpbIcon>
-        </template>
-      </div>
-    <!-- </div> -->
-
-    <!-- <div v-if="infoPos != null" class="ipb-navbar-info" :style="{top: `${infoPos.y}px`, left: `${infoPos.x}px`, opacity: hoveredChI != null ? 1 : 0.9 }"> -->
-    <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="{left: `${infoPosX}px`}">
+  <div class="ipb-navbar-content" ref="navbarElemRef" :class="{stucked}">
+    
+    <div :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
+      @click="() => jumpToChapter(chI)" @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
+      <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${chapters[chI].progress}%`}"></span>
+      <template v-if="mainBM.chI != null && mainBM.chI == chI">
+        <IpbIcon class="ipb-navbar__bar__bm" type="location" fill="#000" :style="{left: `${mainBM.perc * 100}%`}"></IpbIcon>
+      </template>
+    </div>
+      
+    <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPosX">
       <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
       <div class="ipb-heading">
         <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI"></IpbIcon>
         <b>Chapter {{ parseInt(approxChI) + 1 }}</b>
       </div>
-      <!-- <b class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b> -->
-      <span v-if="approxChI != null" class="ipb-title">{{ navbarTitle(approxChI) }}</span>
       
-      <!-- <div class="ipb-bm-note" v-if="mainBM.chI != null && mainBM.chI == approxChI">
-        <IpbIcon @click="() => jumpToChapter(mainBM.chI)"></IpbIcon>
-        <span>Bookmarked at {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-      </div> -->
+      <span v-if="approxChI != null" class="ipb-title">{{ navbarTitle(approxChI) }}</span>
 
       <template v-if="hoveredChI != null">
-        <span class="ipb-desc" v-if="fullViewMode">Click to scroll to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
-        <span class="ipb-desc" v-else-if="hoveredChI != curChI">Click to visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
-        <span class="ipb-desc" v-else>Click to scroll to the top</span>
+        <span class="ipb-desc" v-if="fullViewMode">Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+        <span class="ipb-desc" v-else-if="hoveredChI != curChI">Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+        <span class="ipb-desc" v-else>Back to the top</span>
       </template>
     </div>
-    <div v-else-if="approxChI != null" class="ipb-navbar-info ipb-navbar-info--short" :style="{ left: `${infoPosX}px`}">
+
+    <div v-else-if="approxChI != null" class="ipb-navbar-info ipb-navbar-info--short" :style="infoPosX">
       <b class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
     </div>
+
   </div>
 </template>
 
@@ -76,10 +71,9 @@ export default {
     const infoPosX = computed(() => {
       if (bmInProgress.value || approxChI.value == null) return null
       
-      const xPos = approxChI.value * navbarElem.barWidth
       const infoWidthOffset = hoveredChI.value == null ? 70 : 200
-
-      return xPos + infoWidthOffset > navbarElem.width ? navbarElem.width - infoWidthOffset : xPos
+      const xPosCorrect = mousePos.x + infoWidthOffset > view.width ? view.width - infoWidthOffset : mousePos.x
+      return {top: `${mousePos.y + 22}px`, left: `${xPosCorrect}px`}
     })
 
     const navbarBarClass = chI => {
@@ -88,7 +82,7 @@ export default {
         "has-bm": mainBM.chI && mainBM.chI == chI,
         "ipb-focus": approxChI.value == chI,
         'ipb-one-chapter-only': chapterInfos.length === 1,
-        'ipb-current': curChI.value == chI && chapters[curChI.value].progress > 0 && chapters[curChI.value].progress < 100
+        'ipb-current': curChI.value == chI
       }
     }
 
@@ -103,7 +97,7 @@ export default {
     const jumpToChapter = chI => {
       if (fullViewMode || approxChI.value == curChI.value) {
         const targetScroll = chapters[chI].top;
-        window.scrollTo({ top: targetScroll, behavior: "smooth" })
+        window.scrollTo({ top: targetScroll })
         // if (chapters[chI].top > window.scrollY && chapters[chI].top < window.scrollY + window.innerHeight) {
         //   window.scrollTo({top: targetScroll, behavior: 'smooth'})
         // } else window.scrollTo({top: targetScroll})
@@ -137,7 +131,7 @@ export default {
 
     return {
       chapters, chapterInfos, curChI, approxChI, hoveredChI,
-      infoPosX, mainBM, fullViewMode, navbarElemRef,
+      infoPosX, mainBM, fullViewMode, navbarElemRef, stucked,
       navbarBarClass, navbarTitle, jumpToChapter
     }
   }
@@ -159,6 +153,17 @@ $ao3_red: #900;
 
 .ipb-navbar-content {
   display: flex;
+  background: linear-gradient(to bottom, rgba(#FFF, 1) 20%, rgba(#FFF, 0) 100%);
+  
+  &.stucked .ipb-navbar__bar {
+    opacity: 1;
+
+    &:not(.ipb-one-chapter-only).ipb-current {
+      height: 8px;
+
+      &.ipb-focus { height: 17px; }
+    }
+  }
 
   .ipb-navbar__bar {
     position: relative;
@@ -169,12 +174,7 @@ $ao3_red: #900;
     flex: 1;
     background-color: $bar_color;
     transition: flex 0.5s height 0.2s filter 0.2s;
-
-    &.ipb-current:not(.ipb-one-chapter-only) {
-      height: 8px;
-
-      &.ipb-focus { height: 17px; }
-    }
+    opacity: 0.5;
 
     &:not(:last-child) { border-right: 1px solid #FFF; }
 
@@ -183,6 +183,7 @@ $ao3_red: #900;
     &.ipb-focus {
       height: 17px;
       cursor: pointer;
+      opacity: 1;
 
       &:hover { flex: 200px; z-index: 999999; }
     }
@@ -199,8 +200,8 @@ $ao3_red: #900;
 
     .ipb-navbar__bar__bm {
       position: absolute;
-      top: 50%;
-      transform: translate(-50%, -50%);
+      top: 1px;
+      transform: translateX(-50%);
       height: 100%;
       box-sizing: border-box;
       pointer-events: none;
@@ -220,8 +221,8 @@ $ao3_red: #900;
 } 
 
 .ipb-navbar-info {
-  position: absolute;
-  top: 40px;
+  position: fixed;
+  // top: 40px;
   z-index: 100;
   background-color: #eee;
   padding: 10px;

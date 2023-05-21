@@ -1,15 +1,23 @@
 <template>
-<div class="ipb-bookmark" :class="{tooClose: mainBM.tooClose}" :style="{top: `${pos}px`}">
-  <div title="Click to remove bookmark" class="ipb-bookmark__icon" @click="removeBookmark">
-    <IpbIcon type="location"></IpbIcon>
+<div class="ipb-bookmark" :style="{top: `${pos}px`}">
+  <div class="ipb-bookmark-content">
+    <div class="ipb-bookmark__icon" @click="onMoveClick">
+      <IpbIcon type="location" fill="" ></IpbIcon>
+    </div>
+
+    <div class="ipb-bookmark__btn">
+      <button @click="removeBookmark">Remove</button>
+    </div>
+
+    <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>  
   </div>
-  <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
 </div>
 </template>
 
 <script>
-import {mainBM, removeBookmark} from '../bookmark'
 import { computed } from 'vue'
+import {mainBM, removeBookmark, toggleBookmarkEdit} from '../bookmark'
+
 import IpbIcon from './IpbIcon.vue'
 
 export default {
@@ -18,7 +26,10 @@ export default {
   setup (p) {
     const pos = computed(() => p.chapters[mainBM.chI].top + p.chapters[mainBM.chI].height * mainBM.perc)
 
-    return {mainBM, pos, removeBookmark}
+    const onMoveClick = () => {
+      toggleBookmarkEdit(p.chapters)
+    }
+    return {mainBM, pos, onMoveClick, removeBookmark}
   }
 }
 </script>
@@ -34,86 +45,94 @@ $ao3_red: #900;
   left: 50%;
   transform: translate(-50%, -50%);
 
-  &.tooClose {
-    // &::before { display: block; }
+  &.bmInProgress.ipb-bookmark { opacity: 0.3; pointer-events: none; }
 
-    .ipb-bookmark__icon::before { opacity: 1; }
-    &.bmInProgress .ipb-bookmark__icon .ipb-icon { opacity: 0.3; }
+  .ipb-bookmark-content {
+    position: absolute;
+    top: -17px;
+    right: 0;
+
+    .ipb-bookmark__icon {
+      position: relative;
+      cursor: pointer;
+      width: 25px;
+      height: 25px;
+      margin: 5px;
+
+      .ipb-icon {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.2s;
+        
+        path { 
+          fill: $ao3_red;
+          transition: fill 0.2s;
+        }
+
+        &:hover { transform: scale(1.2); }
+      }
+    }
+
+    &:hover {
+      .ipb-icon path { fill: #FFF; }
+
+      .ipb-bookmark__info { display: block; }
+
+      .ipb-bookmark__btn {
+        max-width: 500px;
+        opacity: 1;
+      }
+    }
   }
 
-  // &::before {
-  //   content: '';
-  //   position: absolute;
-  //   right: 15px;
-  //   width: 70px;
-  //   display: none;
-  //   border-bottom: 2px dashed $ao3_red;
-  //   opacity: 0.5;
-  // }
-
-  &.bmInProgress .ipb-bookmark__icon .ipb-icon { opacity: 1; }
-
-  .ipb-bookmark__icon {
+  .ipb-bookmark__btn {
     position: absolute;
+    z-index: -1;
+    top: 0;
     right: 0;
-    transform: translateY(-50%);
-    z-index: 1;
-    width: 25px;
-    height: 25px;
-    cursor: pointer;
     overflow: hidden;
-    
-    .ipb-icon {
-      width: 100%;
-      height: 100%;
-      opacity: 0.3; 
-      transition: opacity 0.2s;
-    }
-    
-    &::before {
-      content: '\2613';
-      position: absolute;
-      top: 0;
-      left: 4px;
-      color: $ao3_red;
-      text-shadow: 0px 0px 3px #FFF;
-      font-size: 25px;
-      font-weight: 700;
-      line-height: 1;
-      opacity: 0;
-    }
-    
-    &:hover {
-      // .ipb-icon { opacity: 1; }
+    white-space: nowrap;
+    background-color: #900;
+    padding: 5px 35px 5px 5px;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    opacity: 0;
+    max-width: 0;
+    transition: opacity 0.5s, max-width 0.5s;
 
-      &::before {  opacity: 1; }
-      
-      & ~ .ipb-bookmark__info {display: block;}
+    button {
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      margin-right: 5px;
     }
   }
 
   .ipb-bookmark__info {
     display: none;
-    right: 0;
     position: absolute;
     font-size: 12px;
-    background-color: #cccccc;
-    padding: 2px 4px;
-    top: 23px;
-    text-align: right;
+    background-color: #ddd;
+    top: 40px;
+    right: 0;
+    white-space: nowrap;
+    padding: 4px 8px;
 
     &::before {
       content: '';
       position: absolute;
-      right: 6px;
+      right: 8px;
       top: -5px;
       width: 0; 
       height: 0; 
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-bottom: 6px solid #cccccc;
+      border-bottom: 6px solid #ddd;
     }
   }
+
+  
 }
 
 </style>

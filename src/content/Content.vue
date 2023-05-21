@@ -1,8 +1,7 @@
-<template v-if="chapters && mainContent">
-  <!-- <IpbNavbar :bmInProgress="bmInProgress"></IpbNavbar> -->
+<template v-if="chapters">
   <div class="ipb-toolbar" v-if="!bmInProgress">
 
-    <div class="ipb-toolbar__item" @click="toggleBookmarkEdit" :style="{top: 'calc(30px + 4px)'}">
+    <div class="ipb-toolbar__item" @click="() => toggleBookmarkEdit(chapters)" :style="{top: 'calc(30px + 4px)'}">
       <IpbIcon type="location" fill="#FFF"></IpbIcon>
       <b class="ipb-toolbar__item-desc">{{mainBM.chI ? 'Change bookmark location' : 'Add a new bookmark'}}</b>
     </div>
@@ -22,18 +21,17 @@
     </div>
   </div>
   
-  <IpbEditor v-if="bmInProgress" :chapters="chapters" @finish="onBookmarkEnd"></IpbEditor>
+  <IpbEditor v-if="bmInProgress" :chapters="chapters"></IpbEditor>
   
   <IpbBookmark :class="{highlight: bmFocusCountDown, bmInProgress}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
 </template>
 
 <script>
 import {ref, computed} from 'vue'
-import {chapters, curChI, onScroll, view} from './page'
-import { mainBM, bmInProgress } from './bookmark'
+import {chapters, curChI, onScroll} from './page'
+import { mainBM, bmInProgress, toggleBookmarkEdit } from './bookmark'
 import { fullViewMode, mainContent } from './static'
 
-// import IpbNavbar from './components/IpbNavbar.vue'
 import IpbBookmark from './components/IpbBookmark.vue'
 import IpbEditor from './components/IpbEditor.vue'
 import IpbIcon from './components/IpbIcon.vue'
@@ -45,26 +43,7 @@ export default {
     IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
-    // const bmInProgress = ref(false)
     const bmFocusCountDown = ref(0)
-
-    const toggleBookmarkEdit = e => {
-      bmInProgress.value = !bmInProgress.value
-      mainContent.classList.toggle('bmInProgress', bmInProgress.value)
-
-      const bmAreaTop = chapters[Object.keys(chapters)[0]].dom.getBoundingClientRect().y
-      console.log('bmAreaTop', bmAreaTop)
-      if (bmAreaTop > window.innerHeight / 2) {
-        window.scrollTo({ top: window.scrollY + bmAreaTop - window.innerHeight / 2, behavior: 'smooth' })
-      }
-      
-    } // toggleBookmarkEdit
-
-    const onBookmarkEnd = () => {
-      console.log('on bookmark end')
-      mainContent.classList.toggle('bmInProgress', false)
-      bmInProgress.value = false
-    }
 
     const canShowBookmark = computed(() => {
       if (!mainBM.chI) return false
@@ -81,10 +60,9 @@ export default {
       }
       const {top, height} = chapters[mainBM.chI]
       const bmPos = top + height * mainBM.perc
-      // const targetScroll = bmPos - window.innerHeight / 2 + 90
       const targetScroll = bmPos - window.innerHeight / 2
 
-      window.scrollTo({top: targetScroll, behavior: 'smooth'})
+      window.scrollTo({top: targetScroll })
       // if (bmPos > window.scrollY && bmPos < window.scrollY + window.innerHeight) {
       //   window.scrollTo({top: targetScroll, behavior: 'smooth'})
       // } else window.scrollTo({top: targetScroll})
@@ -100,7 +78,7 @@ export default {
     return {
       chapters, mainBM, curChI, bmFocusCountDown, fullViewMode,
       showToolbar, bmInProgress, canShowBookmark, mainContent,
-      toggleBookmarkEdit, onBookmarkEnd, jumpToBookmark
+      toggleBookmarkEdit, jumpToBookmark
     }
   }
 }
@@ -203,8 +181,6 @@ $ao3_red: #900;
       }
     } // .ipb-toolbar__item
   } // .ipb-toolbar
-
-  .ipb-bookmark.highlight:not(.tooClose) .ipb-icon { animation: bookmarkFade 0.5s 4 alternate; }
 } // ao3-in-page-bookmark
 
 #workskin {
@@ -218,15 +194,15 @@ $ao3_red: #900;
   }
 }
 
-@keyframes bookmarkFade {
-  0% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
+// @keyframes bookmarkFade {
+//   0% {
+//     opacity: 0.3;
+//     transform: scale(1);
+//   }
 
-  100% {
-    opacity: 1;
-    transform: scale(0.9);
-  }
-}
+//   100% {
+//     opacity: 1;
+//     transform: scale(0.9);
+//   }
+// }
 </style>
