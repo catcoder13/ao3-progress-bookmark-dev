@@ -47,6 +47,8 @@ $ao3_red: #900;
 
   &.bmInProgress.ipb-bookmark { opacity: 0.3; pointer-events: none; }
 
+  &.highlight .ipb-bookmark__icon { animation: bookmarkFade 0.3s 4 alternate; }
+
   .ipb-bookmark-content {
     position: absolute;
     top: -17px;
@@ -67,7 +69,7 @@ $ao3_red: #900;
         
         path { 
           fill: $ao3_red;
-          transition: fill 0.2s;
+          // transition: fill 0.2s;
         }
 
         &:hover { transform: scale(1.2); }
@@ -75,7 +77,7 @@ $ao3_red: #900;
     }
 
     &:hover {
-      .ipb-icon path { fill: #FFF; }
+      // .ipb-icon path { fill: #FFF; }
 
       .ipb-bookmark__info { display: block; }
 
@@ -93,19 +95,23 @@ $ao3_red: #900;
     right: 0;
     overflow: hidden;
     white-space: nowrap;
-    background-color: #900;
+    // background-color: #900;
     padding: 5px 35px 5px 5px;
     border-top-right-radius: 30px;
     border-bottom-right-radius: 30px;
     opacity: 0;
-    max-width: 0;
-    transition: opacity 0.5s, max-width 0.5s;
+    // max-width: 0;
+    // transition: opacity 0.2s, max-width 0.5s;
 
     button {
       cursor: pointer;
       font-size: 12px;
+      font-weight: bold;
       line-height: 1;
       margin-right: 5px;
+
+      border: none;
+      text-decoration: none;
     }
   }
 
@@ -114,7 +120,7 @@ $ao3_red: #900;
     position: absolute;
     font-size: 12px;
     background-color: #ddd;
-    top: 40px;
+    top: 45px;
     right: 0;
     white-space: nowrap;
     padding: 4px 8px;
@@ -135,4 +141,15 @@ $ao3_red: #900;
   
 }
 
+@keyframes bookmarkFade {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
 </style>

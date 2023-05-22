@@ -1,19 +1,30 @@
 <template>
   <div class="ipb-editor" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
-    <div class="ipb-editor__button-group">
+    <!-- <div class="ipb-editor__button-group">
         <span class="done" @click="onPercBMDoneClick">Cancel</span>
-    </div>
+    </div> -->
+    <span class="ipb-editor__remark" v-if="editBM.invalid">Out of bookmark region</span>
+    <div class="ipb-editor-content">
+      <div class="ipb-editor__btn">
+        <button @click="onPercBMDoneClick">Cancel</button>
+      </div>
 
-    <div class="ipb-editor__remark">
-      <span v-if="editBM.invalid">Out of bookmark region</span>
-      <template v-else-if="mainBM.chI != null">
-        <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-        <span>New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
-      </template>
-      <span v-else :style="{opacity: 0.6}">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-    </div>
+      <div class="ipb-editor__icon" @click="onPercBMAddClick">
+        <IpbIcon type="location" fill="#900" ></IpbIcon>
+      </div>
 
-    <div class="ipb-editor__mark" @click="onPercBMAddClick"><IpbIcon type="location"></IpbIcon></div>
+      
+      <div class="ipb-editor__info" v-if="!editBM.invalid">
+        <!-- <span v-if="editBM.invalid">Out of bookmark region</span> -->
+        <template v-if="mainBM.chI != null">
+          <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+          <span>New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
+        </template>
+        <span v-else>Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
+      </div>
+    </div>
+    
+    <!-- <div class="ipb-editor__mark" @click="onPercBMAddClick"><IpbIcon type="location"></IpbIcon></div> -->
   </div>
 </template>
 
@@ -26,7 +37,7 @@ import IpbIcon from './IpbIcon.vue'
 export default {
   props: ['chapters'],
   components: { IpbIcon },
-  setup (p, {emit}) {
+  setup (p) {
     const editBM = reactive({ y: mousePos.y, perc: 0, invalid: 0 })
 
     const onMouseMove = (e, posY = editBM.y) => {
@@ -55,7 +66,6 @@ export default {
         // mainBM.tooClose = mainBM.chI && mainBM.chI == hoverCH && Math.abs(mainBM.perc - newPerc) < 0.003
         editBM.chI = hoverCH
         editBM.perc = newPerc
-
       } else { // exceed bookmark area
         editBM.invalid = 1
       }
@@ -64,12 +74,14 @@ export default {
     watch(() => mousePos.y, newPosY => onMouseMove(null, newPosY))
 
     onMounted(() => {
+      // console.log('mounted', editBM)
       document.addEventListener('scroll', onMouseMove)
       onMouseMove()
     }) // on mounted
-
+    
     onUnmounted(() => {
       document.removeEventListener('scroll', onMouseMove)
+      // console.log('on unmounted')
     })
 
     const onPercBMAddClick = () => {
@@ -80,7 +92,7 @@ export default {
 
 
     const onPercBMDoneClick = () => {
-      document.removeEventListener('scroll', onMouseMove)
+      // document.removeEventListener('scroll', onMouseMove)
       onBookmarkEnd()
     }
 
@@ -112,93 +124,93 @@ $ao3_red: #900;
   transform: translate(-50%, -50%);
   width: 100%;
   max-width: 1130px;
-  padding: 20px;
-  box-sizing: border-box;
-  color: #FFF;
+  height: 33px;
   user-select: none;
-  text-align: center;
   pointer-events: none;
 
-  &.outOfRange > div { background-color: rgba(grey, 0.5);}
   &.outOfRange {
-    .ipb-editor__mark { display: none;}
-  }
+    background-color: rgba(red, 0.3);
 
-  .ipb-editor__window {
-    pointer-events: all;
-    position: relative;
-    box-sizing: border-box;
-    float: right;
-    width: 220px;
-    height: 105px;
-    margin-right: 50px;
-    padding: 10px;
-    background-color: grey;
-    transition: background-color 0.2s;
-
-    & > *:not(:last-child) {
-      padding-bottom: 5px;
+    .ipb-editor__icon {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
   }
 
-  .ipb-editor__mark {
+  .ipb-editor__remark {
     position: absolute;
     top: 50%;
-    right: -8px;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .ipb-editor-content {
+    position: absolute;
+    top: 0;
+    right: 0;
     pointer-events: all;
+  }
+
+  .ipb-editor__icon {
+    position: relative;
+    width: 25px;
+    height: 25px;
+    margin: 5px;
     cursor: pointer;
-    
+
     .ipb-icon {
       position: absolute;
-      top: 0;
       left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
       animation: bookmarkFade 0.5s infinite alternate;
     }
   }
 
-  .ipb-editor__window__header {
-    display: block;
-    font-size: 14px;
-    font-weight: 700;
+  .ipb-editor__btn {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    right: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 5px 35px 5px 5px;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+
+    button {
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      margin-right: 5px;
+    }
   }
 
-  .ipb-editor__window__remark {
-    font-size: 13px;
-    white-space: nowrap;
+  .ipb-editor__info {
+    position: absolute;
+    font-size: 12px;
+    background-color: #ddd;
+    text-align: right;
+    top: 45px;
+    right: 0;
+    padding: 4px 8px;
 
     span {
       display: block;
       white-space: nowrap;
     }
-  }
 
-  .ipb-editor__window__button-group {
-    span {
-      display: inline-block;
-      cursor: pointer;
-      pointer-events: all;
-      background-color: #eeeeee;
-      box-shadow: 0px 0px 5px #777;
-      border-radius: 3px;
-      transform: scale(0.95);
-      transition: transform 0.2s;
-      width: 115px;
-      font-size: 14px;
-      font-weight: 800;
-      color:#FFF;
-      padding: 8px 0;
-      text-align: center;
-
-      &:not(.disable):hover {
-        transform: scale(1);
-      }
-
-      &.add { background-color: $ao3_red; }
-      // &.remove { background-color: $red; }
-      &.done { width: 55px; color: #333; }
+    &::before {
+      content: '';
+      position: absolute;
+      right: 8px;
+      top: -5px;
+      width: 0;  
+      height: 0; 
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #ddd;
     }
   }
 }
@@ -211,7 +223,7 @@ $ao3_red: #900;
 
   100% {
     opacity: 0.5;
-    transform: scale(1.1);
+    transform: scale(1.3);
   }
 }
 </style>

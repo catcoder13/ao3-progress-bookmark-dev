@@ -1,17 +1,15 @@
 <template>
-  <div class="ipb-bm-list">
-    <span class="ipb-bm-list__title">Bookmarked works</span>
-    <button @click="clearChromeStorage">Clear chrome local storage</button>
+  <div class="ipb-popup">
+    <span class="ipb-popup__title">AO3 In-page Bookmark</span>
+    <button :style="{position: 'absolute', left: 0, fontSize: '10px', width: '70px'}" @click="clearChromeStorage">Clear chrome local storage</button>
     <template v-if="Object.keys(works).length">
-      <div> Sort by <div>
-          <span>Recent</span>
-          <span>Progress</span>
-        </div>
-      </div>
-      <div class="ipb-bm-list__wrapper">
-        <div class="ipb-bm-list__item" v-for="({workName, authorName, authorLink, chI, chID, perc, isOneShot}, workID) in works" :key="workID">
+      <IpbTab class="ipb-groupby" :options="GROUP_BY" v-model="groupBy"></IpbTab>
+      <IpbTab class="ipb-sortby" :options="SORT_BY" v-model="sortBy"></IpbTab>
+
+      <div class="ipb-popup__wrapper">
+        <div class="ipb-popup__item" v-for="({workName, authorName, authorLink, chI, chID, perc, isOneShot}, workID) in works" :key="workID">
           <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(workID)">&#10006;</span>
-          <b class="ipb-bm-list__item__title">{{ workName }}</b>
+          <b class="ipb-popup__item__title">{{ workName }}</b>
           <span class="ipb-author">by <a @click="() => visitURL(authorLink)">{{ authorName }}</a></span>
           <div class="ipb-bm-record">
             <IpbIcon type="bookmark"></IpbIcon>
@@ -29,18 +27,29 @@
     </template>
     <span v-else class="ipb-no-bm-msg">No bookmark added.</span>
   </div>
+
+  <IpbSetting></IpbSetting>
 </template>
 
 <script>
-import IpbIcon from '@/content/components/IpbIcon.vue'
+import {ref} from 'vue'
 import {works, removeWork, clearChromeStorage} from './works'
+import IpbIcon from '@/content/components/IpbIcon.vue'
+import IpbTab from './IpbTab.vue'
+import IpbSetting from './IpbSetting.vue'
 
 const AO3_DOMAIN = "https://archiveofourown.org"
 
+const GROUP_BY = ['All', 'Author']
+const SORT_BY = ['Recent', 'Progress']
+
 export default {
   name: 'App',
-  components: {IpbIcon},
+  components: { IpbIcon, IpbTab, IpbSetting },
   setup () {
+    const sortBy = ref(SORT_BY[0])
+    const groupBy = ref(GROUP_BY[0])
+
     const visitURL = subURL => {
       chrome.runtime.sendMessage(
         {type: 'tab', url: AO3_DOMAIN + subURL},
@@ -49,7 +58,11 @@ export default {
         }
       )
     }
-    return {works, removeWork, visitURL, clearChromeStorage}
+    return {
+      works, removeWork,
+      sortBy, SORT_BY, groupBy, GROUP_BY,
+      visitURL, clearChromeStorage
+    }
   }
 }
 </script>
@@ -60,7 +73,8 @@ $ao3_red: #900;
 body {
   margin: 0;
 }
-.ipb-bm-list {
+
+.ipb-popup {
   width: 500px;
   max-height: 300px;
   overflow: hidden;
@@ -74,19 +88,50 @@ body {
     white-space: nowrap;
   }
 
-  .ipb-bm-list__title {
+  .ipb-popup__title {
     margin: 0;
-    display: inline-block;
-    font-size: 13px;
-    line-height: 12px;
-    padding: 9px 5px 9px 0px;
-    color: #FFF;
-    font-weight: 700;
-    background-color: $ao3_red;
-    white-space: nowrap;
+    display: block;
+    font-size: 22px;
+    line-height: 1;
+    padding: 6px 0 10px;
+    color: $ao3_red;
+    font-weight: bold;
+    text-align: center;
   }
 
-  .ipb-bm-list__wrapper {
+  .ipb-groupby {
+    border-bottom: 3px solid $ao3_red;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+
+    span {
+      vertical-align: bottom;
+      padding: 6px 10px;
+      opacity: 0.7;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+
+      &.current { background-color: $ao3_red; color: #FFF; opacity: 1; }
+    }
+  }
+
+  .ipb-sortby {
+    font-size: 14px;
+    padding: 5px 10px;
+    background: linear-gradient(to bottom, rgba(#ddd, 1) 70%, rgba(#ddd, 0) 100%);
+
+    span {
+      padding: 4px 10px;
+      margin-right: 5px;
+      border-radius: 12px;
+      border: 1px solid $ao3_red;
+
+      &.current { background-color: $ao3_red; color: #FFF; }
+    }
+  }
+
+  .ipb-popup__wrapper {
     overflow-y: auto;
     padding: 10px 10px 10px 10px;
     border-bottom: 3px solid #ddd;
@@ -104,7 +149,7 @@ body {
       &:hover { background-color: #999;}
     }
 
-    .ipb-bm-list__item {
+    .ipb-popup__item {
       position: relative;
       padding-bottom: 10px;
       background-color: #fcfcfc;
@@ -133,7 +178,7 @@ body {
         &:hover { transform: scale(1); opacity: 1; }
       }
 
-      b.ipb-bm-list__item__title {
+      b.ipb-popup__item__title {
         font-size: 14px;
         line-height: 16px;
         padding: 0 30px 5px 0;

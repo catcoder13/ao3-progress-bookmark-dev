@@ -12,7 +12,10 @@
       <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
       <div v-else class="ipb-toolbar__item-desc">
         <b>Jump to bookmark</b>
-        <span class="ipb-warning">Locate bookmark at chapter {{ parseInt(mainBM.chI) + 1 }} via:</span>
+        <span class="ipb-warning">
+          Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
+          Visit Chapter {{ parseInt(mainBM.chI) + 1 }} via:
+        </span>
         <div class="ipb-btn">
           <a :href="mainBM.fwLink"><button>Entire Work</button></a>
           <a :href="mainBM.link"><button>Chapter by chapter</button></a>

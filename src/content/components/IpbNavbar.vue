@@ -1,6 +1,6 @@
 <template>
   <div class="ipb-navbar-content" ref="navbarElemRef" :class="{stucked}">
-    
+
     <div :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
       @click="() => jumpToChapter(chI)" @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
       <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${chapters[chI].progress}%`}"></span>
@@ -36,7 +36,7 @@
 import { computed, onMounted, ref, reactive } from 'vue'
 import { mainBM, bmInProgress } from '../bookmark'
 import { chapters, curChI, view, onScroll } from '../page'
-import {chapterInfos, fullViewMode, workId} from '../static'
+import {chapterInfos, fullViewMode, workId, isOneShot, mainContent} from '../static'
 import {mousePos} from '../mousePos'
 import IpbIcon from './IpbIcon.vue'
 
@@ -96,7 +96,7 @@ export default {
 
     const jumpToChapter = chI => {
       if (fullViewMode || approxChI.value == curChI.value) {
-        const targetScroll = chapters[chI].top;
+        const targetScroll = isOneShot ? window.scrollY + mainContent.getBoundingClientRect().y : chapters[chI].top
         window.scrollTo({ top: targetScroll })
         // if (chapters[chI].top > window.scrollY && chapters[chI].top < window.scrollY + window.innerHeight) {
         //   window.scrollTo({top: targetScroll, behavior: 'smooth'})
