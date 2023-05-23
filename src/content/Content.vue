@@ -93,6 +93,7 @@ $ao3_red: #900;
 .ao3-in-page-bookmark {
   font-family: sans-serif;
   font-size: 17px;
+  user-select: none;
 
   .ipb-toolbar {
     position: fixed;
@@ -196,16 +197,4 @@ $ao3_red: #900;
     background-color: rgba(#aaaaaa, 0.3);
   }
 }
-
-// @keyframes bookmarkFade {
-//   0% {
-//     opacity: 0.3;
-//     transform: scale(1);
-//   }
-
-//   100% {
-//     opacity: 1;
-//     transform: scale(0.9);
-//   }
-// }
 </style>

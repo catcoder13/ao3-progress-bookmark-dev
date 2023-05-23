@@ -1,8 +1,5 @@
 <template>
   <div class="ipb-editor" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
-    <!-- <div class="ipb-editor__button-group">
-        <span class="done" @click="onPercBMDoneClick">Cancel</span>
-    </div> -->
     <span class="ipb-editor__remark" v-if="editBM.invalid">Out of bookmark region</span>
     <div class="ipb-editor-content">
       <div class="ipb-editor__btn">
@@ -15,16 +12,13 @@
 
       
       <div class="ipb-editor__info" v-if="!editBM.invalid">
-        <!-- <span v-if="editBM.invalid">Out of bookmark region</span> -->
         <template v-if="mainBM.chI != null">
-          <span :style="{opacity: 0.6}">Old location: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
-          <span>New location: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
+          <span :style="{opacity: 0.6}">Old bookmark: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
+          <span>New bookmark: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
         </template>
         <span v-else>Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
       </div>
     </div>
-    
-    <!-- <div class="ipb-editor__mark" @click="onPercBMAddClick"><IpbIcon type="location"></IpbIcon></div> -->
   </div>
 </template>
 
@@ -125,7 +119,6 @@ $ao3_red: #900;
   width: 100%;
   max-width: 1130px;
   height: 33px;
-  user-select: none;
   pointer-events: none;
 
   &.outOfRange {
@@ -179,11 +172,22 @@ $ao3_red: #900;
     border-top-right-radius: 30px;
     border-bottom-right-radius: 30px;
 
+    &:hover {
+      button { filter: brightness(0.95); }
+
+      & ~ .ipb-editor__icon .ipb-icon {
+        opacity: 0.3;
+        animation: none;
+      }
+    } 
+
     button {
       cursor: pointer;
       font-size: 12px;
       line-height: 1;
       margin-right: 5px;
+
+      
     }
   }
 
@@ -217,12 +221,10 @@ $ao3_red: #900;
 
 @keyframes bookmarkFade {
   0% {
-    opacity: 1;
     transform: scale(1);
   }
 
   100% {
-    opacity: 0.5;
     transform: scale(1.3);
   }
 }

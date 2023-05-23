@@ -1,12 +1,13 @@
 <template>
 <div class="ipb-bookmark" :style="{top: `${pos}px`}">
   <div class="ipb-bookmark-content">
-    <div class="ipb-bookmark__icon" @click="onMoveClick">
-      <IpbIcon type="location" fill="" ></IpbIcon>
+  
+    <div class="ipb-bookmark__btn">
+      <button @click="removeBookmark" title="Remove this bookmark">Remove</button>
     </div>
 
-    <div class="ipb-bookmark__btn">
-      <button @click="removeBookmark">Remove</button>
+    <div class="ipb-bookmark__icon" @click="onMoveClick" title="Change bookmark location">
+      <IpbIcon type="location" fill="" ></IpbIcon>
     </div>
 
     <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>  
@@ -69,7 +70,6 @@ $ao3_red: #900;
         
         path { 
           fill: $ao3_red;
-          // transition: fill 0.2s;
         }
 
         &:hover { transform: scale(1.2); }
@@ -77,13 +77,11 @@ $ao3_red: #900;
     }
 
     &:hover {
-      // .ipb-icon path { fill: #FFF; }
-
       .ipb-bookmark__info { display: block; }
 
       .ipb-bookmark__btn {
-        max-width: 500px;
-        opacity: 1;
+        // max-width: 500px;
+        display: block;
       }
     }
   }
@@ -95,21 +93,22 @@ $ao3_red: #900;
     right: 0;
     overflow: hidden;
     white-space: nowrap;
-    // background-color: #900;
     padding: 5px 35px 5px 5px;
     border-top-right-radius: 30px;
     border-bottom-right-radius: 30px;
-    opacity: 0;
-    // max-width: 0;
-    // transition: opacity 0.2s, max-width 0.5s;
+    display: none;
+
+    &:hover {
+      button { filter: brightness(0.95);}
+
+      & ~ .ipb-bookmark__icon .ipb-icon { opacity: 0.3; }
+    }
 
     button {
       cursor: pointer;
       font-size: 12px;
-      font-weight: bold;
       line-height: 1;
       margin-right: 5px;
-
       border: none;
       text-decoration: none;
     }

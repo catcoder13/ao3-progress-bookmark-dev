@@ -1,9 +1,20 @@
-import {reactive} from 'vue'
+import {reactive, computed} from 'vue'
 
 const STORE_WORK_KEY_PREFIX = `AO3_IPB_WORK_`
 const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 
 const works = reactive({})
+const worksGroupByAuthor = computed(() => {
+  return Object.keys(works)
+    .reduce((acc, workID) => {
+      const work = works[workID]
+      if (!acc[work.authorName]) acc[work.authorName] = []
+
+      acc[work.authorName].push({workID, ...works[workID]})
+
+      return acc
+    }, {})
+})
 let workIDs = []
 
 chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(wIDObj => {
@@ -37,4 +48,4 @@ const clearChromeStorage = () => {
   chrome.storage.local.clear()
 }
 
-export {works, removeWork, clearChromeStorage}
+export {works, worksGroupByAuthor, removeWork, clearChromeStorage}

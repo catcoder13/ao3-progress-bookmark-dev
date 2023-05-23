@@ -1,6 +1,6 @@
 <template>
   <div class="ipb-tab">
-    <p class="title" v-if="title">{{ title }}</p>
+    <h2 class="ipb-title" v-if="title">{{ title }}</h2>
     <span :class="{current: opt.val == modelValue.val}" v-for="(opt,i) in options" :key="i" @click="() => onSelect(opt)"> {{ getOptLabel(opt) }}</span>
   </div>
 </template>
@@ -23,15 +23,13 @@ export default {
 .ipb-tab {
   position: relative;
 
-  p.title {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+  h2 {
     display: inline-block;
+    font-size: 14px;
     line-height: 1;
     margin: 0;
     font-weight: bold;
+    padding-right: 10px;
   }
 
   span {

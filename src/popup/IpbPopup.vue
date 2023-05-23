@@ -1,31 +1,39 @@
 <template>
   <div class="ipb-popup">
-    <span class="ipb-popup__title">AO3 In-page Bookmark</span>
+    <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
     <button :style="{position: 'absolute', left: 0, fontSize: '8px', width: '70px'}" @click="clearChromeStorage">Clear chrome local storage</button>
     
-    <IpbTab class="ipb-groupby" title="Group by:" :options="GROUP_BY" v-model="groupBy"></IpbTab>
-    <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
-      
-    <div class="ipb-popup__wrapper">
-      <div class="ipb-popup__item" v-for="({ authorName, authorLink, chI, chID, isOneShot, perc, t, workID, workName}) in sortedWorks" :key="workID">
-        <span class="ipb-popup__item__datetime">Bookmarked at {{ (new Date(t)).toLocaleString() }}</span>
-        <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(workID)">&#10006;</span>
-        <b class="ipb-popup__item__title">{{ workName }}</b>
-        <span class="ipb-author">by <a @click="() => visitURL(authorLink)">{{ authorName }}</a></span>
-        <div class="ipb-bm-record">
-          <IpbIcon type="bookmark"></IpbIcon>
-          <b>Chapter {{ parseInt(chI) + 1 }} | {{ (perc * 100).toFixed(2) }}%</b>
-        </div>
-        <div class="ipb-btn">
-          <button v-if="isOneShot" @click="() => visitURL(`/works/${workID}`)">Entire work</button>
-          <template v-else>
-            <button @click="() => visitURL(`/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`)">Entire work</button>
-            <button @click="() => visitURL(`/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`)">Chapter by chapter</button>
-          </template>
-        </div>
+    <IpbTab class="ipb-groupby" title="View mode:" :options="VIEW_MODES" v-model="viewMode"></IpbTab>
+
+    <template v-if="viewMode.val === 'all'">
+      <div class="ipb-popup-filter">
+        <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
       </div>
-      <span v-if="!sortedWorks.length" class="ipb-no-bm-msg">No bookmark added.</span>
-    </div>
+      <div class="ipb-popup__wrapper">
+        <TransitionGroup name="fade-in">
+          <IpbPopupItem v-for="(work, i) in sortWorks(allGroup)" :key="i" :work="work"></IpbPopupItem>
+        </TransitionGroup>
+        <span v-if="!allGroup.length" class="ipb-no-bm-msg">No bookmark added.</span>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="ipb-popup-filter ipb-popup-filter--author">
+        <IpbDropdown :options="Object.keys(worksGroupByAuthor)" v-model="selectedAuthor" title="Filter by author:"></IpbDropdown>
+        <IpbTab v-if="selectedAuthor && worksGroupByAuthor[selectedAuthor].length > 1" class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
+      </div>
+      
+      <div class="ipb-popup__wrapper">
+        <div class="ipb-popup__author-works" v-for="(authorWorks, authorName) in filteredWorksGroupByAuthor" :key="authorName">
+          <h2 class="ipb-author">{{ authorName }}</h2>
+          <TransitionGroup name="fade-in">
+            <IpbPopupItem v-for="(work, j) in sortWorks(authorWorks)" :key="j" :work="work" :hideAuthor="true"></IpbPopupItem>
+          </TransitionGroup>
+        </div>
+        <span v-if="!Object.keys(filteredWorksGroupByAuthor).length" class="ipb-no-bm-msg">No bookmark added.</span>
+      </div>
+    </template>
+      
   </div>
 
   <IpbSetting></IpbSetting>
@@ -33,40 +41,53 @@
 
 <script>
 import {computed, ref} from 'vue'
-import {works, removeWork, clearChromeStorage} from './works'
-import IpbIcon from '@/content/components/IpbIcon.vue'
+import {works, worksGroupByAuthor, clearChromeStorage} from './works'
+
 import IpbTab from './IpbTab.vue'
 import IpbSetting from './IpbSetting.vue'
+import IpbPopupItem from './IpbPopupItem.vue'
+import IpbDropdown from './IpbDropdown.vue'
 
-const AO3_DOMAIN = "https://archiveofourown.org"
-
-const GROUP_BY = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
-const SORT_BY = [{label: 'Recent', val: 't'}, {label: 'Progress', val: 'perc'}]
+const VIEW_MODES = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
+const SORT_BY = [{label: 'Recent bookmark', val: 't'}, {label: 'Read progress', val: 'perc'}, {label: 'Title', val: 'workName'}]
 
 export default {
   name: 'App',
-  components: { IpbIcon, IpbTab, IpbSetting },
+  components: { IpbTab, IpbSetting, IpbPopupItem, IpbDropdown },
   setup () {
     const sortBy = ref(SORT_BY[0])
-    const groupBy = ref(GROUP_BY[0])
+    const viewMode = ref(VIEW_MODES[0])
+    const selectedAuthor = ref(null)
 
-    const sortedWorks = computed(() => {
-      return Object.keys(works)
-        .map(wordID => ({wordID, ...works[wordID]}))
-        .sort((a, b) => b[sortBy.value.val] - a[sortBy.value.val])
-    })
-    const visitURL = subURL => {
-      chrome.runtime.sendMessage(
-        {type: 'tab', url: AO3_DOMAIN + subURL},
-        res => {
-          console.log(res)
-        }
-      )
+
+    const sortWorks = workGroup => {
+      if (sortBy.value.val == 'workName') {
+        return workGroup.sort((a, b) => {
+          const tA = a[sortBy.value.val].toUpperCase()
+          const tB = b[sortBy.value.val].toUpperCase()
+          return tA < tB ? -1 : (tA > tB) ? 1 : 0
+        })
+      }
+
+      return workGroup.sort((a, b) => b[sortBy.value.val] - a[sortBy.value.val])
     }
+
+    const allGroup = computed(() => {
+      return Object.keys(works).map(workID => ({workID, ...works[workID]}))
+    })
+
+    const filteredWorksGroupByAuthor = computed(() => {
+      if (selectedAuthor.value) {
+        return {[selectedAuthor.value]: worksGroupByAuthor.value[selectedAuthor.value]}
+      }
+
+      return worksGroupByAuthor.value
+    })
+
     return {
-      sortedWorks, removeWork,
-      sortBy, SORT_BY, groupBy, GROUP_BY,
-      visitURL, clearChromeStorage
+      allGroup, worksGroupByAuthor, filteredWorksGroupByAuthor, sortWorks, selectedAuthor,
+      sortBy, SORT_BY, viewMode, VIEW_MODES,
+      clearChromeStorage
     }
   }
 }
@@ -74,70 +95,116 @@ export default {
 
 <style lang="scss">
 $ao3_red: #900;
+$bg: #ddd;
 
 body {
+  margin: 0;
+  color: #333;
+}
+
+p,
+h1,
+h2, 
+h3 {
   margin: 0;
 }
 
 .ipb-popup {
-  width: 500px;
+  width: 400px;
   max-height: 300px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   text-align: left;
-  background-color: #ddd;
+  background-color: $ao3_red;
+  user-select: none;
 
   .ipb-popup__title {
-    margin: 0;
     display: block;
     font-size: 22px;
     line-height: 1;
     padding: 6px 0 10px;
-    color: $ao3_red;
+    color: #FFF;
     font-weight: bold;
     text-align: center;
   }
 
   .ipb-groupby {
-    border-bottom: 3px solid $ao3_red;
+    border-bottom: 3px solid #FFF;
     font-size: 14px;
-    font-weight: bold;
     text-align: center;
+
+    h2 {
+      color: #FFF;
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
 
     span {
       vertical-align: bottom;
       padding: 6px 10px;
       opacity: 0.7;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
+      color: #FFF;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
 
-      &.current { background-color: $ao3_red; color: #FFF; opacity: 1; }
+      &.current { background-color: #FFF; opacity: 1; color: #333; font-weight: bold; }
+
+      &:hover { opacity: 1;}
     }
   }
 
   .ipb-sortby {
-    font-size: 14px;
-    padding: 5px 10px 5px 70px;
-    background: linear-gradient(to bottom, rgba(#ddd, 1) 70%, rgba(#ddd, 0) 100%);
-
     span {
+      font-size: 12px;
+      line-height: 11px;
       padding: 4px 10px;
       margin-right: 5px;
       border-radius: 12px;
-      border: 1px solid $ao3_red;
+      border: 1px solid rgba(#333, 0.7);
 
-      &.current { background-color: $ao3_red; color: #FFF; }
+      &:hover {
+        border: 1px solid rgba(#333, 1);
+        background-color: rgba(#333, 0.6);
+        color: #FFF;
+      }
+
+      &.current {
+        background-color: #333;
+        color: #FFF;
+      }
     }
+  }
+
+  .ipb-popup-filter {
+    background-color: #FFF;
+
+    & > * {
+      display: block;
+      padding: 5px 10px;
+    }
+
+    &.ipb-popup-filter--author {
+      .ipb-sortby {
+        h2 { font-size: 12px; }
+        span { font-size: 10px; }
+      }
+    }
+
+    
   }
 
   .ipb-popup__wrapper {
     position: relative;
     min-height: 200px;
-    overflow-y: auto;
-    padding: 10px;
+    overflow-y: overlay;
+    padding: 10px 15px;
     box-sizing: border-box;
-    border-bottom: 5px solid #ddd;
+    border-top: 2px solid $bg;
+    border-bottom: 5px solid $bg;
+    background-color: $bg;
 
     &::-webkit-scrollbar { width: 15px; }
 
@@ -161,81 +228,30 @@ body {
       white-space: nowrap;
     }
 
-    .ipb-popup__item {
-      position: relative;
-      background-color: #fcfcfc;
-      padding: 15px 5px 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 0 3px #999;
+    h2.ipb-author {
+      line-height: 1;
+      padding: 0 5px 10px;
+      // padding-bottom: 10px;
+    }
 
-      & > * {
-        display: block;
-        
-        &:not(:last-child) { padding-bottom: 10px; }
-      }
-
-      .ipb-close-btn {
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        padding: 0;
-        font-size: 20px;
-        line-height: 1;
-        transform: scale(0.95);
-        opacity: 0.8;
-        transition: transform 0.2s opacity 0.2s;
-        cursor: pointer;
-
-        &:hover { transform: scale(1); opacity: 1; }
-      }
-
-      .ipb-popup__item__datetime {
-        position: absolute;
-        top: 0;
-        left: 0;
-        font-size: 11px;
-        line-height: 1;
-        display: inline-block;
-        background-color: #ddd;
-        padding: 1px;
-      }
-
-      b.ipb-popup__item__title {
-        font-size: 14px;
-        line-height: 16px;
-        padding: 0 30px 5px 0;
-        min-width: 150px;
-      }
-
-      .ipb-author {
-        a {
-          color: #166fce;
-          text-decoration: none;
-          border-bottom: 1px dashed #166fce;
-          cursor: pointer;
-
-          &:hover { border-bottom: 1px solid #166fce; }
-        }
-      }
-
-      .ipb-bm-record {
-        & > * { display: inline-block; vertical-align: middle; }
-        .ipb-icon { width: 15px; height: 15px;}
-        
-      }
-
-      .ipb-btn {
-        display: flex;
-        font-size: 11px;
-
-        button {
-          margin-right: 5px;
-          cursor: pointer;
-
-          &:hover {filter: brightness(0.95)};
-        }
-      }
+    .ipb-popup__author-works {
+      // &:not(:first-child) h2 { margin-top: 25px; }
+      padding-bottom: 10px;
     }
   }
+}
+
+.fade-in-enter-active {
+  transition: all 0.5s ease;
+}
+
+.fade-in-leave-active {
+  transition: all 0.5s ease;
+}
+
+.fade-in-enter,
+.fade-in-leave-to {
+  position: absolute;
+  opacity: 0;
 }
 </style>

@@ -41,10 +41,10 @@ export default {
     z-index: 1;
     right: 10px;
     top: 10px;
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background-color: #900;
+    background-color: #ddd;
     cursor: pointer;
     pointer-events: all;
   }

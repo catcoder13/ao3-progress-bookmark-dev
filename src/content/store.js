@@ -24,13 +24,13 @@ const initStoreData = () => {
 }
 initStoreData()
 
-const updateBookmarkStore = (chI, perc, chID) => {
+const updateBookmarkStore = (chI, perc, chID, chTitle) => {
   chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(allKeys => {
     let allWorkKeys = allKeys[STORE_ALL_WORK_KEYS] || []
     if (!allWorkKeys.some(wID => wID === workId)) allWorkKeys.push(workId)
     const t = Date.now()
     chrome.storage.local.set({
-      [STORE_WORK_KEY]: { authorLink, authorName, chI, chID, isOneShot, perc, t, workName},
+      [STORE_WORK_KEY]: { authorLink, authorName, chI, chID, isOneShot, perc, t, chTitle, workName},
       [STORE_ALL_WORK_KEYS]: allWorkKeys
     })
   })

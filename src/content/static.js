@@ -39,26 +39,31 @@ console.log(fullViewMode, workId, workName, authorName, authorLink)
 const chapterListElem = document.getElementById('selected_id')
 let chapterInfos = null 
 if (chapterListElem) {
-  chapterInfos = Array.from(chapterListElem.querySelectorAll('option')).map(optElem => {
+  chapterInfos = Array.from(chapterListElem.querySelectorAll('option')).map((optElem,i) => {
+    const title = optElem.innerText.match(/(?:\d+\. )?(.+)/)[1]
+    // console.log('ch by ch', title)
     return {
       chID: optElem.getAttribute('value'),
-      title: optElem.innerText.match(/(?:\d+\. )?(.+)/)[1]
+      title: title !== `Chapter ${i+1}` ? title : null
     }
   })
 } else if (chapterDoms.length) {
   chapterInfos = Array.from(chapterDoms).map(chDom => {
     const matches = (/^Chapter \d+(?:: (.*))?$/).exec(chDom.querySelector('.title').innerText)
+    const title = matches[1] || matches[0]
+    // console.log('entire work', title, chDom.querySelector('.title a').innerText)
     return {
       chID: chDom.querySelector('.title a').getAttribute('href').match(/\/works\/\d+\/chapters\/(\d+)/)[1],
-      title: matches[1] || matches[0]
+      title: title !== chDom.querySelector('.title a').innerText ? title : null
     }
   })
 } else {
   // one shot does not have chapter id
-  chapterInfos = [{ chID: null, title: mainContent && mainContent.querySelector('.title').innerText }]
+  chapterInfos = [{ chID: null, title: null }]
+  // chapterInfos = [{ chID: null, title: mainContent && mainContent.querySelector('.title').innerText }]
 }
 
-// console.log(chapterInfos)
+console.log(chapterInfos)
 
 // // identify user or guest
 // const iconHrefDom = document.querySelector('#greeting .icon a')

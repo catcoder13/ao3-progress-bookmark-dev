@@ -22,7 +22,7 @@ newWork => {
 })
 
 const updateBookmark = (chI, perc) => {
-  updateBookmarkStore(chI, perc, chapterInfos[chI].chID)
+  updateBookmarkStore(chI, perc, chapterInfos[chI].chID, chapterInfos[chI].title)
   mainBM.chI = chI
   mainBM.perc = perc
   mainBM.chID = chapterInfos[chI].chID

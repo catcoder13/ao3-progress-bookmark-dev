@@ -13,10 +13,11 @@
       <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
       <div class="ipb-heading">
         <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI"></IpbIcon>
-        <b>Chapter {{ parseInt(approxChI) + 1 }}</b>
+        <b v-if="isOneShot">{{workName}}</b>
+        <b v-else>Chapter {{ parseInt(approxChI) + 1 }}</b>
       </div>
       
-      <span v-if="approxChI != null" class="ipb-title">{{ navbarTitle(approxChI) }}</span>
+      <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ipb-title">{{ chapterInfos[approxChI].title }}</span>
 
       <template v-if="hoveredChI != null">
         <span class="ipb-desc" v-if="fullViewMode">Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
@@ -36,7 +37,7 @@
 import { computed, onMounted, ref, reactive } from 'vue'
 import { mainBM, bmInProgress } from '../bookmark'
 import { chapters, curChI, view, onScroll } from '../page'
-import {chapterInfos, fullViewMode, workId, isOneShot, mainContent} from '../static'
+import {chapterInfos, fullViewMode, workId, isOneShot, mainContent, workName} from '../static'
 import {mousePos} from '../mousePos'
 import IpbIcon from './IpbIcon.vue'
 
@@ -86,13 +87,13 @@ export default {
       }
     }
 
-    const navbarTitle = chI => {
-      const chString = `Chapter ${parseInt(chI) + 1}`
-      const chTitle = chapterInfos[chI].title;
-      if (chString == chTitle) return ''
+    // const navbarTitle = chI => {
+    //   const chString = `Chapter ${parseInt(chI) + 1}`
+    //   const chTitle = chapterInfos[chI].title;
+    //   if (chString == chTitle) return ''
 
-      return chTitle
-    }
+    //   return chTitle
+    // }
 
     const jumpToChapter = chI => {
       if (fullViewMode || approxChI.value == curChI.value) {
@@ -130,9 +131,9 @@ export default {
     })
 
     return {
-      chapters, chapterInfos, curChI, approxChI, hoveredChI,
-      infoPosX, mainBM, fullViewMode, navbarElemRef, stucked,
-      navbarBarClass, navbarTitle, jumpToChapter
+      chapters, chapterInfos, curChI, approxChI, hoveredChI, workName,
+      infoPosX, mainBM, fullViewMode, navbarElemRef, stucked, isOneShot,
+      navbarBarClass, jumpToChapter
     }
   }
 }
@@ -175,6 +176,7 @@ $ao3_red: #900;
     background-color: $bar_color;
     transition: flex 0.5s height 0.2s filter 0.2s;
     opacity: 0.5;
+    user-select: none;
 
     &:not(:last-child) { border-right: 1px solid #FFF; }
 
