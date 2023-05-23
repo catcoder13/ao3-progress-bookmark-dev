@@ -5,19 +5,13 @@ const STORE_WORK_KEY = `AO3_IPB_WORK_${workId}`
 const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 
 const work = ref(null)
-// let allWorkKeys = []
 
 const initStoreData = () => {
-  Promise.all([
-    chrome.storage.local.get(STORE_WORK_KEY),
-    // chrome.storage.local.get(STORE_ALL_WORK_KEYS)
-  ]).then(([workObj, allKeys ]) => {
+  chrome.storage.local.get(STORE_WORK_KEY).then(workObj => {
     if (workObj[STORE_WORK_KEY]) work.value = workObj[STORE_WORK_KEY]
     else console.log('no bookmark in this work yet')
-
-    // allWorkKeys = allKeys[STORE_ALL_WORK_KEYS] ? allKeys[STORE_ALL_WORK_KEYS] : []
+    
     console.log('work loaded', work.value)
-    // console.log('all key loaded', allWorkKeys)
   })
 
   chrome.storage.onChanged.addListener(obj => {
@@ -31,21 +25,15 @@ const initStoreData = () => {
 initStoreData()
 
 const updateBookmarkStore = (chI, perc, chID) => {
-  // if (!allWorkKeys.some(wID => wID === workId)) allWorkKeys.push(workId)
-
   chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(allKeys => {
     let allWorkKeys = allKeys[STORE_ALL_WORK_KEYS] || []
     if (!allWorkKeys.some(wID => wID === workId)) allWorkKeys.push(workId)
-
+    const t = Date.now()
     chrome.storage.local.set({
-      [STORE_WORK_KEY]: { chI, perc, chID, workName, authorName, authorLink, isOneShot },
+      [STORE_WORK_KEY]: { authorLink, authorName, chI, chID, isOneShot, perc, t, workName},
       [STORE_ALL_WORK_KEYS]: allWorkKeys
     })
   })
-  
-
-  // if (!allWorkKeys.some(wID => wID === workId)) allWorkKeys.push(workId)
-  // chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: allWorkKeys})
 }
 
 const removeBookmarkStore = () => {
@@ -55,8 +43,6 @@ const removeBookmarkStore = () => {
     const allWorkKeys = allKeys[STORE_ALL_WORK_KEYS] || []
     chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: allWorkKeys.filter(wID => wID !== workId)})
   })
-  // allWorkKeys = allWorkKeys.filter(wID => wID !== workId)
-  // chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: allWorkKeys})
 }
 
 export {work, updateBookmarkStore, removeBookmarkStore}
