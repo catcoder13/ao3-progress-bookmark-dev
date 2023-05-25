@@ -7,6 +7,8 @@ const curChI = ref(0)
 
 const view = reactive({ width: window.innerWidth, height: window.innerHeight, scrollY: 0})
 
+const mainContentTop = ref(0)
+
 if (chapterDoms.length) { // multi chapter
   curChI.value = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
 
@@ -49,6 +51,7 @@ const onResize = () => {
     chapters[chI].height = height
   })
 
+  mainContentTop.value = window.scrollY + mainContent.getBoundingClientRect().y
   onScroll()
 }
 
@@ -58,4 +61,4 @@ onResize()
 
 
 
-export {chapters, curChI, view, onScroll}
+export {chapters, curChI, view, mainContentTop, onScroll}

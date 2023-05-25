@@ -26,7 +26,7 @@
 import { onMounted, onUnmounted, watch, reactive } from 'vue'
 import { updateBookmark, onBookmarkEnd, mainBM } from '../bookmark'
 import { mousePos } from '../mousePos'
-import IpbIcon from './IpbIcon.vue'
+import IpbIcon from '@/common/IpbIcon.vue'
 
 export default {
   props: ['chapters'],
@@ -105,11 +105,6 @@ export default {
 </script>
 
 <style lang="scss">
-$bm_blue: #3caaaa;
-$green: #67f751;
-$red: #fe4141;
-$ao3_red: #900;
-
 .ipb-editor {
   position: fixed;
   z-index: 100;

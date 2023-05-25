@@ -41,14 +41,22 @@ const onBookmarkEnd = () => {
   bmInProgress.value = false
 }
 
-const toggleBookmarkEdit = chapters => {
+const toggleBookmarkEdit = (e, chapters) => {
   bmInProgress.value = !bmInProgress.value
   mainContent.classList.toggle('bmInProgress', bmInProgress.value)
 
-  const bmAreaTop = chapters[Object.keys(chapters)[0]].dom.getBoundingClientRect().y
-  console.log('bmAreaTop', bmAreaTop)
-  if (bmAreaTop > window.innerHeight / 2) {
-    window.scrollTo({ top: window.scrollY + bmAreaTop - window.innerHeight / 2, behavior: 'smooth' })
+  const {y: bmAreaTop, height} = chapters[Object.keys(chapters)[0]].dom.getBoundingClientRect()
+
+  if (bmAreaTop > e.clientY) {
+    window.scrollTo({
+      top: window.scrollY + bmAreaTop - e.clientY + 30,
+      behavior: 'smooth'
+    })
+  } else if (e.clientY > bmAreaTop + height) {
+    window.scrollTo({
+      top: window.scrollY + bmAreaTop + height - e.clientY - 30,
+      behavior: 'smooth'
+    })
   }
   
 }

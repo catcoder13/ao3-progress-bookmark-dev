@@ -19,7 +19,7 @@
 import { computed } from 'vue'
 import {mainBM, removeBookmark, toggleBookmarkEdit} from '../bookmark'
 
-import IpbIcon from './IpbIcon.vue'
+import IpbIcon from '@/common/IpbIcon.vue'
 
 export default {
   props: ['chapters'],
@@ -27,8 +27,8 @@ export default {
   setup (p) {
     const pos = computed(() => p.chapters[mainBM.chI].top + p.chapters[mainBM.chI].height * mainBM.perc)
 
-    const onMoveClick = () => {
-      toggleBookmarkEdit(p.chapters)
+    const onMoveClick = e => {
+      toggleBookmarkEdit(e, p.chapters)
     }
     return {mainBM, pos, onMoveClick, removeBookmark}
   }
@@ -37,7 +37,6 @@ export default {
 
 <style lang="scss">
 $bm_blue: #3caaaa;
-$ao3_red: #900;
 
 .ipb-bookmark {
   position: absolute;

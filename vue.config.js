@@ -3,6 +3,15 @@ module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
   filenameHashing: false,
+  css: {
+    loaderOptions: {
+      sass: {
+        additionalData: `
+          @import "@/common/_common.scss";
+        `
+      }
+    }
+  },
   pages: {
     popup: {
       entry: 'src/popup/popup.js',

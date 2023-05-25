@@ -1,6 +1,5 @@
 <template>
-  <div class="ipb-navbar-content" ref="navbarElemRef" :class="{stucked}">
-
+  <div v-if="settings.showNav" class="ipb-navbar" ref="navbarElemRef" :class="{stucked}" :style="{top: stucked ? 0 : `${mainContentTop}px`, width: stucked ? '100%' : `${mainContent.getBoundingClientRect().width}px`}">
     <div :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
       @click="() => jumpToChapter(chI)" @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
       <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${chapters[chI].progress}%`}"></span>
@@ -34,12 +33,13 @@
 </template>
 
 <script>
-import { computed, onMounted, ref, reactive } from 'vue'
+import { computed, onMounted, ref, reactive, onUnmounted, watch } from 'vue'
 import { mainBM, bmInProgress } from '../bookmark'
-import { chapters, curChI, view, onScroll } from '../page'
+import { chapters, curChI, view, mainContentTop, onScroll } from '../page'
 import {chapterInfos, fullViewMode, workId, isOneShot, mainContent, workName} from '../static'
 import {mousePos} from '../mousePos'
-import IpbIcon from './IpbIcon.vue'
+import { settings } from './../setting'
+import IpbIcon from '@/common/IpbIcon.vue'
 
 export default {
   name: 'IpbNavbar',
@@ -51,7 +51,9 @@ export default {
     const navbarElemRef = ref(null)
     const navbarElem = reactive({width: 0, x: 0, barWidth: 0})
     
-    const stucked = ref(false)
+    // const stucked = ref(false)
+
+    const stucked = computed(() => view.scrollY > mainContentTop.value)
 
     const approxChI = computed(() => {
       if (bmInProgress.value || !inView.value) return null
@@ -87,14 +89,6 @@ export default {
       }
     }
 
-    // const navbarTitle = chI => {
-    //   const chString = `Chapter ${parseInt(chI) + 1}`
-    //   const chTitle = chapterInfos[chI].title;
-    //   if (chString == chTitle) return ''
-
-    //   return chTitle
-    // }
-
     const jumpToChapter = chI => {
       if (fullViewMode || approxChI.value == curChI.value) {
         const targetScroll = isOneShot ? window.scrollY + mainContent.getBoundingClientRect().y : chapters[chI].top
@@ -109,60 +103,80 @@ export default {
       }
     }
 
-    document.addEventListener('mouseenter', () => { inView.value = true })
-    document.addEventListener('mouseleave', () => { inView.value = false })
+    const onMouseEnterDoc = () => inView.value = true
+    const onMouseLeaveDoc = () => inView.value = false
+    
+    const onNavResize = () => {
+      const {x, y, width} = navbarElemRef.value.getBoundingClientRect()
+      navbarElem.left = x
+      navbarElem.top = window.scrollY + y
+      navbarElem.width = width
+      navbarElem.barWidth = width / chapterInfos.length
+    }
+
+    watch(() => stucked.value,
+    newStucked => {
+      onNavResize()
+    })
 
     onMounted(() => {
-      const onNavResize = () => {
-        const {x, y, width} = navbarElemRef.value.getBoundingClientRect()
-        navbarElem.left = x
-        navbarElem.top = window.scrollY + y
-        navbarElem.width = width
-        navbarElem.barWidth = width / chapterInfos.length
-      }
       window.addEventListener('resize', onNavResize)
       onNavResize()
 
-      const observer = new IntersectionObserver(([e]) => {
-        stucked.value = e.intersectionRatio < 1
-        onNavResize()
-      })
-      observer.observe(document.getElementById('ipb-navbar'))
+      // const observer = new IntersectionObserver(([e]) => {
+      //   stucked.value = e.intersectionRatio < 1
+      //   onNavResize()
+      // })
+      // observer.observe(document.getElementById('ipb-navbar'))
+
+      document.addEventListener('mouseenter', onMouseEnterDoc)
+      document.addEventListener('mouseleave', onMouseLeaveDoc)
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', onNavResize)
+      document.removeEventListener('mouseenter', onMouseEnterDoc)
+      document.removeEventListener('mouseleave', onMouseLeaveDoc)
     })
 
     return {
       chapters, chapterInfos, curChI, approxChI, hoveredChI, workName,
       infoPosX, mainBM, fullViewMode, navbarElemRef, stucked, isOneShot,
-      navbarBarClass, jumpToChapter
+      mainContent, mainContentTop,
+      navbarBarClass, jumpToChapter, settings
     }
   }
 }
 </script>
 
 <style lang="scss">
-$bar_color: #999;
-$bar_darken_color: #444;
+// #ipb-navbar {
+//   position: sticky;
+//   top: -1px;
+//   z-index: 99;
+//   height: 0;
+// }
 
-$ao3_red: #900;
-
-#ipb-navbar {
-  position: sticky;
-  top: -1px;
-  z-index: 99;
-  height: 0;
-}
-
-.ipb-navbar-content {
+.ipb-navbar {
+  position: absolute;
+  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   background: linear-gradient(to bottom, rgba(#FFF, 1) 20%, rgba(#FFF, 0) 100%);
-  
-  &.stucked .ipb-navbar__bar {
-    opacity: 1;
+  transition: width 0.2s;
 
-    &:not(.ipb-one-chapter-only).ipb-current {
-      height: 8px;
+  &.stucked {
+    position: fixed;
 
-      &.ipb-focus { height: 17px; }
+    .ipb-navbar__bar {
+      opacity: 1;
+
+      &:not(.ipb-one-chapter-only).ipb-current {
+        height: 8px;
+
+        &.ipb-focus { height: 17px; }
+      }
     }
   }
 

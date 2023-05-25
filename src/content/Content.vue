@@ -1,7 +1,7 @@
 <template v-if="chapters">
   <div class="ipb-toolbar" v-if="!bmInProgress">
 
-    <div class="ipb-toolbar__item" @click="() => toggleBookmarkEdit(chapters)" :style="{top: 'calc(30px + 4px)'}">
+    <div class="ipb-toolbar__item" @click="e => toggleBookmarkEdit(e, chapters)" :style="{top: 'calc(30px + 4px)'}">
       <IpbIcon type="location" fill="#FFF"></IpbIcon>
       <b class="ipb-toolbar__item-desc">{{mainBM.chI ? 'Change bookmark location' : 'Add a new bookmark'}}</b>
     </div>
@@ -27,6 +27,8 @@
   <IpbEditor v-if="bmInProgress" :chapters="chapters"></IpbEditor>
   
   <IpbBookmark :class="{highlight: bmFocusCountDown, bmInProgress}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
+
+  <IpbNavbar v-if="settings.showNav"></IpbNavbar>
 </template>
 
 <script>
@@ -34,16 +36,16 @@ import {ref, computed} from 'vue'
 import {chapters, curChI, onScroll} from './page'
 import { mainBM, bmInProgress, toggleBookmarkEdit } from './bookmark'
 import { fullViewMode, mainContent } from './static'
+import { settings } from './setting'
 
-import IpbBookmark from './components/IpbBookmark.vue'
-import IpbEditor from './components/IpbEditor.vue'
-import IpbIcon from './components/IpbIcon.vue'
+import IpbBookmark from '@/content/components/IpbBookmark.vue'
+import IpbEditor from '@/content/components/IpbEditor.vue'
+import IpbIcon from '@/common/IpbIcon.vue'
+import IpbNavbar from './components/IpbNavbar.vue'
 
 export default {
   name: 'App',
-  components: {
-    // IpbNavbar,
-    IpbEditor, IpbBookmark, IpbIcon },
+  components: { IpbNavbar, IpbEditor, IpbBookmark, IpbIcon },
   setup () {
     const showToolbar = ref(false)
     const bmFocusCountDown = ref(0)
@@ -81,15 +83,13 @@ export default {
     return {
       chapters, mainBM, curChI, bmFocusCountDown, fullViewMode,
       showToolbar, bmInProgress, canShowBookmark, mainContent,
-      toggleBookmarkEdit, jumpToBookmark
+      toggleBookmarkEdit, jumpToBookmark, settings
     }
   }
 }
 </script>
 
 <style lang="scss">
-$ao3_red: #900;
-
 .ao3-in-page-bookmark {
   font-family: sans-serif;
   font-size: 17px;

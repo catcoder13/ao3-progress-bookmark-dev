@@ -1,13 +1,13 @@
 <template>
   <div class="ipb-dropdown" :class="{open}">
     <h2 v-if="title">{{ title }}</h2>
-    <div class="ipb-dropdown__entry" @click="open = !open">
-      <span class="ipb-text">{{ modelValue || 'All' }}</span>
+    <div class="ipb-dropdown__entry">
+      <input type="text" @click="open = !open" @blur="onBlur" readonly :value="modelValue || 'All'"/>
       <span class="ipb-close" v-if="modelValue" @click="onClear">&#10006;</span>
 
-      <div class="ipb-dropdown__entry__options">
+      <div class="ipb-style-scrollbar">
         <span :style="{pointerEvents: 'none'}" v-if="!options.length">empty.</span>
-        <span v-for="(opt, i) in options" @click="e => onSelect(e, opt)" :key="i">{{ opt }}</span>
+        <button class="ipb-input-blur-ref" v-for="(opt, i) in options" @click="e => onSelect(e, opt)" :key="i">{{ opt }}</button>
       </div>
     </div>
     
@@ -33,7 +33,13 @@ export default {
       open.value = false
       e.stopPropagation()
     }
-    return { open, onSelect, onClear }
+
+    const onBlur = e => {
+      if (!e.relatedTarget || !e.relatedTarget.classList.contains('ipb-input-blur-ref')) {
+        open.value = false
+      }
+    }
+    return { open, onSelect, onBlur, onClear }
   }
 }
 </script>
@@ -50,86 +56,98 @@ export default {
 
   .ipb-dropdown__entry {
     position: relative;
-    width: 200px;
-    height: 22px;
-    box-sizing: border-box;
-    border-radius: 25px;
-    background-color: #FFF;
-    border: 1px solid #333;
-    white-space: nowrap;
+    width: 180px;
+    height: 20px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-
-    font-size: 12px;
-    line-height: 1;
-    padding: 4px 10px;
 
     &:before {
       content: '';
       position: absolute;
-      top: 4px;
+      top: 3px;
       right: 10px;
       transform: rotate(45deg);
-      border-right: 2px solid #333;
-      border-bottom: 2px solid #333;
+      border-right: 2px solid #888;
+      border-bottom: 2px solid #888;
       height: 6px;
       width: 6px;
-      transition: transform 0.2s;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    &:hover {
+      input { border: 1px solid #444; }
+
+      &::before { border-color: #444; }
+    }
+
+    input {
+      width: 100%;
+      height: 100%;
+      outline: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 12px;
+      line-height: 1;
+      white-space: nowrap;
+      padding: 4px 40px 4px 10px;
+      box-sizing: border-box;
+      background-color: #FFF;
+      border: 1px solid #888;
+      border-radius: 25px;
+      caret-color: transparent;
+      cursor: pointer;
+      transition: border 0.2s;
+
+      &:focus-visible { border: 1px solid #333; }
     }
 
     span.ipb-close {
       position: absolute;
-      top: 3px;
+      top: 2px;
       right: 30px;
       font-size: 14px;
-      color: #333;
+      color: #888;
       line-height: 1;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, color 0.2s;
 
-      &:hover { transform: scale(1.2);}
+      &:hover { transform: scale(1.2); color: #333; }
     }
 
-    .ipb-dropdown__entry__options {
+    .ipb-style-scrollbar {
       display: none;
       position: absolute;
       z-index: 1;
       top: 21px;
       left: 10px;
       flex-direction: column;
-      background-color: #FFF;
       font-size: 14px;
       box-shadow: 0px 2px 5px #999;
       max-height: 100px;
-      overflow-y: overlay;
       min-width: calc(100% - 20px);
+      overflow-y: overlay;
 
-      span {
+      span,
+      button {
         line-height: 1;
         padding: 5px 20px 5px 10px;
-        cursor: pointer;
+        background-color: #FFF;
+        border: none;
+        text-align: left;
 
         &:nth-child(2n+1) { background-color: #eee; }
+      }
+
+      button {
+        text-align: left;
+        cursor: pointer;
+        font-size: 13px;
+        color: #333;
 
         &:hover {
           background-color: #aaa;
           color: #FFF;
         }
-      }
-
-      &::-webkit-scrollbar { width: 15px; }
-
-      &::-webkit-scrollbar-track { background-color: transparent; }
-
-      &::-webkit-scrollbar-thumb {
-        background-color: #bbb;
-        border-radius: 17px;
-        border: 6px solid transparent;
-        background-clip: content-box;
-
-        &:hover { background-color: #999;}
-      }
+      }      
     }
   } // ipb-dropdown__entry
 
@@ -137,12 +155,12 @@ export default {
     .ipb-dropdown__entry {
       overflow: visible;
 
-      .ipb-text { color: #aaa; }
+      input { color: #aaa; }
 
       &::before { transform: rotate(-135deg); top: 7px; }
     }
 
-    .ipb-dropdown__entry__options { display: flex; }
+    .ipb-style-scrollbar { display: flex; }
   }
 
   

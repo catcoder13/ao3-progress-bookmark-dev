@@ -1,0 +1,155 @@
+<template>
+  <div class="ipb-setting" :class="{open: toggle}" @click="onClickedAreaCheck">
+    <IpbIcon class="ipb-setting__entry" type="menu" fill="#FFF" :open="toggle" @click="onToggle" />
+    <div class="ipb-style-scrollbar">
+      <h2>Settings</h2>
+      <div class="ipb-setting__option-group">
+        <h3>Bookmark list</h3>
+        <div class="ipb-setting__option-group__item">
+          <h4>Compact mode</h4>
+          <IpbToggle v-model="settings.compact" />
+        </div>
+      </div>
+
+      <div class="ipb-setting__option-group">
+        <h3>In-page bookmark UI</h3>
+        <div class="ipb-setting__option-group__item">
+          <h4>Show chapter navigation bar</h4>
+          <IpbToggle v-model="settings.showNav" />
+        </div>
+        <div class="ipb-setting__option-group__item">
+          <h4>Extra navigation UI</h4>
+          <IpbToggle v-model="settings.extraSideNav" />
+        </div>
+        <div class="ipb-setting__option-group__item">
+          <h4>Side bar vertical position</h4>
+          <input type="range" />
+        </div>
+        <div class="ipb-setting__option-group__item">
+          <h4>Bookmark location</h4>
+          <IpbToggle v-model="settings.bmAtRight" />
+        </div>
+      </div>
+     
+      <div class="ipb-setting__option-group">
+        <h3>Bookmark data</h3>
+        <div class="ipb-setting__option-group__item">
+          <h4>Import bookmark data</h4>
+          <button>Import</button>
+        </div>
+        <div class="ipb-setting__option-group__item">
+          <h4>Download bookmark data</h4>
+          <button>Download</button>
+        </div>
+        <div class="ipb-setting__option-group__item">
+          <h4>Delete all bookmarks</h4>
+          <button>Delete</button>
+        </div>
+      </div>
+      
+      <button>Reset all settings</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import {ref} from 'vue'
+import IpbIcon from '@/common/IpbIcon.vue'
+import IpbToggle from './IpbToggle.vue'
+import { settings } from '../setting'
+
+export default {
+  components: { IpbIcon, IpbToggle },
+  setup() {
+    const toggle = ref(false)
+
+    const onToggle = e => {
+      toggle.value = !toggle.value
+      e.stopPropagation()
+    }
+    const onClickedAreaCheck = e => {
+      toggle.value = (e.target === e.currentTarget) ? false : true
+    }
+    return { toggle, onToggle, onClickedAreaCheck, settings }
+  }
+}
+</script>
+
+<style lang="scss">
+.ipb-setting {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  &.open {
+    background-color: rgba(#000, 0.65);
+    pointer-events: all;
+    transition: background-color 0.2s 0.2s;
+    
+    .ipb-style-scrollbar { transform: translateX(0); }
+
+    .ipb-setting__entry {
+      background-color: rgba(#FFF, 0.8);
+      
+      line { stroke: #333; }
+    }
+  }
+
+  .ipb-setting__entry {
+    position: absolute;
+    z-index: 1;
+    right: 10px;
+    top: 10px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background-color: rgba(#FFF, 0.1);
+    cursor: pointer;
+    pointer-events: all;
+    transition: transform 0.2s;
+
+    line { transition: stroke 0.2s; }
+
+    &:hover { transform: scale(1.1); }
+  }
+
+  h2 {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 15px;
+  }
+
+  .ipb-style-scrollbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 250px;
+    height: 100%;
+    background-color: #eee;
+    transform: translateX(100%);
+    transition: transform 0.3s;
+    padding: 10px 0 10px 10px;
+    box-sizing: border-box;
+
+    .ipb-setting__option-group {
+      margin-bottom: 15px;
+
+      h3 {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .ipb-setting__option-group__item {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 5px;
+      }
+    }
+  }
+}
+</style>
