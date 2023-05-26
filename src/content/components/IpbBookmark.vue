@@ -79,7 +79,6 @@ $bm_blue: #3caaaa;
       .ipb-bookmark__info { display: block; }
 
       .ipb-bookmark__btn {
-        // max-width: 500px;
         display: block;
       }
     }
@@ -135,8 +134,29 @@ $bm_blue: #3caaaa;
       border-bottom: 6px solid #ddd;
     }
   }
+} // ipb-bookmark
 
-  
+.ipb-bookmark.ipb-left {
+  .ipb-bookmark-content {
+    right: auto;
+    left: 0;
+
+    .ipb-bookmark__btn {
+      right: auto;
+      left: 0;
+      padding: 5px 5px 5px 35px;
+    }
+
+    .ipb-bookmark__info {
+      right: auto;
+      left: 0;
+
+      &::before {
+        right: auto;
+        left: 8px;
+      }
+    }
+  }
 }
 
 @keyframes bookmarkFade {

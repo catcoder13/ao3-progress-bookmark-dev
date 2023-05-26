@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  props: ['modelValue', 'title', 'options'],
+  props: ['modelValue', 'options', 'title'],
   emits: ['update:modelValue'],
   setup(p, {emit}) {
     const onSelect = (opt) => emit('update:modelValue', opt)

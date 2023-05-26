@@ -1,13 +1,13 @@
 <template v-if="chapters">
-  <div class="ipb-toolbar" v-if="!bmInProgress">
+  <div class="ipb-toolbar" v-if="!bmInProgress" :class="{'ipb-left': !settings.bmAtRight}">
 
-    <div class="ipb-toolbar__item" @click="e => toggleBookmarkEdit(e, chapters)" :style="{top: 'calc(30px + 4px)'}">
+    <div class="ipb-toolbar__item" @click="e => toggleBookmarkEdit(e, chapters)" :style="{top: 0}">
       <IpbIcon type="location" fill="#FFF"></IpbIcon>
       <b class="ipb-toolbar__item-desc">{{mainBM.chI ? 'Change bookmark location' : 'Add a new bookmark'}}</b>
     </div>
 
     <div v-if="mainBM.chI" class="ipb-toolbar__item" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}"
-      @click="jumpToBookmark" :style="{top: 'calc(64px + 4px)'}">
+      @click="jumpToBookmark" :style="{top: 'calc(30px + 4px)'}">
       <IpbIcon type="jump" fill="#FFF"></IpbIcon>
       <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
       <div v-else class="ipb-toolbar__item-desc">
@@ -24,9 +24,9 @@
     </div>
   </div>
   
-  <IpbEditor v-if="bmInProgress" :chapters="chapters"></IpbEditor>
+  <IpbEditor v-if="bmInProgress" :chapters="chapters" :class="{'ipb-left': !settings.bmAtRight}"></IpbEditor>
   
-  <IpbBookmark :class="{highlight: bmFocusCountDown, bmInProgress}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
+  <IpbBookmark :class="{highlight: bmFocusCountDown, bmInProgress, 'ipb-left': !settings.bmAtRight}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
 
   <IpbNavbar v-if="settings.showNav"></IpbNavbar>
 </template>
@@ -185,12 +185,41 @@ export default {
       }
     } // .ipb-toolbar__item
   } // .ipb-toolbar
+
+  .ipb-toolbar.ipb-left {
+    position: fixed;
+    right: auto;
+    left: 0;
+
+    .ipb-toolbar__item {
+      right: auto;
+      left: 0;
+      transform: translateX(-100%);
+
+      &:hover { transform: translateX(0); }
+
+      b { 
+        padding-left: 5px;
+      }
+      
+      & > .ipb-icon {
+        left: auto;
+        right: -30px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
+    }
+    
+  }
+
 } // ao3-in-page-bookmark
 
 #workskin {
-  .chapter {
-    position: relative;
-  }
+  // .chapter {
+  //   position: relative;
+  // }
 
   &.bmInProgress #chapters > .chapter,
   &.bmInProgress.oneshot #chapters {

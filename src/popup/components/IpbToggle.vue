@@ -6,8 +6,6 @@
 </template>
 
 <script>
-import {ref} from 'vue'
-
 export default {
   props: ['modelValue'],
   emits: ['update:modelValue'],
@@ -49,7 +47,7 @@ export default {
     border-radius: 15px;
     border: 1px solid #999;
     box-sizing: border-box;
-    opacity: 0.8;
+    opacity: 0.7;
 
     &:hover { opacity: 1; }
 

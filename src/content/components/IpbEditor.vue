@@ -7,7 +7,7 @@
       </div>
 
       <div class="ipb-editor__icon" @click="onPercBMAddClick">
-        <IpbIcon type="location" fill="#900" ></IpbIcon>
+        <IpbIcon type="location"></IpbIcon>
       </div>
 
       
@@ -68,14 +68,12 @@ export default {
     watch(() => mousePos.y, newPosY => onMouseMove(null, newPosY))
 
     onMounted(() => {
-      // console.log('mounted', editBM)
       document.addEventListener('scroll', onMouseMove)
       onMouseMove()
     }) // on mounted
     
     onUnmounted(() => {
       document.removeEventListener('scroll', onMouseMove)
-      // console.log('on unmounted')
     })
 
     const onPercBMAddClick = () => {
@@ -86,7 +84,6 @@ export default {
 
 
     const onPercBMDoneClick = () => {
-      // document.removeEventListener('scroll', onMouseMove)
       onBookmarkEnd()
     }
 
@@ -210,6 +207,29 @@ export default {
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
       border-bottom: 6px solid #ddd;
+    }
+  }
+} // ipb-editor
+
+.ipb-editor.ipb-left {
+  .ipb-editor-content {
+    left: 0;
+    right: auto;
+
+    .ipb-editor__btn {
+      right: auto;
+      left: 0;
+      padding: 5px 5px 5px 35px;
+    }
+
+    .ipb-editor__info {
+      right: auto;
+      left: 0;
+      
+      &::before {
+        right: auto;
+        left: 8px;
+      }
     }
   }
 }

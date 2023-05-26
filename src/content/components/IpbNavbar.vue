@@ -1,67 +1,96 @@
 <template>
-  <div v-if="settings.showNav" class="ipb-navbar" ref="navbarElemRef" :class="{stucked}" :style="{top: stucked ? 0 : `${mainContentTop}px`, width: stucked ? '100%' : `${mainContent.getBoundingClientRect().width}px`}">
+  <div class="ipb-navbar" :class="{stucked}" :style="{top: `${navbarElem.top}px`, width: `${navbarElem.width}px`}">
     <div :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
       @click="() => jumpToChapter(chI)" @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
       <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${chapters[chI].progress}%`}"></span>
       <template v-if="mainBM.chI != null && mainBM.chI == chI">
-        <IpbIcon class="ipb-navbar__bar__bm" type="location" fill="#000" :style="{left: `${mainBM.perc * 100}%`}"></IpbIcon>
+        <IpbIcon class="ipb-navbar__bar__bm" type="location" fill="#000" :style="{left: `${mainBM.perc * 100}%`}" />
       </template>
     </div>
-      
-    <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPosX">
-      <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
-      <div class="ipb-heading">
-        <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI"></IpbIcon>
-        <b v-if="isOneShot">{{workName}}</b>
-        <b v-else>Chapter {{ parseInt(approxChI) + 1 }}</b>
-      </div>
-      
-      <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ipb-title">{{ chapterInfos[approxChI].title }}</span>
-
-      <template v-if="hoveredChI != null">
-        <span class="ipb-desc" v-if="fullViewMode">Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
-        <span class="ipb-desc" v-else-if="hoveredChI != curChI">Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
-        <span class="ipb-desc" v-else>Back to the top</span>
-      </template>
-    </div>
-
-    <div v-else-if="approxChI != null" class="ipb-navbar-info ipb-navbar-info--short" :style="infoPosX">
-      <b class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
-    </div>
-
   </div>
+      
+  <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPos">
+    <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
+    <div class="ipb-heading">
+      <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI"></IpbIcon>
+      <b v-if="isOneShot">{{workName}}</b>
+      <b v-else>Chapter {{ parseInt(approxChI) + 1 }}</b>
+    </div>
+    
+    <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ipb-title">{{ chapterInfos[approxChI].title }}</span>
+
+    <template v-if="hoveredChI != null && !bmInProgress">
+      <span class="ipb-desc" v-if="fullViewMode">Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+      <span class="ipb-desc" v-else-if="hoveredChI != curChI">Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+      <span class="ipb-desc" v-else>Back to the top</span>
+    </template>
+  </div>
+
+  <div v-else-if="approxChI != null" class="ipb-navbar-info ipb-navbar-info--short" :style="infoPos">
+    <b class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
+  </div>
+
+  
 </template>
 
 <script>
-import { computed, onMounted, ref, reactive, onUnmounted, watch } from 'vue'
+import { computed, onMounted, ref, reactive, onUnmounted } from 'vue'
 import { mainBM, bmInProgress } from '../bookmark'
-import { chapters, curChI, view, mainContentTop, onScroll } from '../page'
+import { chapters, curChI, view, onScroll } from '../page'
 import {chapterInfos, fullViewMode, workId, isOneShot, mainContent, workName} from '../static'
-import {mousePos} from '../mousePos'
-import { settings } from './../setting'
+import {mousePos, activateMouseMove, deactivateMouseMove} from '../mousePos'
 import IpbIcon from '@/common/IpbIcon.vue'
+
+
 
 export default {
   name: 'IpbNavbar',
   components: { IpbIcon },
   setup() {
-    const inView = ref(true)
-    const hoveredChI = ref(null)
+    activateMouseMove()
 
-    const navbarElemRef = ref(null)
     const navbarElem = reactive({width: 0, x: 0, barWidth: 0})
+
+    const stucked = ref(false)
+    let mainContentTop = 0
+    let wrapperWidth = 0
+    let wrapperLeft = 0
+    const innerDivWorkWrapper = document.querySelector('#inner #main .wrapper')
+
+    const onLocalScroll = () => {
+      stucked.value = window.scrollY > mainContentTop
+
+      navbarElem.left = stucked.value ? 0 : wrapperLeft
+      navbarElem.top = stucked.value ? 0 : mainContentTop
+      navbarElem.width = stucked.value ? view.width : wrapperWidth
+      navbarElem.barWidth = navbarElem.width / chapterInfos.length
+    }
+
+    const onLocalResize = () => {
+      const {x, y, width, height} = innerDivWorkWrapper.getBoundingClientRect()
+      mainContentTop = window.scrollY + y + height
+      wrapperWidth = width
+      wrapperLeft = x
+
+      onLocalScroll()
+    }
+
+
+    const inView = ref(true)
+
+    const onMouseEnterDoc = () => inView.value = true
+    const onMouseLeaveDoc = () => inView.value = false
+
+
+    const hoveredChI = ref(null)
     
-    // const stucked = ref(false)
-
-    const stucked = computed(() => view.scrollY > mainContentTop.value)
-
     const approxChI = computed(() => {
       if (bmInProgress.value || !inView.value) return null
       
       if (hoveredChI.value != null) return hoveredChI.value
 
       if (stucked.value) {
-        if (mousePos.y > 70) return null
+        if (mousePos.y > 70 || mousePos.y < 0) return null
       } else {
         const mousePosY = view.scrollY + mousePos.y
         if (mousePosY > navbarElem.top + 70 || mousePosY < navbarElem.top) return null
@@ -71,11 +100,11 @@ export default {
       return Math.min(chapterInfos.length - 1, Math.floor(mousePosX / navbarElem.barWidth))
     })
 
-    const infoPosX = computed(() => {
+    const infoPos = computed(() => {
       if (bmInProgress.value || approxChI.value == null) return null
       
       const infoWidthOffset = hoveredChI.value == null ? 70 : 200
-      const xPosCorrect = mousePos.x + infoWidthOffset > view.width ? view.width - infoWidthOffset : mousePos.x
+      const xPosCorrect = mousePos.x + infoWidthOffset > navbarElem.width ? navbarElem.width - infoWidthOffset : mousePos.x
       return {top: `${mousePos.y + 22}px`, left: `${xPosCorrect}px`}
     })
 
@@ -103,60 +132,33 @@ export default {
       }
     }
 
-    const onMouseEnterDoc = () => inView.value = true
-    const onMouseLeaveDoc = () => inView.value = false
-    
-    const onNavResize = () => {
-      const {x, y, width} = navbarElemRef.value.getBoundingClientRect()
-      navbarElem.left = x
-      navbarElem.top = window.scrollY + y
-      navbarElem.width = width
-      navbarElem.barWidth = width / chapterInfos.length
-    }
-
-    watch(() => stucked.value,
-    newStucked => {
-      onNavResize()
-    })
-
     onMounted(() => {
-      window.addEventListener('resize', onNavResize)
-      onNavResize()
-
-      // const observer = new IntersectionObserver(([e]) => {
-      //   stucked.value = e.intersectionRatio < 1
-      //   onNavResize()
-      // })
-      // observer.observe(document.getElementById('ipb-navbar'))
+      document.addEventListener('scroll', onLocalScroll)
+      window.addEventListener('resize', onLocalResize)
+      onLocalResize()
 
       document.addEventListener('mouseenter', onMouseEnterDoc)
       document.addEventListener('mouseleave', onMouseLeaveDoc)
     })
 
     onUnmounted(() => {
-      window.removeEventListener('resize', onNavResize)
+      document.removeEventListener('scroll', onLocalScroll)
+      window.removeEventListener('resize', onLocalResize)
       document.removeEventListener('mouseenter', onMouseEnterDoc)
       document.removeEventListener('mouseleave', onMouseLeaveDoc)
+      deactivateMouseMove()
     })
 
     return {
-      chapters, chapterInfos, curChI, approxChI, hoveredChI, workName,
-      infoPosX, mainBM, fullViewMode, navbarElemRef, stucked, isOneShot,
-      mainContent, mainContentTop,
-      navbarBarClass, jumpToChapter, settings
+      chapters, chapterInfos, curChI, approxChI, hoveredChI, workName, bmInProgress,
+      infoPos, mainBM, fullViewMode, navbarElem, stucked, isOneShot,
+      navbarBarClass, jumpToChapter
     }
   }
 }
 </script>
 
 <style lang="scss">
-// #ipb-navbar {
-//   position: sticky;
-//   top: -1px;
-//   z-index: 99;
-//   height: 0;
-// }
-
 .ipb-navbar {
   position: absolute;
   width: 100%;
@@ -297,7 +299,7 @@ export default {
   .ipb-desc {
     font-size: 11px;
     font-style: italic;
-    color: #555;
+    color: #85aec2;
 
   }
 } // ipb-navbar-info

@@ -16,7 +16,7 @@ const initStoreData = () => {
     if (workObj[STORE_WORK_KEY]) work.value = workObj[STORE_WORK_KEY]
     else console.log('no bookmark in this work yet')
     
-    console.log('work loaded', work.value)
+    // console.log('work loaded', work.value)
 
     if (settingObj[STORE_SETTING_KEY]) {
       updateSetting(settingObj[STORE_SETTING_KEY])

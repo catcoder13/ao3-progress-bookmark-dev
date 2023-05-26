@@ -6,8 +6,10 @@ $bar_darken_color: #444;
 $bm_filter_bar_color: #ececec;
 
 $bm_blue: #3caaaa;
-$green: #67f751;
+$green: #12d64c;
 $red: #fe4141;
+
+$link_blue: #166fce;
 
 body {
   margin: 0;
@@ -24,12 +26,12 @@ h4 {
 }
 
 a {
-  color: #166fce;
+  color: $link_blue;
   text-decoration: none;
-  border-bottom: 1px dashed #166fce;
+  border-bottom: 1px dashed $link_blue;
   cursor: pointer;
 
-  &:hover { border-bottom: 1px solid #166fce; }
+  &:hover { border-bottom: 1px solid $link_blue; }
 }
 
 .ipb-style-scrollbar {

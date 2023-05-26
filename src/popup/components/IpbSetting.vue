@@ -4,14 +4,6 @@
     <div class="ipb-style-scrollbar">
       <h2>Settings</h2>
       <div class="ipb-setting__option-group">
-        <h3>Bookmark list</h3>
-        <div class="ipb-setting__option-group__item">
-          <h4>Compact mode</h4>
-          <IpbToggle v-model="settings.compact" />
-        </div>
-      </div>
-
-      <div class="ipb-setting__option-group">
         <h3>In-page bookmark UI</h3>
         <div class="ipb-setting__option-group__item">
           <h4>Show chapter navigation bar</h4>
@@ -22,12 +14,11 @@
           <IpbToggle v-model="settings.extraSideNav" />
         </div>
         <div class="ipb-setting__option-group__item">
-          <h4>Side bar vertical position</h4>
-          <input type="range" />
-        </div>
-        <div class="ipb-setting__option-group__item">
-          <h4>Bookmark location</h4>
-          <IpbToggle v-model="settings.bmAtRight" />
+          <h4>Side button/bookmark alignment</h4>
+          <div class="ipb-tab--custom">
+            <span :class="{checked: !settings.bmAtRight}" @click="settings.bmAtRight = false">Left</span>
+            <span :class="{checked: settings.bmAtRight}" @click="settings.bmAtRight = true">Right</span>
+          </div>
         </div>
       </div>
      
@@ -56,7 +47,9 @@
 import {ref} from 'vue'
 import IpbIcon from '@/common/IpbIcon.vue'
 import IpbToggle from './IpbToggle.vue'
+import IpbTab from './IpbTab.vue'
 import { settings } from '../setting'
+
 
 export default {
   components: { IpbIcon, IpbToggle },
@@ -133,7 +126,7 @@ export default {
     background-color: #eee;
     transform: translateX(100%);
     transition: transform 0.3s;
-    padding: 10px 0 10px 10px;
+    padding: 10px;
     box-sizing: border-box;
 
     .ipb-setting__option-group {
@@ -150,6 +143,32 @@ export default {
         padding-bottom: 5px;
       }
     }
+  }
+}
+
+.ipb-tab--custom {
+  display: flex;
+
+  span {
+    background-color: #777;
+    color: #FFF;
+    padding: 5px 10px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+
+    &:not(:last-child) { margin-right: 5px; }
+
+    &.checked {
+      pointer-events: none;
+      opacity: 1;
+    }
+
+    &:hover {
+      opacity: 0.9;
+    }
+
   }
 }
 </style>

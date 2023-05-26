@@ -5,9 +5,7 @@ let chapters = null
 const chaptersRef = {}
 const curChI = ref(0)
 
-const view = reactive({ width: window.innerWidth, height: window.innerHeight, scrollY: 0})
-
-const mainContentTop = ref(0)
+const view = reactive({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight, scrollY: 0})
 
 if (chapterDoms.length) { // multi chapter
   curChI.value = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
@@ -44,6 +42,7 @@ const onScroll = (e, manualY) => {
 const onResize = () => {
   view.width = document.documentElement.clientWidth
   view.height = document.documentElement.clientHeight
+  
   const chIs = Object.keys(chapters)
   chIs.forEach(chI => {
     const {top, height} = (chapters[chI].dom && chapters[chI].dom.getBoundingClientRect()) || {top: 0, height: 0}
@@ -51,7 +50,6 @@ const onResize = () => {
     chapters[chI].height = height
   })
 
-  mainContentTop.value = window.scrollY + mainContent.getBoundingClientRect().y
   onScroll()
 }
 
@@ -61,4 +59,4 @@ onResize()
 
 
 
-export {chapters, curChI, view, mainContentTop, onScroll}
+export {chapters, curChI, view, onScroll}

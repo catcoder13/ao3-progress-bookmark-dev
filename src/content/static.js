@@ -41,7 +41,7 @@ let chapterInfos = null
 if (chapterListElem) {
   chapterInfos = Array.from(chapterListElem.querySelectorAll('option')).map((optElem,i) => {
     const title = optElem.innerText.match(/(?:\d+\. )?(.+)/)[1]
-    // console.log('ch by ch', title)
+    
     return {
       chID: optElem.getAttribute('value'),
       title: title !== `Chapter ${i+1}` ? title : null
@@ -51,7 +51,6 @@ if (chapterListElem) {
   chapterInfos = Array.from(chapterDoms).map(chDom => {
     const matches = (/^Chapter \d+(?:: (.*))?$/).exec(chDom.querySelector('.title').innerText)
     const title = matches[1] || matches[0]
-    // console.log('entire work', title, chDom.querySelector('.title a').innerText)
     return {
       chID: chDom.querySelector('.title a').getAttribute('href').match(/\/works\/\d+\/chapters\/(\d+)/)[1],
       title: title !== chDom.querySelector('.title a').innerText ? title : null
@@ -60,15 +59,9 @@ if (chapterListElem) {
 } else {
   // one shot does not have chapter id
   chapterInfos = [{ chID: null, title: null }]
-  // chapterInfos = [{ chID: null, title: mainContent && mainContent.querySelector('.title').innerText }]
 }
 
-console.log(chapterInfos)
-
-// // identify user or guest
-// const iconHrefDom = document.querySelector('#greeting .icon a')
-// const userName = iconHrefDom && iconHrefDom.getAttribute('href').split('/users/')[1].toLowerCase()
-// console.log('user', userName)
+// console.log(chapterInfos)
 
 export {
   workId, workName, fullViewMode, isOneShot,

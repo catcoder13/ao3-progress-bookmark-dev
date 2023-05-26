@@ -3,7 +3,9 @@ import {reactive, computed} from 'vue'
 const STORE_WORK_KEY_PREFIX = `AO3_IPB_WORK_`
 const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 const AO3_DOMAIN = "https://archiveofourown.org"
+
 const works = reactive({})
+
 const worksGroupByAuthor = computed(() => {
   return Object.keys(works)
     .reduce((acc, workID) => {
@@ -45,7 +47,6 @@ const removeWork = workID => {
 }
 
 const visitURL = subURL => {
-  console.log('visit url', subURL)
   chrome.runtime.sendMessage(
     {type: 'tab', url: AO3_DOMAIN + subURL},
     res => {

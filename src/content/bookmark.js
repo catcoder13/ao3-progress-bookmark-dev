@@ -1,6 +1,7 @@
 import {ref, reactive, watch} from 'vue'
 import { work, updateBookmarkStore, removeBookmarkStore } from './store'
 import { workId, chapterInfos, mainContent } from './static'
+import { activateMouseMove, deactivateMouseMove } from './mousePos'
 
 const mainBM = reactive({chI: null, perc: null, chID: null, link: null, fwLink: null})
 
@@ -36,25 +37,31 @@ const removeBookmark = () => {
 }
 
 const onBookmarkEnd = () => {
-  console.log('on bookmark end')
   mainContent.classList.toggle('bmInProgress', false)
   bmInProgress.value = false
+  deactivateMouseMove()
 }
 
 const toggleBookmarkEdit = (e, chapters) => {
   bmInProgress.value = !bmInProgress.value
+  if (bmInProgress.value) activateMouseMove(null, e.clientY)
+  else deactivateMouseMove()
+
   mainContent.classList.toggle('bmInProgress', bmInProgress.value)
+  const chIs = Object.keys(chapters)
+  const firstChI = chIs[0]
+  const lastChI = chIs[chIs.length - 1]
+  const {y: bmAreaFirstTop} = chapters[firstChI].dom.getBoundingClientRect()
+  const {y: bmAreaLastTop, height: lastHeight} = chapters[lastChI].dom.getBoundingClientRect()
 
-  const {y: bmAreaTop, height} = chapters[Object.keys(chapters)[0]].dom.getBoundingClientRect()
-
-  if (bmAreaTop > e.clientY) {
+  if (bmAreaFirstTop > e.clientY) {
     window.scrollTo({
-      top: window.scrollY + bmAreaTop - e.clientY + 30,
+      top: window.scrollY + bmAreaFirstTop - e.clientY + 30,
       behavior: 'smooth'
     })
-  } else if (e.clientY > bmAreaTop + height) {
+  } else if (e.clientY > bmAreaLastTop + lastHeight) {
     window.scrollTo({
-      top: window.scrollY + bmAreaTop + height - e.clientY - 30,
+      top: window.scrollY + bmAreaLastTop + lastHeight - e.clientY - 30,
       behavior: 'smooth'
     })
   }

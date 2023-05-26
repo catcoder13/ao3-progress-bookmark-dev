@@ -102,15 +102,16 @@ export default {
 
     span.ipb-close {
       position: absolute;
-      top: 2px;
+      top: 50%;
       right: 30px;
+      transform: translateY(-50%);
       font-size: 14px;
       color: #888;
       line-height: 1;
       cursor: pointer;
       transition: transform 0.2s, color 0.2s;
 
-      &:hover { transform: scale(1.2); color: #333; }
+      &:hover { transform: translateY(-50%) scale(1.2); color: #333; }
     }
 
     .ipb-style-scrollbar {
@@ -129,7 +130,7 @@ export default {
       span,
       button {
         line-height: 1;
-        padding: 5px 20px 5px 10px;
+        padding: 5px 10px;
         background-color: #FFF;
         border: none;
         text-align: left;
