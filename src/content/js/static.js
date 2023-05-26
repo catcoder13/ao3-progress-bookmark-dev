@@ -16,7 +16,6 @@ const workName = mainContent && mainContent.querySelector('.title').innerText
 const authorName = mainContent && mainContent.querySelector('.byline a[rel=author]').innerText
 const authorLink = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
 
-// let chapterId = null
 let fullViewMode = false
 
 const match1 = (window.location.href).match(/chapters\/(\d+)/)

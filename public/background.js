@@ -1,5 +1,3 @@
-// const AO3_DOMAIN = "https://archiveofourown.org"
-
 const onReceiveMsgFromPopup = (res, sender, sendResponse) => {
   if (res.type === 'tab') {
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
@@ -9,4 +7,5 @@ const onReceiveMsgFromPopup = (res, sender, sendResponse) => {
     })
   }
 }
+
 chrome.runtime.onMessage.addListener(onReceiveMsgFromPopup)

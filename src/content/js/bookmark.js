@@ -36,18 +36,19 @@ const removeBookmark = () => {
   removeBookmarkStore() // delete store record
 }
 
-const onBookmarkEnd = () => {
+const stopBookmarkEdit = () => {
   mainContent.classList.toggle('bmInProgress', false)
   bmInProgress.value = false
   deactivateMouseMove()
 }
 
-const toggleBookmarkEdit = (e, chapters) => {
-  bmInProgress.value = !bmInProgress.value
-  if (bmInProgress.value) activateMouseMove(null, e.clientY)
-  else deactivateMouseMove()
+const startBookmarkEdit = (e, chapters) => {
+  mainContent.classList.toggle('bmInProgress', true)
+  bmInProgress.value = true
+  activateMouseMove(null, e.clientY)
 
-  mainContent.classList.toggle('bmInProgress', bmInProgress.value)
+  if (!chapters) return
+
   const chIs = Object.keys(chapters)
   const firstChI = chIs[0]
   const lastChI = chIs[chIs.length - 1]
@@ -65,10 +66,9 @@ const toggleBookmarkEdit = (e, chapters) => {
       behavior: 'smooth'
     })
   }
-  
 }
 
 export {
   mainBM, bmInProgress,
-  toggleBookmarkEdit, updateBookmark, removeBookmark, onBookmarkEnd
+  startBookmarkEdit, updateBookmark, removeBookmark, stopBookmarkEdit
 }

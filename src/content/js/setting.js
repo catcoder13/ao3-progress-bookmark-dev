@@ -1,12 +1,6 @@
 import { reactive } from 'vue'
+import { DEFAULT_SETTINGS } from '@/common/variables'
 
-const DEFAULT_SETTINGS = {
-  compact: false,
-  showNav: true,
-  extraSideNav: false,
-  sideNavVPos: 100,
-  bmAtRight: true
-}
 const settings = reactive(DEFAULT_SETTINGS)
 
 const updateSetting = settingObj => {

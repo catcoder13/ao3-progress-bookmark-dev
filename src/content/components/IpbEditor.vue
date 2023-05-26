@@ -1,12 +1,12 @@
 <template>
-  <div class="ipb-editor" :class="percBookmarkIndicatorClass()" :style="{top: `${editBM.y}px`}">
+  <div class="ipb-editor" :class="{outOfRange: editBM.invalid}" :style="{top: `${editBM.y}px`}">
     <span class="ipb-editor__remark" v-if="editBM.invalid">Out of bookmark region</span>
     <div class="ipb-editor-content">
       <div class="ipb-editor__btn">
-        <button @click="onPercBMDoneClick">Cancel</button>
+        <button @click="stopBookmarkEdit">Cancel</button>
       </div>
 
-      <div class="ipb-editor__icon" @click="onPercBMAddClick">
+      <div class="ipb-editor__icon" @click="onUpdateBookmark">
         <IpbIcon type="location"></IpbIcon>
       </div>
 
@@ -24,8 +24,9 @@
 
 <script>
 import { onMounted, onUnmounted, watch, reactive } from 'vue'
-import { updateBookmark, onBookmarkEnd, mainBM } from '../bookmark'
-import { mousePos } from '../mousePos'
+import { updateBookmark, stopBookmarkEdit, mainBM } from '../js/bookmark'
+import { mousePos } from '../js/mousePos'
+
 import IpbIcon from '@/common/IpbIcon.vue'
 
 export default {
@@ -76,26 +77,15 @@ export default {
       document.removeEventListener('scroll', onMouseMove)
     })
 
-    const onPercBMAddClick = () => {
+    const onUpdateBookmark = () => {
       if (editBM.invalid) return
       updateBookmark(editBM.chI, editBM.perc.toFixed(5))
-      onPercBMDoneClick()
-    }
-
-
-    const onPercBMDoneClick = () => {
-      onBookmarkEnd()
-    }
-
-    const percBookmarkIndicatorClass = () => {
-      return {
-        'outOfRange': editBM.invalid === 1
-      }
+      stopBookmarkEdit()
     }
 
     return { 
       editBM, mainBM,
-      onPercBMAddClick, onPercBMDoneClick, percBookmarkIndicatorClass
+      onUpdateBookmark, stopBookmarkEdit
     }
   }
 }
@@ -109,7 +99,7 @@ export default {
   top: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 1130px;
+  max-width: 1150px;
   height: 33px;
   pointer-events: none;
 
@@ -149,7 +139,7 @@ export default {
       top: 0;
       width: 100%;
       height: 100%;
-      animation: bookmarkFade 0.5s infinite alternate;
+      animation: bookmarkHighlight 0.5s infinite alternate;
     }
   }
 
@@ -178,8 +168,7 @@ export default {
       font-size: 12px;
       line-height: 1;
       margin-right: 5px;
-
-      
+      padding: 3px 8px;
     }
   }
 
@@ -234,13 +223,4 @@ export default {
   }
 }
 
-@keyframes bookmarkFade {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(1.3);
-  }
-}
 </style>

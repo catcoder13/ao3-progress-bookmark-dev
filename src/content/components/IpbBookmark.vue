@@ -17,7 +17,7 @@
 
 <script>
 import { computed } from 'vue'
-import {mainBM, removeBookmark, toggleBookmarkEdit} from '../bookmark'
+import {mainBM, removeBookmark, startBookmarkEdit} from '../js/bookmark'
 
 import IpbIcon from '@/common/IpbIcon.vue'
 
@@ -28,7 +28,7 @@ export default {
     const pos = computed(() => p.chapters[mainBM.chI].top + p.chapters[mainBM.chI].height * mainBM.perc)
 
     const onMoveClick = e => {
-      toggleBookmarkEdit(e, p.chapters)
+      startBookmarkEdit(e)
     }
     return {mainBM, pos, onMoveClick, removeBookmark}
   }
@@ -36,18 +36,16 @@ export default {
 </script>
 
 <style lang="scss">
-$bm_blue: #3caaaa;
-
 .ipb-bookmark {
   position: absolute;
   width: 100%;
-  max-width: 1130px;
+  max-width: 1150px;
   left: 50%;
   transform: translate(-50%, -50%);
 
   &.bmInProgress.ipb-bookmark { opacity: 0.3; pointer-events: none; }
 
-  &.highlight .ipb-bookmark__icon { animation: bookmarkFade 0.3s 4 alternate; }
+  &.highlight .ipb-bookmark__icon { animation: bookmarkScale 0.3s 4 alternate; }
 
   .ipb-bookmark-content {
     position: absolute;
@@ -107,8 +105,8 @@ $bm_blue: #3caaaa;
       font-size: 12px;
       line-height: 1;
       margin-right: 5px;
-      border: none;
       text-decoration: none;
+      padding: 3px 8px;
     }
   }
 
@@ -159,15 +157,4 @@ $bm_blue: #3caaaa;
   }
 }
 
-@keyframes bookmarkFade {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0.5;
-    transform: scale(1.3);
-  }
-}
 </style>

@@ -1,13 +1,7 @@
 import { reactive, watch } from "vue"
+import { STORE_SETTING_KEY, DEFAULT_SETTINGS } from "@/common/variables"
 
-const STORE_SETTING_KEY = 'AO3_IPB_SETTINGS'
-
-const settings = reactive({
-  compact: false,
-  showNav: true,
-  extraSideNav: false,
-  bmAtRight: true
-})
+const settings = reactive(DEFAULT_SETTINGS)
 
 chrome.storage.local.get(STORE_SETTING_KEY).then(settingObjKey => {
   const settingObj = settingObjKey[STORE_SETTING_KEY]

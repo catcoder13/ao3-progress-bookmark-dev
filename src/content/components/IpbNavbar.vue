@@ -35,10 +35,11 @@
 
 <script>
 import { computed, onMounted, ref, reactive, onUnmounted } from 'vue'
-import { mainBM, bmInProgress } from '../bookmark'
-import { chapters, curChI, view, onScroll } from '../page'
-import {chapterInfos, fullViewMode, workId, isOneShot, mainContent, workName} from '../static'
-import {mousePos, activateMouseMove, deactivateMouseMove} from '../mousePos'
+import { mainBM, bmInProgress } from '../js/bookmark'
+import { chapters, curChI, view, onScroll } from '../js/page'
+import {chapterInfos, fullViewMode, workId, isOneShot, mainContent, workName} from '../js/static'
+import {mousePos, activateMouseMove, deactivateMouseMove} from '../js/mousePos'
+
 import IpbIcon from '@/common/IpbIcon.vue'
 
 
@@ -240,7 +241,6 @@ export default {
 
 .ipb-navbar-info {
   position: fixed;
-  // top: 40px;
   z-index: 100;
   background-color: #eee;
   padding: 10px;

@@ -1,14 +1,14 @@
 <template v-if="chapters">
   <div class="ipb-toolbar" v-if="!bmInProgress" :class="{'ipb-left': !settings.bmAtRight}">
 
-    <div class="ipb-toolbar__item" @click="e => toggleBookmarkEdit(e, chapters)" :style="{top: 0}">
-      <IpbIcon type="location" fill="#FFF"></IpbIcon>
+    <button @click="e => startBookmarkEdit(e, chapters)" :style="{top: 0}">
+      <span class="ipb-btn-child"><IpbIcon type="location" fill="#FFF"></IpbIcon></span>
       <b class="ipb-toolbar__item-desc">{{mainBM.chI ? 'Change bookmark location' : 'Add a new bookmark'}}</b>
-    </div>
+    </button>
 
-    <div v-if="mainBM.chI" class="ipb-toolbar__item" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}"
+    <button v-if="mainBM.chI" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}"
       @click="jumpToBookmark" :style="{top: 'calc(30px + 4px)'}">
-      <IpbIcon type="jump" fill="#FFF"></IpbIcon>
+      <span class="ipb-btn-child"><IpbIcon class="ipb-btn-child" type="jump" fill="#FFF"></IpbIcon></span>
       <b v-if="fullViewMode || mainBM.chI == curChI" class="ipb-toolbar__item-desc">Jump to bookmark</b>
       <div v-else class="ipb-toolbar__item-desc">
         <b>Jump to bookmark</b>
@@ -21,27 +21,30 @@
           <a :href="mainBM.link"><button>Chapter by chapter</button></a>
         </div>
       </div>
-    </div>
+    </button>
   </div>
   
   <IpbEditor v-if="bmInProgress" :chapters="chapters" :class="{'ipb-left': !settings.bmAtRight}"></IpbEditor>
   
-  <IpbBookmark :class="{highlight: bmFocusCountDown, bmInProgress, 'ipb-left': !settings.bmAtRight}" v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
+  <IpbBookmark v-if="canShowBookmark" :class="{highlight: bmFocusCountDown, bmInProgress, 'ipb-left': !settings.bmAtRight}" :chapters="chapters"></IpbBookmark>
 
   <IpbNavbar v-if="settings.showNav"></IpbNavbar>
 </template>
 
 <script>
-import {ref, computed} from 'vue'
-import {chapters, curChI, onScroll} from './page'
-import { mainBM, bmInProgress, toggleBookmarkEdit } from './bookmark'
-import { fullViewMode, mainContent } from './static'
-import { settings } from './setting'
+import '@/common/__base.scss'
 
-import IpbBookmark from '@/content/components/IpbBookmark.vue'
-import IpbEditor from '@/content/components/IpbEditor.vue'
-import IpbIcon from '@/common/IpbIcon.vue'
+import {ref, computed} from 'vue'
+import {chapters, curChI, onScroll} from './js/page'
+import { mainBM, bmInProgress, startBookmarkEdit } from './js/bookmark'
+import { fullViewMode, mainContent } from './js/static'
+import { settings } from './js/setting'
+
+import IpbBookmark from './components/IpbBookmark.vue'
+import IpbEditor from './components/IpbEditor.vue'
 import IpbNavbar from './components/IpbNavbar.vue'
+import IpbIcon from '@/common/IpbIcon.vue'
+
 
 export default {
   name: 'App',
@@ -83,7 +86,7 @@ export default {
     return {
       chapters, mainBM, curChI, bmFocusCountDown, fullViewMode,
       showToolbar, bmInProgress, canShowBookmark, mainContent,
-      toggleBookmarkEdit, jumpToBookmark, settings
+      startBookmarkEdit, jumpToBookmark, settings
     }
   }
 }
@@ -98,11 +101,11 @@ export default {
   .ipb-toolbar {
     position: fixed;
     z-index: 99;
-    top: 100px;
+    top: 130px;
     right: 0;
     text-align: right;
 
-    .ipb-toolbar__item {
+    button {
       position: absolute;
       right: 0;
       transform: translateX(100%);
@@ -110,23 +113,33 @@ export default {
       pointer-events: all;
       cursor: pointer;
       font-size: 12px;
-      transition: transform 0.2s;
       opacity: 0.6;
 
-      &:hover { transform: translateX(0); opacity: 1; z-index: 1;}
-      &:active {background-color: green;}
+      &:hover {
+        transition: transform 0.2s;
+        transform: translateX(0);
+        opacity: 1;
+        z-index: 1;
+      }
+      
       & > * { vertical-align: middle; }
 
-      & > .ipb-icon {
+      & > .ipb-btn-child {
         position: absolute;
         top: 0;
         left: -30px;
-        height: 20px;
-        width: 20px;
+        height: 30px;
+        width: 30px;
         border-top-left-radius: 5px;
         border-bottom-left-radius: 5px;
         background-color: $ao3_red; 
-        padding: 5px;
+
+        .ipb-icon {
+          width: 100%;
+          height: 100%;
+          padding: 5px;
+          box-sizing: border-box;
+        }
       }
 
       .ipb-toolbar__item-desc {
@@ -191,7 +204,7 @@ export default {
     right: auto;
     left: 0;
 
-    .ipb-toolbar__item {
+    button {
       right: auto;
       left: 0;
       transform: translateX(-100%);
@@ -201,8 +214,8 @@ export default {
       b { 
         padding-left: 5px;
       }
-      
-      & > .ipb-icon {
+
+      & > .ipb-btn-child {
         left: auto;
         right: -30px;
         border-top-left-radius: 0;
@@ -217,10 +230,6 @@ export default {
 } // ao3-in-page-bookmark
 
 #workskin {
-  // .chapter {
-  //   position: relative;
-  // }
-
   &.bmInProgress #chapters > .chapter,
   &.bmInProgress.oneshot #chapters {
     background-color: rgba(#aaaaaa, 0.3);

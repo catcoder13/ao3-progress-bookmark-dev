@@ -132,7 +132,6 @@ export default {
         line-height: 1;
         padding: 5px 10px;
         background-color: #FFF;
-        border: none;
         text-align: left;
 
         &:nth-child(2n+1) { background-color: #eee; }

@@ -1,0 +1,16 @@
+const STORE_SETTING_KEY = 'AO3_IPB_SETTINGS'
+const STORE_WORK_KEY_PREFIX = `AO3_IPB_WORK_`
+const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
+const DEFAULT_SETTINGS = {
+  compact: false,
+  showNav: true,
+  extraSideNav: false,
+  bmAtRight: true
+}
+
+export {
+  STORE_SETTING_KEY,
+  STORE_WORK_KEY_PREFIX,
+  STORE_ALL_WORK_KEYS,
+  DEFAULT_SETTINGS
+}

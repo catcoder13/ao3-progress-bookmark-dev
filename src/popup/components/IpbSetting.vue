@@ -45,14 +45,15 @@
 
 <script>
 import {ref} from 'vue'
-import IpbIcon from '@/common/IpbIcon.vue'
+import { settings } from '../js/setting'
+
 import IpbToggle from './IpbToggle.vue'
-import IpbTab from './IpbTab.vue'
-import { settings } from '../setting'
+import IpbIcon from '@/common/IpbIcon.vue'
+
 
 
 export default {
-  components: { IpbIcon, IpbToggle },
+  components: { IpbToggle, IpbIcon },
   setup() {
     const toggle = ref(false)
 
@@ -85,9 +86,10 @@ export default {
     .ipb-style-scrollbar { transform: translateX(0); }
 
     .ipb-setting__entry {
-      background-color: rgba(#FFF, 0.8);
-      
+
       line { stroke: #333; }
+
+      &:hover { background-color: rgba(#FFF, 0.8); }
     }
   }
 
@@ -99,14 +101,12 @@ export default {
     width: 27px;
     height: 27px;
     border-radius: 50%;
-    background-color: rgba(#FFF, 0.1);
     cursor: pointer;
     pointer-events: all;
-    transition: transform 0.2s;
 
     line { transition: stroke 0.2s; }
 
-    &:hover { transform: scale(1.1); }
+    &:hover { background-color: rgba(#FFF, 0.1); }
   }
 
   h2 {
@@ -139,8 +139,9 @@ export default {
 
       .ipb-setting__option-group__item {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        padding-bottom: 5px;
+        padding-bottom: 6px;
       }
     }
   }

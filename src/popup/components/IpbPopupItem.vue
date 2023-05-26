@@ -76,8 +76,9 @@
 </template>
 
 <script>
-import { removeWork, visitURL } from '@/popup/works'
-import { settings } from '../setting'
+import { removeWork, visitURL } from '../js/works'
+import { settings } from '../js/setting'
+
 import IpbIcon from '@/common/IpbIcon.vue'
 
 

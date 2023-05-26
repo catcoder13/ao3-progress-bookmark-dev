@@ -54,26 +54,24 @@
 </template>
 
 <script>
+import '@/common/__base.scss'
+
 import {computed, ref} from 'vue'
-import {works, worksGroupByAuthor, visitURL, clearChromeStorage} from './works'
-import IpbTab from '@/popup/components/IpbTab.vue'
-import IpbSetting from '@/popup/components/IpbSetting.vue'
-import IpbPopupItem from '@/popup/components/IpbPopupItem.vue'
-import IpbDropdown from '@/popup/components/IpbDropdown.vue'
+import {works, worksGroupByAuthor, visitURL, clearChromeStorage} from './js/works'
+import { settings } from './js/setting'
+
+import IpbTab from './components/IpbTab.vue'
+import IpbSetting from './components/IpbSetting.vue'
+import IpbPopupItem from './components/IpbPopupItem.vue'
+import IpbDropdown from './components/IpbDropdown.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
-
-import { settings } from './setting'
-
 
 const VIEW_MODES = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
 const SORT_BY = [{label: 'Recent bookmarks', val: 't'}, {label: 'Read progress', val: 'perc'}, {label: 'Titles', val: 'workName'}]
 
 export default {
   name: 'App',
-  components: {
-    IpbTab, IpbSetting, IpbDropdown,
-    IpbPopupItem, IpbIcon
-  },
+  components: { IpbTab, IpbSetting, IpbDropdown, IpbPopupItem, IpbIcon },
   setup () {
     const sortBy = ref(SORT_BY[0])
     const viewMode = ref(VIEW_MODES[0])

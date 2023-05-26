@@ -1,10 +1,9 @@
 import { ref } from "vue"
 import { workId, workName, authorName, authorLink, isOneShot } from "./static"
 import { updateSetting } from './setting'
+import { STORE_ALL_WORK_KEYS, STORE_SETTING_KEY } from "@/common/variables"
 
 const STORE_WORK_KEY = `AO3_IPB_WORK_${workId}`
-const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
-const STORE_SETTING_KEY = 'AO3_IPB_SETTINGS'
 
 const work = ref(null)
 
@@ -15,8 +14,6 @@ const initStoreData = () => {
   ]).then(([workObj, settingObj]) => {
     if (workObj[STORE_WORK_KEY]) work.value = workObj[STORE_WORK_KEY]
     else console.log('no bookmark in this work yet')
-    
-    // console.log('work loaded', work.value)
 
     if (settingObj[STORE_SETTING_KEY]) {
       updateSetting(settingObj[STORE_SETTING_KEY])
