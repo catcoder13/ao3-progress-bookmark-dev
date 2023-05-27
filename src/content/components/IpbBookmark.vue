@@ -1,12 +1,12 @@
 <template>
-<div class="ipb-bookmark" :style="{top: `${pos}px`}">
-  <div class="ipb-bookmark-content">
+<div class="ipb-bookmark" :class="ipbBookmarkClass()" :style="{top: `${pos}px`}">
+  <div class="ipb-bookmark-content" @click="onMoveClick" title="Change bookmark location">
   
     <div class="ipb-bookmark__btn">
       <button @click="removeBookmark" title="Remove this bookmark">Remove</button>
     </div>
 
-    <div class="ipb-bookmark__icon" @click="onMoveClick" title="Change bookmark location">
+    <div class="ipb-bookmark__icon">
       <IpbIcon type="location" fill="" ></IpbIcon>
     </div>
 
@@ -17,8 +17,7 @@
 
 <script>
 import { computed } from 'vue'
-import {mainBM, removeBookmark, startBookmarkEdit} from '../js/bookmark'
-
+import {mainBM, bmFocusCountDown, bmInProgress, removeBookmark, startBookmarkEdit} from '../js/bookmark'
 import IpbIcon from '@/common/IpbIcon.vue'
 
 export default {
@@ -27,10 +26,17 @@ export default {
   setup (p) {
     const pos = computed(() => p.chapters[mainBM.chI].top + p.chapters[mainBM.chI].height * mainBM.perc)
 
+    const ipbBookmarkClass = () => {
+      return {
+        highlight: bmFocusCountDown.value,
+        bmInProgress: bmInProgress.value
+      }
+    }
+
     const onMoveClick = e => {
       startBookmarkEdit(e)
     }
-    return {mainBM, pos, onMoveClick, removeBookmark}
+    return {mainBM, pos, onMoveClick, removeBookmark, ipbBookmarkClass }
   }
 }
 </script>
@@ -39,11 +45,13 @@ export default {
 .ipb-bookmark {
   position: absolute;
   width: 100%;
-  max-width: 1150px;
+  max-width: 1140px;
   left: 50%;
   transform: translate(-50%, -50%);
+  pointer-events: none;
 
-  &.bmInProgress.ipb-bookmark { opacity: 0.3; pointer-events: none; }
+  & > * { pointer-events: all; }
+  &.bmInProgress.ipb-bookmark > * { opacity: 0.3; pointer-events: none; }
 
   &.highlight .ipb-bookmark__icon { animation: bookmarkScale 0.3s 4 alternate; }
 
@@ -51,10 +59,10 @@ export default {
     position: absolute;
     top: -17px;
     right: 0;
+    cursor: pointer;
 
     .ipb-bookmark__icon {
       position: relative;
-      cursor: pointer;
       width: 25px;
       height: 25px;
       margin: 5px;
@@ -134,7 +142,7 @@ export default {
   }
 } // ipb-bookmark
 
-.ipb-bookmark.ipb-left {
+.ipb-left .ipb-bookmark {
   .ipb-bookmark-content {
     right: auto;
     left: 0;

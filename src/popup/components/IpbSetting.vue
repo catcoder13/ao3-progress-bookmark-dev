@@ -10,7 +10,7 @@
           <IpbToggle v-model="settings.showNav" />
         </div>
         <div class="ipb-setting__option-group__item">
-          <h4>Extra navigation UI</h4>
+          <h4>Extra navigation buttons</h4>
           <IpbToggle v-model="settings.extraSideNav" />
         </div>
         <div class="ipb-setting__option-group__item">

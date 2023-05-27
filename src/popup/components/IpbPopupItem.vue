@@ -212,7 +212,6 @@ export default {
   .ipb-info {
     h3 {
       font-size: 16px;
-      margin-bottom: 10px;
 
       span {
         padding-right: 5px;

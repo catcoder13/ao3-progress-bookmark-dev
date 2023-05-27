@@ -99,7 +99,7 @@ export default {
   top: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 1150px;
+  max-width: 1140px;
   height: 33px;
   pointer-events: none;
 
@@ -200,7 +200,7 @@ export default {
   }
 } // ipb-editor
 
-.ipb-editor.ipb-left {
+.ipb-left .ipb-editor {
   .ipb-editor-content {
     left: 0;
     right: auto;

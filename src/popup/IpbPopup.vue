@@ -28,7 +28,7 @@
 
     <template v-else>
       <div class="ipb-popup__filter ipb-popup__filter--author">
-        <IpbDropdown :options="Object.keys(worksGroupByAuthor).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()))" v-model="selectedAuthor" title="Filter by author:"></IpbDropdown>
+        <IpbDropdown :options="Object.keys(worksGroupByAuthor)" v-model="selectedAuthor" title="Filter by author:"></IpbDropdown>
         <div :style="{position: 'relative'}" v-if="selectedAuthor && worksGroupByAuthor[selectedAuthor].length > 1">
           <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
           <span :title="`Sort ${sortBy.label.toLowerCase()} in ${ascend ? 'ascending' : 'descending'} order`">

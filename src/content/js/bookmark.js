@@ -7,6 +7,8 @@ const mainBM = reactive({chI: null, perc: null, chID: null, link: null, fwLink: 
 
 const bmInProgress = ref(false)
 
+const bmFocusCountDown = ref(0)
+
 watch(() => work.value,
 newWork => {
   if (!newWork) {
@@ -31,8 +33,9 @@ const updateBookmark = (chI, perc) => {
   mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
 }
 
-const removeBookmark = () => {
+const removeBookmark = e => {
   mainBM.chI = null
+  e.stopPropagation()
   removeBookmarkStore() // delete store record
 }
 
@@ -69,6 +72,6 @@ const startBookmarkEdit = (e, chapters) => {
 }
 
 export {
-  mainBM, bmInProgress,
+  mainBM, bmInProgress, bmFocusCountDown,
   startBookmarkEdit, updateBookmark, removeBookmark, stopBookmarkEdit
 }
