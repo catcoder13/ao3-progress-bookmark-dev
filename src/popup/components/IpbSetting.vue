@@ -7,17 +7,25 @@
         <h3>In-page bookmark UI</h3>
         <div class="ipb-setting__option-group__item">
           <h4>Show chapter navigation bar</h4>
-          <IpbToggle v-model="settings.showNav" />
+          <IpbToggle v-model="settings.progressBar" />
         </div>
         <div class="ipb-setting__option-group__item">
           <h4>Extra navigation buttons</h4>
-          <IpbToggle v-model="settings.extraSideNav" />
+          <IpbToggle v-model="settings.extraSideBtn" />
+        </div>
+        <div class="ipb-setting__extra-btn" v-if="settings.extraSideBtn">
+          <div v-for="(val, btnKey) in settingExtraBtn" :key="btnKey"
+            :class="{checked: val}"
+            @click="settingExtraBtn[btnKey] = !val">
+              <IpbIcon v-bind="EXTRA_BUTTON_INFOS[btnKey].iconProps" :fill="val ? '#1c73b5' : '#777'"/>
+              <span>{{ EXTRA_BUTTON_INFOS[btnKey].label }}</span>
+          </div>
         </div>
         <div class="ipb-setting__option-group__item">
           <h4>Side button/bookmark alignment</h4>
           <div class="ipb-tab--custom">
-            <span :class="{checked: !settings.bmAtRight}" @click="settings.bmAtRight = false">Left</span>
-            <span :class="{checked: settings.bmAtRight}" @click="settings.bmAtRight = true">Right</span>
+            <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
+            <span :class="{checked: settings.alignRight}" @click="settings.alignRight = true">Right</span>
           </div>
         </div>
       </div>
@@ -45,7 +53,8 @@
 
 <script>
 import {ref} from 'vue'
-import { settings } from '../js/setting'
+import { settings, settingExtraBtn } from '../js/setting'
+import { EXTRA_BUTTON_INFOS } from '@/common/variables'
 
 import IpbToggle from './IpbToggle.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
@@ -64,7 +73,7 @@ export default {
     const onClickedAreaCheck = e => {
       toggle.value = (e.target === e.currentTarget) ? false : true
     }
-    return { toggle, onToggle, onClickedAreaCheck, settings }
+    return { toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS }
   }
 }
 </script>
@@ -77,6 +86,7 @@ export default {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  user-select: none;
 
   &.open {
     background-color: rgba(#000, 0.65);
@@ -121,7 +131,7 @@ export default {
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 250px;
+    max-width: 280px;
     height: 100%;
     background-color: #eee;
     transform: translateX(100%);
@@ -143,6 +153,40 @@ export default {
         justify-content: space-between;
         padding-bottom: 6px;
       }
+
+      .ipb-setting__extra-btn {
+        padding-bottom: 6px;
+
+        & > * {
+          display: inline-block;
+          cursor: pointer;
+          padding: 3px 6px;
+          line-height: 1;
+          font-size: 11px;
+          opacity: 0.7;
+          color: #777;
+          border: 1px solid #777;
+          border-radius: 12px;
+          margin-bottom: 5px;
+          margin-right: 5px;
+
+          &:hover { opacity: 1; }
+
+          &.checked { 
+            opacity: 1;
+            border: 1px solid #1c73b5;
+            color: #1c73b5;
+            font-weight: bold;
+          }
+
+          
+          
+          & > * { display: inline-block; vertical-align: middle; }
+
+          .ipb-icon { padding-right: 2px; }
+        }
+      }
+
     }
   }
 }

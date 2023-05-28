@@ -177,25 +177,14 @@ export default {
     font-size: 12px;
     background-color: #ddd;
     text-align: right;
-    top: 45px;
-    right: 0;
+    bottom: 0;
+    transform: translateY(calc(100% + 10px));
+    right: 10px;
     padding: 4px 8px;
 
     span {
       display: block;
       white-space: nowrap;
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      right: 8px;
-      top: -5px;
-      width: 0;  
-      height: 0; 
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-bottom: 6px solid #ddd;
     }
   }
 } // ipb-editor
@@ -213,12 +202,7 @@ export default {
 
     .ipb-editor__info {
       right: auto;
-      left: 0;
-      
-      &::before {
-        right: auto;
-        left: 8px;
-      }
+      left: 10px;
     }
   }
 }

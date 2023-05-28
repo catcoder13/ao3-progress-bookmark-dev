@@ -1,11 +1,11 @@
 <template v-if="chapters">
-  <div :class="{'ipb-left': !settings.bmAtRight}">
+  <div :class="{'ipb-left': !settings.alignRight}">
     <IpbSidebar v-if="!bmInProgress"></IpbSidebar>
     <IpbEditor v-else :chapters="chapters"></IpbEditor>
     
     <IpbBookmark v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
 
-    <IpbNavbar v-if="settings.showNav"></IpbNavbar>
+    <IpbNavbar v-if="settings.progressBar"></IpbNavbar>
   </div>
 </template>
 

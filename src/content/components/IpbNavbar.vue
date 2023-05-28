@@ -89,10 +89,12 @@ export default {
       if (bmInProgress.value || !inView.value) return null
       
       if (hoveredChI.value != null) return hoveredChI.value
-
+      
       if (stucked.value) {
         if (mousePos.y > 70 || mousePos.y < 0) return null
       } else {
+        if (mousePos.x < navbarElem.left || mousePos.x > navbarElem.left + navbarElem.width) return null
+        
         const mousePosY = view.scrollY + mousePos.y
         if (mousePosY > navbarElem.top + 70 || mousePosY < navbarElem.top) return null
       }

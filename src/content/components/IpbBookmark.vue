@@ -7,7 +7,7 @@
     </div>
 
     <div class="ipb-bookmark__icon">
-      <IpbIcon type="location" fill="" ></IpbIcon>
+      <IpbIcon type="location"></IpbIcon>
     </div>
 
     <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>  
@@ -51,7 +51,11 @@ export default {
   pointer-events: none;
 
   & > * { pointer-events: all; }
-  &.bmInProgress.ipb-bookmark > * { opacity: 0.3; pointer-events: none; }
+  
+  &.bmInProgress.ipb-bookmark > * {
+    opacity: 0.3;
+    pointer-events: none;
+  }
 
   &.highlight .ipb-bookmark__icon { animation: bookmarkScale 0.3s 4 alternate; }
 
@@ -72,10 +76,6 @@ export default {
         width: 100%;
         height: 100%;
         transition: transform 0.2s;
-        
-        path { 
-          fill: $ao3_red;
-        }
 
         &:hover { transform: scale(1.2); }
       }
@@ -121,24 +121,14 @@ export default {
   .ipb-bookmark__info {
     display: none;
     position: absolute;
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1;
     background-color: #ddd;
-    top: 45px;
-    right: 0;
+    bottom: 0;
+    transform: translateY(calc(100% + 10px));
+    right: 10px;
     white-space: nowrap;
-    padding: 4px 8px;
-
-    &::before {
-      content: '';
-      position: absolute;
-      right: 8px;
-      top: -5px;
-      width: 0; 
-      height: 0; 
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-bottom: 6px solid #ddd;
-    }
+    padding: 3px 8px;
   }
 } // ipb-bookmark
 
@@ -155,12 +145,7 @@ export default {
 
     .ipb-bookmark__info {
       right: auto;
-      left: 0;
-
-      &::before {
-        right: auto;
-        left: 8px;
-      }
+      left: 10px;
     }
   }
 }

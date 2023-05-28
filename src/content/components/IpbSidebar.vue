@@ -2,36 +2,28 @@
   <div class="ipb-sidebar-group">
     <div class="ipb-sidebar">
       <button @click="startBookmark">
-        <span class="ipb-btn-child"><IpbIcon fill="#FFF" type="location"></IpbIcon></span>
-        <div class="ipb-sidebar__item-desc"><b>{{ mainBM.chI != null ? 'Change bookmark location' : 'Add a new bookmark' }}</b></div>
+        <div class="ipb-bubble">{{ mainBM.chI != null ? 'Change bookmark location' : 'Add a new bookmark' }}</div>
+        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="location"></IpbIcon></div>
       </button>
 
       <button v-if="mainBM.chI != null" @click="jumpToBookmark" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}">
-      <span class="ipb-btn-child"><IpbIcon fill="#FFF" type="jump"></IpbIcon></span>
-      <div class="ipb-sidebar__item-desc">
-        <b>Jump to bookmark</b>
-        <div v-if="!fullViewMode && mainBM.chI != curChI" class="ipb-desc">
-          <span class="ipb-warning">
+        <div class="ipb-bubble">
+          <b>Jump to bookmark</b>
+          <span v-if="!fullViewMode && mainBM.chI != curChI" class="ipb-warning">
             Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
-            Visit Chapter {{ parseInt(mainBM.chI) + 1 }} via:
+            Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
           </span>
-          <div class="ipb-btn">
-            <a :href="mainBM.fwLink"><button>Entire Work</button></a>
-            <a :href="mainBM.link"><button>Chapter by chapter</button></a>
-          </div>
         </div>
-      </div>
-    </button>
+        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="jump"></IpbIcon></div>
+      </button>
+    </div>
+    <div v-if="settings.extraSideBtn" class="ipb-sidebar ipb-sidebar--extra">
+      <button class="ipb-extra" @click="eventRef[eventKey]" v-for="({label, iconProps, eventKey}, i) in buttons" :key="i">
+        <div class="ipb-bubble">{{ label }}</div>
+        <div class="ipb-btn-child"><IpbIcon v-bind="iconProps" fill="#FFF"></IpbIcon></div>
+      </button>
+    </div>
   </div>
-  <div v-if="settings.extraSideNav" class="ipb-sidebar ipb-sidebar--extra">
-    <button class="ipb-extra" @click="eventRef[eventKey]" v-for="({label, iconProp, eventKey}, i) in buttons" :key="i">
-      <span class="ipb-btn-child"><IpbIcon v-bind="iconProp"></IpbIcon></span>
-      <div class="ipb-sidebar__item-desc"><b>{{ label }}</b></div>
-    </button>
-  </div>
-
-
-</div>
 </template>
 
 <script>
@@ -40,16 +32,18 @@ import {chapters, curChI, onScroll} from '../js/page'
 import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit } from '../js/bookmark'
 import { fullViewMode } from '../js/static'
 import { settings } from '../js/setting'
+import { EXTRA_BUTTON_INFOS } from '@/common/variables'
 import IpbIcon from '@/common/IpbIcon.vue'
+import { settingExtraBtn } from '@/popup/js/setting'
 
-const extraButtons = [
-  {label: 'Back to top', eventKey: 'onBackToTop', iconProp: {fill: '#FFF', type: 'top'}, extra: true},
-  {label: 'First chapter', eventKey: 'onFirstChapter', iconProp: {fill: '#FFF', type: 'next-last', open: false}, extra: true},
-  {label: 'Previous chapter', eventKey: 'onPreviousChapter', iconProp: {fill: '#FFF', type: 'next', open: false}, extra: true},
-  {label: 'Next chapter', eventKey: 'onNextChapter', iconProp: {fill: '#FFF', type: 'next', open: true}, extra: true},
-  {label: 'Latest chapter', eventKey: 'onLastestChapter', iconProp: {fill: '#FFF', type: 'next-last', open: true}, extra: true},
-  {label: 'Jump to comment', eventKey: 'onJumpToComment', iconProp: {fill: '#FFF', type: 'speech'}, extra: true}
-]
+// const extraButtons = [
+//   {label: 'Back to top', eventKey: 'onBackToTop', iconProp: { type: 'top'}},
+//   {label: 'First chapter', eventKey: 'onFirstChapter', iconProp: {type: 'next-last', open: false}},
+//   {label: 'Previous chapter', eventKey: 'onPreviousChapter', iconProp: {type: 'next', open: false}},
+//   {label: 'Next chapter', eventKey: 'onNextChapter', iconProp: {type: 'next', open: true}},
+//   {label: 'Latest chapter', eventKey: 'onLastestChapter', iconProp: {type: 'next-last', open: true}},
+//   {label: 'Comment section', eventKey: 'onJumpToComment', iconProp: {type: 'speech'}}
+// ]
 
 export default {
   components: { IpbIcon },
@@ -105,7 +99,9 @@ export default {
     }
 
     const buttons = computed(() => {
-      return extraButtons
+      return Object.keys(EXTRA_BUTTON_INFOS)
+        .filter(btnKey => settingExtraBtn[btnKey])
+        .map(btnKey => EXTRA_BUTTON_INFOS[btnKey])
     })
 
     return {
@@ -126,6 +122,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  pointer-events: none;
 }
 
 .ipb-sidebar {
@@ -136,96 +133,64 @@ export default {
 
   & > button {
     position: relative;
-    transform: translateX(100%);
     line-height: 1;
-    padding: 0 4px;
-    background: $ao3_red;
     cursor: pointer;
     opacity: 0.5;
+    pointer-events: all;
 
-    &:hover { 
-      transform: translateX(0);
+    &:hover {
       opacity: 1;
       z-index: 1;
       transition: transform 0.2s, opacity 0.2s;
+
+      .ipb-bubble { display: block; }
     }
 
-    &.bmOnOtherCh {
-      background-color: grey;
-      cursor: default;
-      min-width: 240px;
-
-      &:active::before,
-      &:active .ipb-btn-child::before { opacity: 0; }
-
-      & > .ipb-btn-child {
-        background-color: grey;
-      }
-
-      & > .ipb-sidebar__item-desc .ipb-desc {
-        background-color: grey;
-      }
-      
-    }
-
-    & > span.ipb-btn-child {
-      background-color: $ao3_red;
+    .ipb-bubble {
       position: absolute;
-      top: 0;
-      left: 0;
-      transform: translateX(calc(-100% + 1px));
-      height: 100%;
+      padding: 3px 8px;
+      background-color: #ddd;
+      bottom: 0;
+      transform: translateY(calc(100% + 10px));
+      right: 10px;
+      pointer-events: none;
+      font-size: 11px;
+      line-height: 1;
+      display: none;
+      text-align: left;
+      
+      b {
+        display: block;
+        padding-bottom: 5px;
 
+        &:only-child {
+          font-weight: normal;
+          padding-bottom: 0;
+        }
+      }
+
+      .ipb-warning {
+        display: block;
+        color: #e13939;
+      }
+    }
+
+    &.bmOnOtherCh > .ipb-btn-child { background-color: grey; }
+
+    & > .ipb-btn-child {
+      background-color: $ao3_red;
+      width: 20px;
+      height: 20px;
       border-top-left-radius: 3px;
       border-bottom-left-radius: 3px;
 
       .ipb-icon {
         width: 100%;
         height: 100%;
-        padding: 5px;
+        padding: 3px;
         box-sizing: border-box;
       }
 
-    }
-
-    & > div.ipb-sidebar__item-desc {
-      position: relative;
-      font-size: 11px;
-
-      b {
-        line-height: 1;
-        color: #FFF;
-      }
-
-      .ipb-desc {
-        position: absolute;
-        top: calc(100% + 3px);
-        right: 20px;
-        width: calc(100% - 20px);
-        white-space: break-spaces;
-        padding: 10px;
-        box-sizing: border-box;
-        text-align: left;
-        color: #FFF;
-
-        .ipb-warning { color: #ffd0d0; }
-
-        .ipb-btn {
-          white-space: nowrap;
-          padding-top: 5px;
-
-          a button {
-            cursor: pointer;
-            padding: 3px 8px;
-            border-radius: 2px;
-            margin-right: 4px;
-
-            &:hover {
-              filter: brightness(0.9);
-            }
-          }
-        }
-      }
     }
   }
 } // .ipb-sidebar
@@ -238,35 +203,22 @@ export default {
     align-items: flex-start;
 
     & > button {
-      transform: translateX(-100%);
-
-      &:hover { transform: translateX(0); }
-
+      .ipb-bubble {
+        right: auto;
+        left: 10px;
+      }
+      
       & > .ipb-btn-child {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         border-top-right-radius: 3px;
         border-bottom-right-radius: 3px;
-
-        left: auto;
-        right: 0;
-        transform: translateX(calc(100% - 1px));
-      }
-
-      & > .ipb-sidebar__item-desc .ipb-desc {
-        right: auto;
-        left: 20px;
       }
     }
   }
 }
 
 .ipb-sidebar.ipb-sidebar--extra {
-  & > button,
-  & > button > .ipb-btn-child,
-  & > button > .ipb-sidebar__item-desc,
-  & > button > .ipb-sidebar__item-desc .ipb-desc {
-    background-color: $btn_blue;
-  }
+  & > button > .ipb-btn-child { background-color: $btn_blue; }
 }
 </style>

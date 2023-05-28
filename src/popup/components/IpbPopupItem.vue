@@ -209,6 +209,8 @@ export default {
 } // ipb-popup-item
 
 .ipb-popup-item.ipb-popup-item--small {
+  margin-bottom: 5px;
+  
   .ipb-info {
     h3 {
       font-size: 16px;

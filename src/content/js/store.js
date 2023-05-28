@@ -1,7 +1,7 @@
 import { ref } from "vue"
 import { workId, workName, authorName, authorLink, isOneShot } from "./static"
-import { updateSetting } from './setting'
-import { STORE_ALL_WORK_KEYS, STORE_SETTING_KEY, STORE_WORK_KEY_PREFIX } from "@/common/variables"
+import { updateSetting, updateSettingExtraBtn } from './setting'
+import { STORE_ALL_WORK_KEYS, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_KEY, STORE_WORK_KEY_PREFIX } from "@/common/variables"
 
 const STORE_WORK_KEY = STORE_WORK_KEY_PREFIX + workId
 
@@ -9,17 +9,19 @@ const work = ref(null)
 
 const initStoreData = () => {
   Promise.all([
-    chrome.storage.sync.get(STORE_WORK_KEY),
-    chrome.storage.sync.get(STORE_SETTING_KEY)
+    chrome.storage.sync.get(STORE_WORK_KEY).then(obj => obj[STORE_WORK_KEY]),
+    chrome.storage.sync.get(STORE_SETTING_KEY).then(obj => obj[STORE_SETTING_KEY]),
+    chrome.storage.sync.get(STORE_SETTING_EXTRA_BTN_KEY).then(obj => obj[STORE_SETTING_EXTRA_BTN_KEY])
     // chrome.storage.local.get(STORE_WORK_KEY),
     // chrome.storage.local.get(STORE_SETTING_KEY)
-  ]).then(([workObj, settingObj]) => {
-    if (workObj[STORE_WORK_KEY]) work.value = workObj[STORE_WORK_KEY]
+  ]).then(([workObj, settingObj, settingExtraBtnObj]) => {
+
+    if (workObj) work.value = workObj
     else console.log('no bookmark in this work yet')
 
-    if (settingObj[STORE_SETTING_KEY]) {
-      updateSetting(settingObj[STORE_SETTING_KEY])
-    }
+    if (settingObj) updateSetting(settingObj)
+    
+    if (settingExtraBtnObj) updateSettingExtraBtn(settingExtraBtnObj)
   })
 
   chrome.storage.onChanged.addListener(obj => {
@@ -31,6 +33,11 @@ const initStoreData = () => {
     if (obj[STORE_SETTING_KEY]) {
       const settingObj = obj[STORE_SETTING_KEY].newValue || {}
       updateSetting(settingObj)
+    }
+
+    if (obj[STORE_SETTING_EXTRA_BTN_KEY]) {
+      const settingExtraBtnObj = obj[STORE_SETTING_EXTRA_BTN_KEY].newValue || {}
+      updateSettingExtraBtn(settingExtraBtnObj)
     }
     
   })
