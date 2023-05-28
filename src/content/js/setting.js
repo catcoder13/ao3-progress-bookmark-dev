@@ -16,4 +16,4 @@ const updateSettingExtraBtn = settingExtraBtnObj => {
   })
 }
 
-export { settings, updateSetting, updateSettingExtraBtn }
+export { settings, updateSetting, settingExtraBtn, updateSettingExtraBtn }

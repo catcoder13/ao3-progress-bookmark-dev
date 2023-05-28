@@ -20,16 +20,6 @@ Promise.all([
   }
 })
 
-// chrome.storage.sync.get(STORE_SETTING_KEY).then(settingObjKey => {
-// // chrome.storage.local.get(STORE_SETTING_KEY).then(settingObjKey => {
-//   const settingObj = settingObjKey[STORE_SETTING_KEY]
-//   if (settingObj) {
-//     Object.keys(settingObj).forEach(setKey => {
-//       settings[setKey] = settingObj[setKey]
-//     })
-//   }
-// })
-
 watch(() => settingExtraBtn,
 () => {
   chrome.storage.sync.set({ [STORE_SETTING_EXTRA_BTN_KEY]: settingExtraBtn})

@@ -45,6 +45,8 @@
     <path v-if="type === 'next'" :transform="`rotate(${open ? 90 : -90} 0 0)`" :fill="fill" d="M38.7322,93.35959,26.38465,83.42631l26.89093-33.426L26.38465,16.57369,38.7322,6.64041,73.61535,50.0003Z"/>
     
     <path v-if="type === 'next-last'" :transform="`rotate(${open ? 90 : -90} 0 0)`" :fill="fill" d="M29.71856,93.35929,17.371,83.426,44.26194,50,17.371,16.57339,29.71856,6.64011,64.60171,50ZM82.629,3.7693H66.78146V96.2307H82.629Z" />
+    
+    <path v-if="type === 'recenter'" :fill="fill" d="M50,5.00439,5.00439,50,50,94.99561,94.99561,50Zm0,63.126A18.13043,18.13043,0,1,1,68.13043,50,18.13044,18.13044,0,0,1,50,68.13043Z" />
   </svg>
 </template>
 
@@ -73,7 +75,7 @@ export default {
     stroke: #FFF;
     stroke-miterlimit: 10;
     stroke-width: 5;
-    transition: opacity 0.2s y2 0.2s;
+    transition: opacity 0.2s;
   }
 }
 </style>

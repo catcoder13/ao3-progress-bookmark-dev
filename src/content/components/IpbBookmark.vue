@@ -51,18 +51,21 @@ export default {
   pointer-events: none;
 
   & > * { pointer-events: all; }
-  
+
   &.bmInProgress.ipb-bookmark > * {
-    opacity: 0.3;
     pointer-events: none;
   }
 
-  &.highlight .ipb-bookmark__icon { animation: bookmarkScale 0.3s 4 alternate; }
+  &.highlight .ipb-bookmark-content .ipb-bookmark__icon {
+    animation: bookmarkScale 0.3s 4 alternate;
+
+    .ipb-icon { opacity: 0.8; }
+  }
 
   .ipb-bookmark-content {
     position: absolute;
     top: -17px;
-    right: 0;
+    right: 15px;
     cursor: pointer;
 
     .ipb-bookmark__icon {
@@ -75,9 +78,13 @@ export default {
         position: absolute;
         width: 100%;
         height: 100%;
-        transition: transform 0.2s;
+        transition: transform 0.2s, opacity 0.2s;
+        opacity: 0.2;
 
-        &:hover { transform: scale(1.2); }
+        &:hover {
+          transform: scale(1.2); 
+          opacity: 0.7;
+        }
       }
     }
 
@@ -104,8 +111,6 @@ export default {
 
     &:hover {
       button { filter: brightness(0.95);}
-
-      & ~ .ipb-bookmark__icon .ipb-icon { opacity: 0.3; }
     }
 
     button {
@@ -135,7 +140,7 @@ export default {
 .ipb-left .ipb-bookmark {
   .ipb-bookmark-content {
     right: auto;
-    left: 0;
+    left: 15px;
 
     .ipb-bookmark__btn {
       right: auto;

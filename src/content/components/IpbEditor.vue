@@ -191,12 +191,12 @@ export default {
 
 .ipb-left .ipb-editor {
   .ipb-editor-content {
-    left: 0;
+    left: 15px;
     right: auto;
 
     .ipb-editor__btn {
       right: auto;
-      left: 0;
+      left: 15px;
       padding: 5px 5px 5px 35px;
     }
 

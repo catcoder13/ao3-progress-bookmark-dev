@@ -28,22 +28,17 @@
 
 <script>
 import { computed } from 'vue'
-import {chapters, curChI, onScroll} from '../js/page'
+import {
+  chapters, curChI, onScroll,
+  jumpToChapter, jumpToCurrentChapter,
+  jumpToFirstChapter, jumpToLastChapter, jumpToPreviousChapter, jumpToNextChapter
+} from '../js/page'
 import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit } from '../js/bookmark'
 import { fullViewMode } from '../js/static'
-import { settings } from '../js/setting'
+import { settings, settingExtraBtn } from '../js/setting'
 import { EXTRA_BUTTON_INFOS } from '@/common/variables'
-import IpbIcon from '@/common/IpbIcon.vue'
-import { settingExtraBtn } from '@/popup/js/setting'
 
-// const extraButtons = [
-//   {label: 'Back to top', eventKey: 'onBackToTop', iconProp: { type: 'top'}},
-//   {label: 'First chapter', eventKey: 'onFirstChapter', iconProp: {type: 'next-last', open: false}},
-//   {label: 'Previous chapter', eventKey: 'onPreviousChapter', iconProp: {type: 'next', open: false}},
-//   {label: 'Next chapter', eventKey: 'onNextChapter', iconProp: {type: 'next', open: true}},
-//   {label: 'Latest chapter', eventKey: 'onLastestChapter', iconProp: {type: 'next-last', open: true}},
-//   {label: 'Comment section', eventKey: 'onJumpToComment', iconProp: {type: 'speech'}}
-// ]
+import IpbIcon from '@/common/IpbIcon.vue'
 
 export default {
   components: { IpbIcon },
@@ -55,6 +50,7 @@ export default {
     const jumpToBookmark = () => {
       if (!fullViewMode && mainBM.chI != curChI.value) {
         console.log('bookmark is located at another chapter')
+        jumpToChapter(mainBM.chI)
         return
       }
       const {top, height} = chapters[mainBM.chI]
@@ -68,24 +64,15 @@ export default {
       if (!countDownInt) clearTimeout(countDownInt)
       countDownInt = setTimeout(() => {
         bmFocusCountDown.value = false
-      }, 2000)
+      }, 1200)
     }
     const eventRef = {
-      onBackToTop () {
-        document.getElementById('main').scrollIntoView()
-      },
-      onFirstChapter () {
-
-      },
-      onPreviousChapter () {
-
-      },
-      onNextChapter () {
-
-      },
-      onLastestChapter () {
-
-      },
+      backToTop: () => document.getElementById('main').scrollIntoView(),
+      jumpToFirstChapter,
+      jumpToPreviousChapter,
+      jumpToCurrentChapter,
+      jumpToNextChapter,
+      jumpToLastChapter,
       onJumpToComment (e) {
         const commentBtnElem = document.getElementById('show_comments_link').querySelector('a')
       

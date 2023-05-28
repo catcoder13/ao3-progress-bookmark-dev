@@ -1,7 +1,5 @@
 import {reactive, computed} from 'vue'
-import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS } from '@/common/variables'
-
-const AO3_DOMAIN = "https://archiveofourown.org"
+import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS, AO3_DOMAIN } from '@/common/variables'
 
 const works = reactive({})
 

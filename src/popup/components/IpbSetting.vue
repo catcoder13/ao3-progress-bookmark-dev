@@ -34,15 +34,15 @@
         <h3>Bookmark data</h3>
         <div class="ipb-setting__option-group__item">
           <h4>Import bookmark data</h4>
-          <button>Import</button>
+          <button @click="onImportData">Import</button>
         </div>
         <div class="ipb-setting__option-group__item">
           <h4>Download bookmark data</h4>
-          <button>Download</button>
+          <button @click="onDownloadData">Download</button>
         </div>
         <div class="ipb-setting__option-group__item">
           <h4>Delete all bookmarks</h4>
-          <button>Delete</button>
+          <button @click="onDeleteAllData">Delete</button>
         </div>
       </div>
       
@@ -54,6 +54,7 @@
 <script>
 import {ref} from 'vue'
 import { settings, settingExtraBtn } from '../js/setting'
+import { onImportData, onDownloadData, onDeleteAllData } from '../js/download'
 import { EXTRA_BUTTON_INFOS } from '@/common/variables'
 
 import IpbToggle from './IpbToggle.vue'
@@ -73,7 +74,10 @@ export default {
     const onClickedAreaCheck = e => {
       toggle.value = (e.target === e.currentTarget) ? false : true
     }
-    return { toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS }
+    return {
+      toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS,
+      onImportData, onDownloadData, onDeleteAllData
+    }
   }
 }
 </script>
@@ -138,6 +142,7 @@ export default {
     transition: transform 0.3s;
     padding: 10px;
     box-sizing: border-box;
+    overflow-y: scroll;
 
     .ipb-setting__option-group {
       margin-bottom: 15px;
