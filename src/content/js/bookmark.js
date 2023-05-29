@@ -1,6 +1,6 @@
 import {ref, reactive, watch} from 'vue'
 import { work, updateBookmarkStore, removeBookmarkStore } from './store'
-import { workId, chapterInfos, mainContent } from './static'
+import { workID, chapterInfos, mainContent } from './static'
 import { activateMouseMove, deactivateMouseMove } from './mousePos'
 
 const mainBM = reactive({chI: null, perc: null, chID: null, link: null, fwLink: null})
@@ -18,8 +18,8 @@ newWork => {
     mainBM.chI = chI
     mainBM.perc = perc
     mainBM.chID = chID
-    mainBM.link = `/works/${workId}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
-    mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+    mainBM.link = `/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
+    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
   }
   
 })
@@ -29,8 +29,8 @@ const updateBookmark = (chI, perc) => {
   mainBM.chI = chI
   mainBM.perc = perc
   mainBM.chID = chapterInfos[chI].chID
-  mainBM.link = `/works/${workId}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
-  mainBM.fwLink = `/works/${workId}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+  mainBM.link = `/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
+  mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
 }
 
 const removeBookmark = e => {

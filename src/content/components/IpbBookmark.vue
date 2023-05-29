@@ -1,6 +1,6 @@
 <template>
-<div class="ipb-bookmark" :class="ipbBookmarkClass()" :style="{top: `${pos}px`}">
-  <div class="ipb-bookmark-content" @click="onMoveClick" title="Change bookmark location">
+<div class="ipb-bookmark ipb-bookmark--static" :class="ipbBookmarkClass()" :style="{top: `${pos}px`}">
+  <div class="ipb-bookmark-content" @click="onMoveClick">
   
     <div class="ipb-bookmark__btn">
       <button @click="removeBookmark" title="Remove this bookmark">Remove</button>
@@ -42,12 +42,8 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-bookmark {
+.ipb-bookmark.ipb-bookmark--static {
   position: absolute;
-  width: 100%;
-  max-width: 1140px;
-  left: 50%;
-  transform: translate(-50%, -50%);
   pointer-events: none;
 
   & > * { pointer-events: all; }
@@ -63,21 +59,8 @@ export default {
   }
 
   .ipb-bookmark-content {
-    position: absolute;
-    top: -17px;
-    right: 15px;
-    cursor: pointer;
-
     .ipb-bookmark__icon {
-      position: relative;
-      width: 25px;
-      height: 25px;
-      margin: 5px;
-
       .ipb-icon {
-        position: absolute;
-        width: 100%;
-        height: 100%;
         transition: transform 0.2s, opacity 0.2s;
         opacity: 0.2;
 
@@ -97,62 +80,11 @@ export default {
     }
   }
 
-  .ipb-bookmark__btn {
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    right: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 5px 35px 5px 5px;
-    border-top-right-radius: 30px;
-    border-bottom-right-radius: 30px;
-    display: none;
+  .ipb-bookmark__btn { display: none; }
 
-    &:hover {
-      button { filter: brightness(0.95);}
-    }
-
-    button {
-      cursor: pointer;
-      font-size: 12px;
-      line-height: 1;
-      margin-right: 5px;
-      text-decoration: none;
-      padding: 3px 8px;
-    }
-  }
-
-  .ipb-bookmark__info {
-    display: none;
-    position: absolute;
-    font-size: 11px;
-    line-height: 1;
-    background-color: #ddd;
-    bottom: 0;
-    transform: translateY(calc(100% + 10px));
-    right: 10px;
-    white-space: nowrap;
-    padding: 3px 8px;
-  }
+  .ipb-bookmark__info { display: none; }
+  
 } // ipb-bookmark
 
-.ipb-left .ipb-bookmark {
-  .ipb-bookmark-content {
-    right: auto;
-    left: 15px;
-
-    .ipb-bookmark__btn {
-      right: auto;
-      left: 0;
-      padding: 5px 5px 5px 35px;
-    }
-
-    .ipb-bookmark__info {
-      right: auto;
-      left: 10px;
-    }
-  }
-}
 
 </style>

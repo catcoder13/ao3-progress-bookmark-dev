@@ -2,15 +2,15 @@
   <template v-if="settings.compact">
     <div class="ipb-popup-item" :class="{'ipb-popup-item--small': settings.compact}">
       <div class="ipb-info">
-        <h3>{{ work.workName }} 
+        <h3>{{ work.name }} 
           <span>
-            <a v-if="!hideAuthor" class="ipb-author" :title="work.authorName" @click="() => visitURL(work.authorLink)"><IpbIcon type="author" fill="#166fce"/></a>
+            <a v-if="!hideAuthor" class="ipb-author" :title="work.author" @click="() => visitURL(work.authorURL)"><IpbIcon type="author" fill="#166fce"/></a>
             <a :title="`Bookmarked at ${(new Date(work.t)).toLocaleString()}`"><IpbIcon type="clock" fill="#555"/></a>
           </span>
           
         </h3>
         <div class="ipb-btn">
-          <button :title="`One-shot: ${work.workName}`" v-if="work.isOneShot" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
+          <button :title="`One-shot: ${work.name}`" v-if="work.oneShot" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
           <template v-else>
             <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}?view_full_work=true#chapter-${parseInt(work.chI) + 1}`)">Entire work</button>
             <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">Chapter {{parseInt(work.chI) + 1}}</button>
@@ -20,7 +20,7 @@
 
       <div class="ipb-record">
         <div class="ipb-record-content">
-          <b v-if="work.isOneShot"><IpbIcon type="bookmark" fill="#555" />One-shot</b>
+          <b v-if="work.oneShot"><IpbIcon type="bookmark" fill="#555" />One-shot</b>
           <b v-else>
             <IpbIcon type="bookmark" fill="#555" />
             {{`Chapter ${parseInt(work.chI) + 1}`}}
@@ -38,11 +38,11 @@
   <template v-else>
     <div class="ipb-popup-item">
       <div class="ipb-info">
-        <h3>{{ work.workName }}</h3>
-        <span v-if="!hideAuthor">by <a @click="() => visitURL(work.authorLink)">{{ work.authorName }}</a></span>
+        <h3>{{ work.name }}</h3>
+        <span v-if="!hideAuthor">by <a @click="() => visitURL(work.authorURL)">{{ work.author }}</a></span>
         <p>Visit bookmarked page via:</p>
         <div class="ipb-btn">
-          <button :title="`One-shot: ${work.workName}`" v-if="work.isOneShot" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
+          <button :title="`One-shot: ${work.name}`" v-if="work.oneShot" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
         <template v-else>
           <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}?view_full_work=true#chapter-${parseInt(work.chI) + 1}`)">Entire work</button>
           <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">Chapter {{parseInt(work.chI) + 1}}</button>
@@ -55,7 +55,7 @@
       <div class="ipb-record">
         <div class="ipb-record-content">
             
-            <p v-if="!work.isOneShot">
+            <p v-if="!work.oneShot">
               <IpbIcon type="bookmark" fill="#555"></IpbIcon>Bookmarked at<br />
               <b>{{`Chapter ${parseInt(work.chI) + 1}`}}</b>
             </p>
@@ -141,7 +141,6 @@ export default {
       opacity: 0.8;
 
       .ipb-icon {
-        display: inline-block;
         padding-right: 5px;
         vertical-align: bottom;
       }
@@ -174,9 +173,6 @@ export default {
       }
 
       .ipb-icon {
-        display: inline-block;
-        width: 15px;
-        height: 15px;
         vertical-align: bottom;
       }
 

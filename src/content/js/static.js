@@ -2,19 +2,19 @@
 // mainContent: one-shot title, one-shot chapter section
 // chapterDoms: multiple chapter work's chapter's titles, each chapter's section
 const mainContent = document.querySelector('#workskin')
-if (!mainContent) console.warn('not in a work page')
+if (!mainContent) console.warn('[AO3 IPB] URL matches a work page, however #worksin does not exist, thus it is deemed not a work page.')
 
 const chapterDoms = mainContent ? mainContent.querySelectorAll('#chapters > .chapter') : []
 
 // initialise mainContent class name
-const isOneShot = chapterDoms.length === 0
-if (mainContent) mainContent.classList.toggle('oneshot', isOneShot)
+const oneShot = chapterDoms.length === 0
+if (mainContent) mainContent.classList.toggle('oneshot', oneShot)
 
 // retrieve work id and chapter id(if any)
-let workId = null
-const workName = mainContent && mainContent.querySelector('.title').innerText
-const authorName = mainContent && mainContent.querySelector('.byline a[rel=author]').innerText
-const authorLink = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
+let workID = null
+const name = mainContent && mainContent.querySelector('.title').innerText
+const author = mainContent && mainContent.querySelector('.byline a[rel=author]').innerText
+const authorURL = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
 
 let fullViewMode = false
 
@@ -22,18 +22,18 @@ const match1 = (window.location.href).match(/chapters\/(\d+)/)
 const match2 = (window.location.href).match(/\/works\/(\d+)/)
 
 if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
-  // workId not found on window.location.href, extract from dom element instead
-  workId = mainContent && mainContent.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)/)[1]
+  // workID not found on window.location.href, extract from dom element instead
+  workID = mainContent && mainContent.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)/)[1]
 } else if (match2) { // pattern: https://archiveofourown.org/works/xxxxxxxxx/...
-  workId = match2[1]
+  workID = match2[1]
 
   const urlParams = (new URLSearchParams(window.location.search)).get('view_full_work')
   fullViewMode = (urlParams && urlParams.toLowerCase() === 'true') ? 1 : 0
 } else {
-  console.warn('url not match, workId not found')
+  console.warn('url not match, workID not found')
 }
 
-console.log(fullViewMode, workId, workName, authorName, authorLink)
+console.log(fullViewMode, workID, name, author, authorURL)
 
 const chapterListElem = document.getElementById('selected_id')
 let chapterInfos = null 
@@ -63,7 +63,7 @@ if (chapterListElem) {
 // console.log(chapterInfos)
 
 export {
-  workId, workName, fullViewMode, isOneShot,
-  authorName, authorLink,
+  workID, name, fullViewMode, oneShot,
+  author, authorURL,
   mainContent, chapterDoms, chapterInfos
 }

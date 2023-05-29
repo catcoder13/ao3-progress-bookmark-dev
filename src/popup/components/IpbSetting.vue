@@ -32,38 +32,60 @@
      
       <div class="ipb-setting__option-group">
         <h3>Bookmark data</h3>
-        <div class="ipb-setting__option-group__item">
+
+        <div class="ipb-setting__option-group__item ipb-import">
           <h4>Import bookmark data</h4>
-          <button @click="onImportData">Import</button>
+          <div>
+            <!-- <input type="file" @change="e => curFile = e.target.files[0]" required /> -->
+            <input ref="inputFile" type="file" @change="e => curFile = e.target.files[0]" required />
+            <button @click="importMsgOn = true">Import</button>
+          </div>
         </div>
+
         <div class="ipb-setting__option-group__item">
           <h4>Download bookmark data</h4>
-          <button @click="onDownloadData">Download</button>
+          <button @click="downloadData">Download</button>
         </div>
-        <div class="ipb-setting__option-group__item">
+        <div class="ipb-setting__option-group__item ipb-delete">
           <h4>Delete all bookmarks</h4>
-          <button @click="onDeleteAllData">Delete</button>
+          <button @click="deleteMsgOn = true">Delete</button>
         </div>
       </div>
       
-      <button>Reset all settings</button>
+      <button class="ipb-setting__reset" @click="onResetSetting">Reset all settings</button>
+    </div>
+
+    <div v-if="importMsgOn" class="ipb-setting__overlay-msg">
+      <IpbFileSummary :file="curFile" @complete="importComplete" @cancel="importMsgOn = false"/>
+    </div>
+
+    <div v-if="deleteMsgOn" class="ipb-setting__overlay-msg">
+      <div class="ipb-text">
+        <span>Are you sure you want to delete all bookmark data?</span>
+        <span>Before delete, you may want to download your bookmark data via "Download" button under the setting panel.</span>
+      </div>
+      <div class="ipb-button">
+        <button class="ipb-delete" @click="onDeleteAllBookmarkData">Confirm delete</button>
+        <button @click="deleteMsgOn = false">Cancel</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import {ref} from 'vue'
-import { settings, settingExtraBtn } from '../js/setting'
-import { onImportData, onDownloadData, onDeleteAllData } from '../js/download'
+import { settings, settingExtraBtn, onResetSetting } from '../js/setting'
+import { downloadData } from '../js/data'
 import { EXTRA_BUTTON_INFOS } from '@/common/variables'
+import { removeAllWorks } from '../js/works'
 
 import IpbToggle from './IpbToggle.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
-
+import IpbFileSummary from './IpbFileSummary.vue'
 
 
 export default {
-  components: { IpbToggle, IpbIcon },
+  components: { IpbToggle, IpbIcon, IpbFileSummary },
   setup() {
     const toggle = ref(false)
 
@@ -72,11 +94,38 @@ export default {
       e.stopPropagation()
     }
     const onClickedAreaCheck = e => {
-      toggle.value = (e.target === e.currentTarget) ? false : true
+      if (e.target === e.currentTarget) toggle.value = false
     }
+
+    const inputFile = ref(null)
+
+    const deleteMsgOn = ref(false)
+
+    const onDeleteAllBookmarkData = () => {
+      removeAllWorks()
+      deleteMsgOn.value = false
+    }
+
+    const importMsgOn = ref(false)
+    const curFile = ref(null)
+
+    const onImportBookmarkData = () => {
+      importMsgOn.value = false
+    }
+
+    const importComplete = () => {
+      curFile.value = null
+      inputFile.value.value = null
+      importMsgOn.value = false
+      toggle.value = false
+    }
+
     return {
+      inputFile,
+      deleteMsgOn, onDeleteAllBookmarkData,
+      curFile, importMsgOn, onImportBookmarkData, importComplete,
       toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS,
-      onImportData, onDownloadData, onDeleteAllData
+      downloadData, onResetSetting
     }
   }
 }
@@ -130,7 +179,7 @@ export default {
     margin-bottom: 15px;
   }
 
-  .ipb-style-scrollbar {
+  & > .ipb-style-scrollbar {
     position: absolute;
     top: 0;
     right: 0;
@@ -157,7 +206,52 @@ export default {
         align-items: center;
         justify-content: space-between;
         padding-bottom: 6px;
-      }
+
+        button {
+          border: 1px solid #777;
+          cursor: pointer;
+          padding: 3px 5px;
+          line-height: 1;
+          color: #333;
+
+          &:hover {
+            background-color: #333;
+            color: #FFF;
+          }
+        }
+
+        &.ipb-delete {
+          button:hover {
+            border-color: $red;
+            background-color: $red;
+          }
+        }
+
+        &.ipb-import {
+          display: block;
+          font-size: 12px;
+
+          h4 { margin-bottom: 5px; }
+
+          & > div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+
+            input {
+              font-size: 12px;
+              width: 170px;
+              
+              &:invalid ~ button {
+                opacity: 0.5;
+                pointer-events: none;
+                cursor: default;
+              }
+            }
+          }
+          
+        }
+      } // .ipb-setting__option-group__item
 
       .ipb-setting__extra-btn {
         padding-bottom: 6px;
@@ -194,7 +288,64 @@ export default {
 
     }
   }
-}
+
+  .ipb-setting__overlay-msg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: rgba(#000, 0.85);
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+
+    .ipb-text {
+      padding: 80px 20px 40px;
+
+      span {
+        display: block;
+        color: #FFF;
+
+        &:last-child { color: #aaa; }
+      }
+    }
+
+    .ipb-button {
+      text-align: center;
+
+      button {
+        padding: 5px 10px;
+        cursor: pointer;
+
+        &:first-child { margin-right: 10px; }
+
+        &:hover { filter: brightness(0.8); }
+
+        &.ipb-delete:hover {
+          background-color: $red;
+          color: #FFF;
+        }
+      }
+    }
+    
+  }
+
+  .ipb-setting__reset {
+    border: 1px solid #777;
+    color: #333;
+    line-height: 1;
+    cursor: pointer;
+    padding: 3px 5px;
+
+    &:hover {
+      background-color: #333;
+      border: 1px solid #333;
+      color: #FFF;
+    }
+  }
+} // .ipb-setting
 
 .ipb-tab--custom {
   display: flex;

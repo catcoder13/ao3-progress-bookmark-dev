@@ -1,17 +1,17 @@
 <template>
-  <div class="ipb-editor" :class="{outOfRange: editBM.invalid}" :style="{top: `${editBM.y}px`}">
-    <span class="ipb-editor__remark" v-if="editBM.invalid">Out of bookmark region</span>
-    <div class="ipb-editor-content">
-      <div class="ipb-editor__btn">
+  <div class="ipb-bookmark ipb-bookmark--editor" :class="{outOfRange: editBM.invalid}" :style="{top: `${editBM.y}px`}">
+    <span class="ipb-bookmark__remark" v-if="editBM.invalid">Out of bookmark region</span>
+    <div class="ipb-bookmark-content">
+      <div class="ipb-bookmark__btn">
         <button @click="stopBookmarkEdit">Cancel</button>
       </div>
 
-      <div class="ipb-editor__icon" @click="onUpdateBookmark">
+      <div class="ipb-bookmark__icon" @click="onUpdateBookmark">
         <IpbIcon type="location"></IpbIcon>
       </div>
 
       
-      <div class="ipb-editor__info" v-if="!editBM.invalid">
+      <div class="ipb-bookmark__info" v-if="!editBM.invalid">
         <template v-if="mainBM.chI != null">
           <span :style="{opacity: 0.6}">Old bookmark: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
           <span>New bookmark: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
@@ -92,119 +92,57 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-editor {
+.ipb-bookmark.ipb-bookmark--editor {
   position: fixed;
   z-index: 100;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  max-width: 1140px;
-  height: 33px;
   pointer-events: none;
 
   &.outOfRange {
-    background-color: rgba(red, 0.3);
-
-    .ipb-editor__icon {
+    .ipb-bookmark__icon {
       cursor: not-allowed;
       opacity: 0.5;
     }
   }
 
-  .ipb-editor__remark {
+  .ipb-bookmark__remark {
     position: absolute;
+    z-index: -1;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    display: block;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: rgba(red, 0.3);
+    text-align: center;
+    pointer-events: none;
   }
 
-  .ipb-editor-content {
-    position: absolute;
-    top: 0;
-    right: 0;
+  .ipb-bookmark-content {
     pointer-events: all;
   }
 
-  .ipb-editor__icon {
-    position: relative;
-    width: 25px;
-    height: 25px;
-    margin: 5px;
+  .ipb-bookmark__icon {
     cursor: pointer;
 
-    .ipb-icon {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      animation: bookmarkHighlight 0.5s infinite alternate;
-    }
+    .ipb-icon { animation: bookmarkHighlight 0.5s infinite alternate; }
   }
 
-  .ipb-editor__btn {
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    right: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 5px 35px 5px 5px;
-    border-top-right-radius: 30px;
-    border-bottom-right-radius: 30px;
-
-    &:hover {
-      button { filter: brightness(0.95); }
-
-      & ~ .ipb-editor__icon .ipb-icon {
-        opacity: 0.3;
-        animation: none;
-      }
-    } 
-
-    button {
-      cursor: pointer;
-      font-size: 12px;
-      line-height: 1;
-      margin-right: 5px;
-      padding: 3px 8px;
-    }
+  .ipb-bookmark__btn &:hover  ~ .ipb-bookmark__icon .ipb-icon {
+    opacity: 0.3;
+    animation: none;
   }
 
-  .ipb-editor__info {
-    position: absolute;
-    font-size: 12px;
-    background-color: #ddd;
+  .ipb-bookmark__info {
     text-align: right;
-    bottom: 0;
-    transform: translateY(calc(100% + 10px));
-    right: 10px;
-    padding: 4px 8px;
-
+    
     span {
       display: block;
       white-space: nowrap;
+
+      &:first-child { padding-bottom: 2px; }
     }
   }
-} // ipb-editor
-
-.ipb-left .ipb-editor {
-  .ipb-editor-content {
-    left: 15px;
-    right: auto;
-
-    .ipb-editor__btn {
-      right: auto;
-      left: 15px;
-      padding: 5px 5px 5px 35px;
-    }
-
-    .ipb-editor__info {
-      right: auto;
-      left: 10px;
-    }
-  }
-}
-
+} // ipb-bookmark
 </style>

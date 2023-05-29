@@ -1,8 +1,6 @@
 <template>
   <div class="ipb-popup" :class="{compact: settings.compact}">
     <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
-    <button :style="{position: 'absolute', left: 0, fontSize: '8px', width: '70px'}" @click="clearChromeStorage">Clear chrome local storage</button>
-    
     <div class="ipb-popup__view-mode">
       <IpbTab class="ipb-groupby" title="View mode:" :options="VIEW_MODES" v-model="viewMode"></IpbTab>
       <span :title="settings.compact ? 'Compact layout' : 'Expand layout'">
@@ -38,8 +36,8 @@
       </div>
       
       <div class="ipb-popup__wrapper ipb-style-scrollbar">
-        <div class="ipb-popup__author-works" v-for="(authorWorks, authorName) in filteredWorksGroupByAuthor" :key="authorName">
-          <a class="ipb-author" @click="() => visitURL(authorWorks[0].authorLink)"><IpbIcon type="author" fill="#166fce"/>{{ authorName }}</a>
+        <div class="ipb-popup__author-works" v-for="(authorWorks, author) in filteredWorksGroupByAuthor" :key="author">
+          <a class="ipb-author" @click="() => visitURL(authorWorks[0].authorURL)"><IpbIcon type="author" fill="#166fce"/>{{ author }}</a>
           <TransitionGroup name="fade-in">
             <IpbPopupItem v-for="(work, j) in sortWorks(authorWorks)" :key="j" :work="work" :hideAuthor="true" />
           </TransitionGroup>
@@ -57,7 +55,7 @@
 import '@/common/__base.scss'
 
 import {computed, ref} from 'vue'
-import {works, worksGroupByAuthor, visitURL, clearChromeStorage} from './js/works'
+import {works, worksGroupByAuthor, visitURL} from './js/works'
 import { settings } from './js/setting'
 
 import IpbTab from './components/IpbTab.vue'
@@ -67,7 +65,7 @@ import IpbDropdown from './components/IpbDropdown.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
 
 const VIEW_MODES = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
-const SORT_BY = [{label: 'Recent bookmarks', val: 't'}, {label: 'Read progress', val: 'perc'}, {label: 'Titles', val: 'workName'}]
+const SORT_BY = [{label: 'Recent bookmark', val: 't'}, {label: 'Progress', val: 'perc'}, {label: 'Title', val: 'name'}]
 
 export default {
   name: 'App',
@@ -81,7 +79,7 @@ export default {
 
     const sortWorks = workGroup => {
       let workArrRef = null
-      if (sortBy.value.val == 'workName') {
+      if (sortBy.value.val == 'name') {
         workArrRef = workGroup.sort((a, b) => {
           const tA = a[sortBy.value.val].toUpperCase()
           const tB = b[sortBy.value.val].toUpperCase()
@@ -108,8 +106,7 @@ export default {
 
     return {
       allGroup, worksGroupByAuthor, filteredWorksGroupByAuthor, sortWorks, selectedAuthor,
-      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend,
-      clearChromeStorage
+      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend
     }
   }
 }

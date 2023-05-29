@@ -1,5 +1,5 @@
 import {reactive, ref} from 'vue'
-import {mainContent, chapterDoms, fullViewMode, workId, chapterInfos, isOneShot} from './static'
+import {mainContent, chapterDoms, fullViewMode, workID, chapterInfos, oneShot} from './static'
 import { AO3_DOMAIN } from '@/common/variables'
 
 let chapters = null
@@ -85,7 +85,7 @@ const jumpToPreviousChapter = () => {
 }
 
 const jumpToCurrentChapter = () => {
-  if (isOneShot) {
+  if (oneShot) {
     mainContent.querySelector('.title').scrollIntoView()
   } else {
     chapters[getCurrentChapter()].dom.scrollIntoView()
@@ -103,12 +103,12 @@ const jumpToLastChapter = () => {
 }
 
 const jumpToChapter = chI => {
-  if (isOneShot) return
+  if (oneShot) return
 
   if (fullViewMode) {
     document.getElementById(`chapter-${parseInt(chI) + 1}`).scrollIntoView()
   } else {
-    window.location.href = `${AO3_DOMAIN}/works/${workId}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
+    window.location.href = `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
   }
 
   onScroll()

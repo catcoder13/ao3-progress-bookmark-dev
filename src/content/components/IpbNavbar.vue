@@ -12,16 +12,22 @@
   <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPos">
     <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
     <div class="ipb-heading">
-      <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI"></IpbIcon>
-      <b v-if="isOneShot">{{workName}}</b>
+      <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI" />
+      <b v-if="oneShot">{{name}}</b>
       <b v-else>Chapter {{ parseInt(approxChI) + 1 }}</b>
     </div>
     
     <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ipb-title">{{ chapterInfos[approxChI].title }}</span>
 
     <template v-if="hoveredChI != null && !bmInProgress">
-      <span class="ipb-desc" v-if="fullViewMode">Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
-      <span class="ipb-desc" v-else-if="hoveredChI != curChI">Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b></span>
+      <span class="ipb-desc" v-if="fullViewMode">
+        <IpbIcon type="mouse" fill="#999"/>
+        Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b>
+      </span>
+      <span class="ipb-desc" v-else-if="hoveredChI != curChI">
+        <IpbIcon type="visit" fill="#999"/>
+        Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b>
+      </span>
       <span class="ipb-desc" v-else>Back to the top</span>
     </template>
   </div>
@@ -37,7 +43,7 @@
 import { computed, onMounted, ref, reactive, onUnmounted } from 'vue'
 import { mainBM, bmInProgress } from '../js/bookmark'
 import { chapters, curChI, view, onScroll } from '../js/page'
-import {chapterInfos, fullViewMode, workId, isOneShot, mainContent, workName} from '../js/static'
+import {chapterInfos, fullViewMode, workID, oneShot, mainContent, name} from '../js/static'
 import {mousePos, activateMouseMove, deactivateMouseMove} from '../js/mousePos'
 
 import IpbIcon from '@/common/IpbIcon.vue'
@@ -123,7 +129,7 @@ export default {
 
     const jumpToChapter = chI => {
       if (fullViewMode || approxChI.value == curChI.value) {
-        const targetScroll = isOneShot ? window.scrollY + mainContent.getBoundingClientRect().y : chapters[chI].top
+        const targetScroll = oneShot ? window.scrollY + mainContent.getBoundingClientRect().y : chapters[chI].top
         window.scrollTo({ top: targetScroll })
         // if (chapters[chI].top > window.scrollY && chapters[chI].top < window.scrollY + window.innerHeight) {
         //   window.scrollTo({top: targetScroll, behavior: 'smooth'})
@@ -131,7 +137,7 @@ export default {
         onScroll(null, targetScroll)
       }
       else {
-        window.location.href = `/works/${workId}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
+        window.location.href = `/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
       }
     }
 
@@ -153,8 +159,8 @@ export default {
     })
 
     return {
-      chapters, chapterInfos, curChI, approxChI, hoveredChI, workName, bmInProgress,
-      infoPos, mainBM, fullViewMode, navbarElem, stucked, isOneShot,
+      chapters, chapterInfos, curChI, approxChI, hoveredChI, name, bmInProgress,
+      infoPos, mainBM, fullViewMode, navbarElem, stucked, oneShot,
       navbarBarClass, jumpToChapter
     }
   }
@@ -302,7 +308,6 @@ export default {
     font-size: 11px;
     font-style: italic;
     color: #85aec2;
-
   }
 } // ipb-navbar-info
 </style>

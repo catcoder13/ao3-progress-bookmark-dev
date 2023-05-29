@@ -8,27 +8,27 @@ const AO3_DOMAIN = "https://archiveofourown.org"
 const DEFAULT_SETTINGS = {
   compact: false,
   progressBar: true,
-  extraSideBtn: false,
+  extraSideBtn: true,
   alignRight: true
 }
 
 const DEFAULT_SETTING_EXTRA_BUTTONS = {
-  backToTop: true,
-  firstCh: true,
+  backToTop: false,
+  firstCh: false,
   prevCh: true,
   curCh: true,
   nextCh: true,
-  latestCh: true,
+  latestCh: false,
   comment: true
 }
 
 const EXTRA_BUTTON_INFOS = {
   backToTop: {label: 'Top', eventKey: 'backToTop', iconProps: { type: 'top'}},
-  firstCh: {label: 'First chapter', eventKey: 'jumpToFirstChapter', iconProps: {type: 'next-last', open: false}},
-  prevCh: {label: 'Previous chapter', eventKey: 'jumpToPreviousChapter', iconProps: {type: 'next', open: false}},
+  firstCh: {label: 'First chapter', eventKey: 'jumpToFirstChapter', iconProps: {type: 'next-last', open: false}, checkIfExternal: true},
+  prevCh: {label: 'Previous chapter', eventKey: 'jumpToPreviousChapter', iconProps: {type: 'next', open: false}, checkIfExternal: true},
   curCh: {label: 'Current chapter', eventKey: 'jumpToCurrentChapter', iconProps: {type: 'recenter'}},
-  nextCh: {label: 'Next chapter', eventKey: 'jumpToNextChapter', iconProps: {type: 'next', open: true}},
-  latestCh: {label: 'Latest chapter', eventKey: 'jumpToLastChapter', iconProps: {type: 'next-last', open: true}},
+  nextCh: {label: 'Next chapter', eventKey: 'jumpToNextChapter', iconProps: {type: 'next', open: true}, checkIfExternal: true},
+  latestCh: {label: 'Latest chapter', eventKey: 'jumpToLastChapter', iconProps: {type: 'next-last', open: true}, checkIfExternal: true},
   comment: {label: 'Comment section', eventKey: 'onJumpToComment', iconProps: {type: 'speech'}}
 }
 

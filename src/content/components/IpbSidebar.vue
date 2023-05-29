@@ -3,7 +3,7 @@
     <div class="ipb-sidebar">
       <button @click="startBookmark">
         <div class="ipb-bubble">{{ mainBM.chI != null ? 'Change bookmark location' : 'Add a new bookmark' }}</div>
-        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="location"></IpbIcon></div>
+        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="edit" /></div>
       </button>
 
       <button v-if="mainBM.chI != null" @click="jumpToBookmark" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}">
@@ -12,15 +12,19 @@
           <span v-if="!fullViewMode && mainBM.chI != curChI" class="ipb-warning">
             Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
             Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
+            <IpbIcon type="visit" fill="#999" />
           </span>
         </div>
-        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="jump"></IpbIcon></div>
+        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="location" /></div>
       </button>
     </div>
     <div v-if="settings.extraSideBtn" class="ipb-sidebar ipb-sidebar--extra">
-      <button class="ipb-extra" @click="eventRef[eventKey]" v-for="({label, iconProps, eventKey}, i) in buttons" :key="i">
-        <div class="ipb-bubble">{{ label }}</div>
-        <div class="ipb-btn-child"><IpbIcon v-bind="iconProps" fill="#FFF"></IpbIcon></div>
+      <button @click="eventRef[eventKey]" v-for="({iconProps, eventKey, btnKey, checkIfExternal}, i) in buttons" :key="i">
+        <div class="ipb-bubble">
+          {{ btnLabel(btnKey) }}
+          <IpbIcon v-if="checkIfExternal && !fullViewMode && isExternal[btnKey]" type="visit" fill="#999" />
+        </div>
+        <div class="ipb-btn-child"><IpbIcon v-bind="iconProps" fill="#FFF" /></div>
       </button>
     </div>
   </div>
@@ -34,7 +38,7 @@ import {
   jumpToFirstChapter, jumpToLastChapter, jumpToPreviousChapter, jumpToNextChapter
 } from '../js/page'
 import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit } from '../js/bookmark'
-import { fullViewMode } from '../js/static'
+import { chapterInfos, fullViewMode } from '../js/static'
 import { settings, settingExtraBtn } from '../js/setting'
 import { EXTRA_BUTTON_INFOS } from '@/common/variables'
 
@@ -46,6 +50,14 @@ export default {
 
     const startBookmark = e => startBookmarkEdit(e, chapters)
 
+    const isExternal = computed(() => {
+      return {
+        firstCh: curChI.value > 0,
+        prevCh: curChI.value > 0,
+        nextCh: curChI.value < chapterInfos.length - 1,
+        latestCh: curChI.value < chapterInfos.length - 1 
+      }
+    })
     let countDownInt = null
     const jumpToBookmark = () => {
       if (!fullViewMode && mainBM.chI != curChI.value) {
@@ -88,13 +100,22 @@ export default {
     const buttons = computed(() => {
       return Object.keys(EXTRA_BUTTON_INFOS)
         .filter(btnKey => settingExtraBtn[btnKey])
-        .map(btnKey => EXTRA_BUTTON_INFOS[btnKey])
+        .map(btnKey => ({btnKey, ...EXTRA_BUTTON_INFOS[btnKey]}))
     })
 
+    const btnLabel = btnKey => {
+      const curChIStr = parseInt(curChI.value) + 1
+      return {
+        prevCh: curChIStr === 1 ? 'Previous (already at chapter 1)' : 'Previous: Chapter ' + Math.max(1, curChIStr - 1),
+        curCh: 'Current: Chapter ' + curChIStr,
+        nextCh: curChIStr === chapterInfos.length ? 'Next (already at the latest chapter)' : 'Next: Chapter ' + Math.min(chapterInfos.length, curChIStr + 1),
+        latestCh: 'Latest: Chapter ' + chapterInfos.length
+      }[btnKey] || EXTRA_BUTTON_INFOS[btnKey].label
+    }
     return {
       mainBM, curChI, startBookmark, jumpToBookmark,
       bmInProgress, fullViewMode, settings,
-      buttons, eventRef
+      buttons, eventRef, btnLabel, isExternal
     }
   }
 }
@@ -104,7 +125,7 @@ export default {
 .ipb-sidebar-group {
   position: fixed;
   z-index: 99;
-  top: 75px;
+  top: 100px;
   right: 0;
   display: flex;
   flex-direction: column;
@@ -138,8 +159,8 @@ export default {
       padding: 3px 8px;
       background-color: #ddd;
       bottom: 0;
-      transform: translateY(calc(100% + 10px));
-      right: 10px;
+      transform: translateY(calc(100% + 5px));
+      right: 22px;
       pointer-events: none;
       font-size: 11px;
       line-height: 1;
@@ -158,11 +179,13 @@ export default {
 
       .ipb-warning {
         display: block;
-        color: #e13939;
+        color: #397ce1;
       }
     }
 
-    &.bmOnOtherCh > .ipb-btn-child { background-color: grey; }
+    &.bmOnOtherCh {
+      .ipb-bubble { padding: 7px; }
+    }
 
     & > .ipb-btn-child {
       background-color: $ao3_red;
@@ -192,7 +215,7 @@ export default {
     & > button {
       .ipb-bubble {
         right: auto;
-        left: 10px;
+        left: 22px;
       }
       
       & > .ipb-btn-child {
@@ -206,6 +229,9 @@ export default {
 }
 
 .ipb-sidebar.ipb-sidebar--extra {
-  & > button > .ipb-btn-child { background-color: $btn_blue; }
-}
+  & > button {
+    & > .ipb-btn-child { background-color: $btn_blue; }
+  }
+} 
+  
 </style>
