@@ -5,9 +5,11 @@ const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 
 const AO3_DOMAIN = "https://archiveofourown.org"
 
+const BOOKMARK_LIMIT = 500
+
 const DEFAULT_SETTINGS = {
   compact: false,
-  progressBar: true,
+  progressBar: false,
   extraSideBtn: true,
   alignRight: true
 }
@@ -15,9 +17,9 @@ const DEFAULT_SETTINGS = {
 const DEFAULT_SETTING_EXTRA_BUTTONS = {
   backToTop: false,
   firstCh: false,
-  prevCh: true,
-  curCh: true,
-  nextCh: true,
+  prevCh: false,
+  curCh: false,
+  nextCh: false,
   latestCh: false,
   comment: true
 }
@@ -40,5 +42,6 @@ export {
   STORE_SETTING_EXTRA_BTN_KEY,
   DEFAULT_SETTING_EXTRA_BUTTONS,
   EXTRA_BUTTON_INFOS,
-  AO3_DOMAIN
+  AO3_DOMAIN,
+  BOOKMARK_LIMIT
 }

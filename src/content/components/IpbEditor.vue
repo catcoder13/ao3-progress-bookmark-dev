@@ -79,7 +79,9 @@ export default {
 
     const onUpdateBookmark = () => {
       if (editBM.invalid) return
+
       updateBookmark(editBM.chI, editBM.perc.toFixed(5))
+      
       stopBookmarkEdit()
     }
 
@@ -141,7 +143,7 @@ export default {
       display: block;
       white-space: nowrap;
 
-      &:first-child { padding-bottom: 2px; }
+      &:first-child:not(:only-child) { padding-bottom: 2px; }
     }
   }
 } // ipb-bookmark

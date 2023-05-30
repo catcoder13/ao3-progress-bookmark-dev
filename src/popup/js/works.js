@@ -23,25 +23,27 @@ const worksGroupByAuthor = computed(() => {
 })
 
 const fetchSyncData = () => {
-  chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(wIDObj => {
-    // chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(wIDObj => {
-    const workIDs = wIDObj[STORE_ALL_WORK_KEYS]
-    if (!workIDs) return
-  
-    Promise.all(
-      workIDs.map(workID => chrome.storage.sync.get(STORE_WORK_KEY_PREFIX + workID))
-      // workIDs.map(workID => chrome.storage.local.get(STORE_WORK_KEY_PREFIX + workID))
-    ).then(workObjs => {
-      workObjs.forEach((workObj, i) => {
-        const work = workObj[STORE_WORK_KEY_PREFIX + workIDs[i]]
-        if (work) {
-          works[workIDs[i]] = work
-        } else {
-          console.log(workIDs[i], 'object not found')
-        }
-  
-      })
-    }).catch(err => console.warn(`[AO3 IPB] Error occur on fetching works`, err))
+  chrome.storage.sync.get(STORE_ALL_WORK_KEYS)
+    .then(obj => obj[STORE_ALL_WORK_KEYS])
+    .then(workIDs => {
+      if (!workIDs) return
+
+      console.log('workIDs', workIDs)
+
+      Promise.all(
+        workIDs.map(workID => chrome.storage.sync.get(STORE_WORK_KEY_PREFIX + workID))
+        // workIDs.map(workID => chrome.storage.local.get(STORE_WORK_KEY_PREFIX + workID))
+      ).then(workObjs => {
+        workObjs.forEach((workObj, i) => {
+          const work = workObj[STORE_WORK_KEY_PREFIX + workIDs[i]]
+          if (work) {
+            works[workIDs[i]] = work
+          } else {
+            console.log(workIDs[i], 'object not found')
+          }
+    
+        })
+      }).catch(err => console.warn(`[AO3 IPB] Error occur on fetching works`, err))
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))
 }
 fetchSyncData()
@@ -60,11 +62,14 @@ const removeAllWorks = () => {
   chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
 
-    workIDs.forEach(workID => {
-      chrome.storage.sync.remove(STORE_WORK_KEY_PREFIX + workID)
-      delete works[workID]
-    })
-    chrome.storage.sync.set({ [STORE_ALL_WORK_KEYS]: [] })
+    chrome.storage.sync.remove([
+      ...workIDs.map(workID => STORE_WORK_KEY_PREFIX + workID),
+      STORE_ALL_WORK_KEYS
+    ])
+
+    workIDs.forEach(workID => delete works[workID])
+    
+    // chrome.storage.sync.set({ [STORE_ALL_WORK_KEYS]: [] })
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))
 }
 

@@ -1,22 +1,28 @@
 <template>
   <div class="ipb-file-summary">
     <h2>Import summary</h2>
-    <div class="ipb-file-summary__content">
-      <h3>Total work(s) from file: {{ summaries.workCount }}</h3>
+    <div v-if="!summaries.workCount">
+      <span>No bookmark data found in this file!</span>
+    </div>
+    <div v-else-if="summaries.workCount > BOOKMARK_LIMIT">
+      <span>Bookmark data exceeds limit! (Limit: {{ BOOKMARK_LIMIT }}, bookmark data in file: {{ summaries.workCount }})</span>
+    </div>
+    <div v-else class="ipb-file-summary__content">
+      <h4>Total work(s) from file: {{ summaries.workCount }}</h4>
       <div class="ipb-author-work ipb-style-scrollbar">
-        <h3>Authors</h3>
+        <h4>Authors</h4>
         <div class="" v-for="(authorWorkCount, authorName) in summaries.authors" :key=authorName>
           <IpbIcon type="author" fill="#999" />
           <span>{{ authorName }}: {{ authorWorkCount }} work{{ authorWorkCount > 1 ? 's' : ''}}</span>
         </div>
       </div>
+      <div class="ipb-remark">
+        Note: All existing bookmark will be <b>deleted/overwritten</b>!
+      </div>
     </div>
-    <div class="ipb-remark">
-      Note: existing <b>matched</b> bookmark will be overwritten.<br />
-      However, any existing bookmark that does not match the imported data will not be deleted.
-    </div>
+    
     <div class="ipb-button">
-      <button @click="onImport">Confirm import</button>
+      <button :class="{'ipb-disable': !summaries.workCount || summaries.workCount > BOOKMARK_LIMIT }" @click="onConfirmImport">Confirm import</button>
       <button @click="onCancel">Cancel</button>
     </div>
   </div>
@@ -25,18 +31,19 @@
 <script>
 import { onUnmounted, reactive } from 'vue'
 import { importData } from '../js/data'
-import { STORE_ALL_WORK_KEYS, STORE_SETTING_KEY, STORE_SETTING_EXTRA_BTN_KEY, STORE_WORK_KEY_PREFIX } from '@/common/variables'
+import { STORE_ALL_WORK_KEYS, STORE_WORK_KEY_PREFIX, BOOKMARK_LIMIT } from '@/common/variables'
 import IpbIcon from '@/common/IpbIcon.vue'
 export default {
     props: ["file"],
     emits: ['complete', 'cancel'],
+    components: { IpbIcon },
     setup(p, { emit }) {
         const reader = new FileReader()
         const summaries = reactive({ workCount: 0, authors: {} })
         let resultObj = {}
         const onFileRead = () => {
             resultObj = JSON.parse(reader.result)
-            const { [STORE_ALL_WORK_KEYS]: workIDs, [STORE_SETTING_KEY]: mainSettings, [STORE_SETTING_EXTRA_BTN_KEY]: extraBtnSettings } = resultObj
+            const { [STORE_ALL_WORK_KEYS]: workIDs } = resultObj
             console.log('to import ', resultObj)
             summaries.workCount = workIDs.length
             summaries.authors = workIDs.reduce((acc, workID) => {
@@ -51,26 +58,31 @@ export default {
         onUnmounted(() => {
             reader.removeEventListener("load", onFileRead)
         });
-        const onImport = () => {
-            importData(resultObj)
-            emit('complete')
+        const onConfirmImport = () => {
+          if (!summaries.workCount || summaries.workCount > BOOKMARK_LIMIT) return
+          importData(resultObj)
+          emit('complete')
         };
         const onCancel = () => emit("cancel")
-        return { summaries, onImport, onCancel }
-    },
-    components: { IpbIcon }
+
+
+        return { summaries, onConfirmImport, onCancel, BOOKMARK_LIMIT }
+    }
 }
 </script>
 
 <style lang="scss">
-.ipb-file-summary {
+.ipb-setting .ipb-file-summary {
   width: 100%;
   height: 100%;
   padding: 20px;
   box-sizing: border-box;
   color: #FFF;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
-  & > * { margin-bottom: 10px; }
+  // & > * { margin-bottom: 10px; }
 
   h3 {
     font-size: 18px;
@@ -100,6 +112,12 @@ export default {
   }
 
   .ipb-button {
+    button.ipb-disable {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      &:hover { filter: brightness(1); }
+    }
   }
 }
 </style>

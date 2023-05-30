@@ -1,12 +1,12 @@
-import {ref, reactive, watch} from 'vue'
-import { work, updateBookmarkStore, removeBookmarkStore } from './store'
+import {ref, reactive, watch, computed } from 'vue'
+import { work, workIDs, updateBookmarkStore, removeBookmarkStore } from './store'
 import { workID, chapterInfos, mainContent } from './static'
 import { activateMouseMove, deactivateMouseMove } from './mousePos'
+import { BOOKMARK_LIMIT } from '@/common/variables'
 
 const mainBM = reactive({chI: null, perc: null, chID: null, link: null, fwLink: null})
 
 const bmInProgress = ref(false)
-
 const bmFocusCountDown = ref(0)
 
 watch(() => work.value,
@@ -24,13 +24,17 @@ newWork => {
   
 })
 
+const withinBookmarkLimit = computed(() => workIDs.value.length < BOOKMARK_LIMIT)
+
 const updateBookmark = (chI, perc) => {
-  updateBookmarkStore(chI, perc, chapterInfos[chI].chID, chapterInfos[chI].title)
-  mainBM.chI = chI
-  mainBM.perc = perc
-  mainBM.chID = chapterInfos[chI].chID
-  mainBM.link = `/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
-  mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+  if (mainBM.chI != null || withinBookmarkLimit.value) {
+    updateBookmarkStore(chI, perc, chapterInfos[chI].chID, chapterInfos[chI].title)
+    mainBM.chI = chI
+    mainBM.perc = perc
+    mainBM.chID = chapterInfos[chI].chID
+    mainBM.link = `/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
+    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+  }
 }
 
 const removeBookmark = e => {
@@ -46,6 +50,11 @@ const stopBookmarkEdit = () => {
 }
 
 const startBookmarkEdit = (e, chapters) => {
+  if (mainBM.chI == null && !withinBookmarkLimit.value) {
+    console.warn(`[AO3 IPB] Reached bookmark limit! Maximum bookmark: ${BOOKMARK_LIMIT}`)
+    return
+  }
+
   mainContent.classList.toggle('bmInProgress', true)
   bmInProgress.value = true
   activateMouseMove(null, e.clientY)
@@ -72,6 +81,6 @@ const startBookmarkEdit = (e, chapters) => {
 }
 
 export {
-  mainBM, bmInProgress, bmFocusCountDown,
+  mainBM, bmInProgress, bmFocusCountDown, withinBookmarkLimit,
   startBookmarkEdit, updateBookmark, removeBookmark, stopBookmarkEdit
 }

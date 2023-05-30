@@ -305,6 +305,7 @@ export default {
       padding: 80px 20px 40px;
 
       span {
+        font-size: 13px;
         display: block;
         color: #FFF;
 

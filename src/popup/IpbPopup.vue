@@ -1,5 +1,6 @@
 <template>
   <div class="ipb-popup" :class="{compact: settings.compact}">
+    <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
     <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
     <div class="ipb-popup__view-mode">
       <IpbTab class="ipb-groupby" title="View mode:" :options="VIEW_MODES" v-model="viewMode"></IpbTab>
@@ -16,6 +17,7 @@
           <IpbIcon type="sort" fill="#333" :open="ascend" @click="ascend = !ascend" />
         </span>
       </div>
+      <div class="ipb-popup__work-count">{{ allGroup.length }}/{{ BOOKMARK_LIMIT }} work(s)</div>
       <div class="ipb-popup__wrapper ipb-style-scrollbar">
         <TransitionGroup name="fade-in">
           <IpbPopupItem v-for="(work, i) in sortWorks(allGroup)" :key="work.workID" :work="work" />
@@ -63,6 +65,7 @@ import IpbSetting from './components/IpbSetting.vue'
 import IpbPopupItem from './components/IpbPopupItem.vue'
 import IpbDropdown from './components/IpbDropdown.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
+import { BOOKMARK_LIMIT } from '@/common/variables'
 
 const VIEW_MODES = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
 const SORT_BY = [{label: 'Recent bookmark', val: 't'}, {label: 'Progress', val: 'perc'}, {label: 'Title', val: 'name'}]
@@ -104,9 +107,16 @@ export default {
       return worksGroupByAuthor.value
     })
 
+    
+    const clearLocalStorage =  () => {
+      chrome.storage.sync.clear()
+    }
+
+
     return {
       allGroup, worksGroupByAuthor, filteredWorksGroupByAuthor, sortWorks, selectedAuthor,
-      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend
+      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend, clearLocalStorage,
+      BOOKMARK_LIMIT
     }
   }
 }
@@ -235,6 +245,11 @@ $bg: #FFF;
 
       &:hover { opacity: 1; }
     }
+  }
+
+  .ipb-popup__work-count {
+    padding: 5px 10px;
+    background-color: #FFF;
   }
 
   .ipb-popup__wrapper {

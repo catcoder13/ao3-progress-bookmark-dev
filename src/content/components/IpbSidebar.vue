@@ -1,8 +1,17 @@
 <template>
   <div class="ipb-sidebar-group">
     <div class="ipb-sidebar">
-      <button @click="startBookmark">
-        <div class="ipb-bubble">{{ mainBM.chI != null ? 'Change bookmark location' : 'Add a new bookmark' }}</div>
+      <button class="ipb-sidebar__button--bookmark" @click="startBookmark" :class="{exceed: mainBM.chI === null && !withinBookmarkLimit}">
+        <template v-if="mainBM.chI === null && !withinBookmarkLimit">
+          <div class="ipb-bubble">
+            You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
+            Try to delete some of the existing bookmark to free out more space for new bookmark.
+          </div>
+        </template>
+        <template v-else>
+          <div class="ipb-bubble">{{ mainBM.chI != null ? 'Change bookmark location' : 'Add a new bookmark' }}</div>
+        </template>
+        
         <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="edit" /></div>
       </button>
 
@@ -37,10 +46,10 @@ import {
   jumpToChapter, jumpToCurrentChapter,
   jumpToFirstChapter, jumpToLastChapter, jumpToPreviousChapter, jumpToNextChapter
 } from '../js/page'
-import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit } from '../js/bookmark'
+import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit, withinBookmarkLimit } from '../js/bookmark'
 import { chapterInfos, fullViewMode } from '../js/static'
 import { settings, settingExtraBtn } from '../js/setting'
-import { EXTRA_BUTTON_INFOS } from '@/common/variables'
+import { BOOKMARK_LIMIT, EXTRA_BUTTON_INFOS } from '@/common/variables'
 
 import IpbIcon from '@/common/IpbIcon.vue'
 
@@ -113,7 +122,7 @@ export default {
       }[btnKey] || EXTRA_BUTTON_INFOS[btnKey].label
     }
     return {
-      mainBM, curChI, startBookmark, jumpToBookmark,
+      mainBM, curChI, startBookmark, jumpToBookmark, withinBookmarkLimit, BOOKMARK_LIMIT,
       bmInProgress, fullViewMode, settings,
       buttons, eventRef, btnLabel, isExternal
     }
@@ -129,13 +138,13 @@ export default {
   right: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 5px;
   pointer-events: none;
 }
 
 .ipb-sidebar {
   display: flex;
-  gap: 2px;
+  gap: 5px;
   flex-direction: column;
   align-items: flex-end;
 
@@ -152,6 +161,19 @@ export default {
       transition: transform 0.2s, opacity 0.2s;
 
       .ipb-bubble { display: block; }
+    }
+
+    &.ipb-sidebar__button--bookmark.exceed {
+      cursor: not-allowed;
+
+      &:hover {
+        opacity: inherit;
+        z-index: inherit;
+      }
+
+      .ipb-btn-child {
+        background-color: #333;
+      }
     }
 
     .ipb-bubble {
@@ -189,8 +211,8 @@ export default {
 
     & > .ipb-btn-child {
       background-color: $ao3_red;
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       border-top-left-radius: 3px;
       border-bottom-left-radius: 3px;
 
