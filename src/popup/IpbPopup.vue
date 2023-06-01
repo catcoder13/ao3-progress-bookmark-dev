@@ -20,7 +20,7 @@
       <div class="ipb-popup__work-count">{{ allGroup.length }}/{{ BOOKMARK_LIMIT }} work(s)</div>
       <div class="ipb-popup__wrapper ipb-style-scrollbar">
         <TransitionGroup name="fade-in">
-          <IpbPopupItem v-for="(work, i) in sortWorks(allGroup)" :key="work.workID" :work="work" />
+          <IpbPopupItem v-for="work in sortWorks(allGroup)" :key="work.workID" :work="work" />
         </TransitionGroup>
         <span v-if="!allGroup.length" class="ipb-no-bm-msg">No bookmark added.</span>
       </div>

@@ -1,12 +1,12 @@
 <template>
   <div class="ipb-navbar" :class="{stucked}" :style="{top: `${navbarElem.top}px`, width: `${navbarElem.width}px`}">
-    <div :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
-      @click="() => jumpToChapter(chI)" @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
-      <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${chapters[chI].progress}%`}"></span>
+    <a :href="navbarHref(chI)" :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
+      @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
+      <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${curChProgress}%`}"></span>
       <template v-if="mainBM.chI != null && mainBM.chI == chI">
         <IpbIcon class="ipb-navbar__bar__bm" type="location" fill="#000" :style="{left: `${mainBM.perc * 100}%`}" />
       </template>
-    </div>
+    </a>
   </div>
       
   <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPos">
@@ -41,20 +41,21 @@
 
 <script>
 import { computed, onMounted, ref, reactive, onUnmounted } from 'vue'
+import { AO3_DOMAIN } from '@/common/variables'
 import { mainBM, bmInProgress } from '../js/bookmark'
-import { chapters, curChI, view, onScroll } from '../js/page'
-import {chapterInfos, fullViewMode, workID, oneShot, mainContent, name} from '../js/static'
+import { chapters, curChI, curChProgress, view } from '../js/page'
+import {chapterInfos, fullViewMode, workID, oneShot, name} from '../js/static'
 import {mousePos, activateMouseMove, deactivateMouseMove} from '../js/mousePos'
+import { scrollY, activateScroll, deactivateScroll } from '../js/scroll'
 
 import IpbIcon from '@/common/IpbIcon.vue'
-
-
 
 export default {
   name: 'IpbNavbar',
   components: { IpbIcon },
   setup() {
     activateMouseMove()
+    activateScroll()
 
     const navbarElem = reactive({width: 0, x: 0, barWidth: 0})
 
@@ -101,7 +102,7 @@ export default {
       } else {
         if (mousePos.x < navbarElem.left || mousePos.x > navbarElem.left + navbarElem.width) return null
         
-        const mousePosY = view.scrollY + mousePos.y
+        const mousePosY = scrollY.value + mousePos.y
         if (mousePosY > navbarElem.top + 70 || mousePosY < navbarElem.top) return null
       }
 
@@ -119,26 +120,19 @@ export default {
 
     const navbarBarClass = chI => {
       return {
-        "ipb-navbar__bar": true,
+        "ipb-navbar__bar ipb-a-button": true,
         "has-bm": mainBM.chI && mainBM.chI == chI,
         "ipb-focus": approxChI.value == chI,
-        'ipb-one-chapter-only': chapterInfos.length === 1,
         'ipb-current': curChI.value == chI
       }
     }
 
-    const jumpToChapter = chI => {
-      if (fullViewMode || approxChI.value == curChI.value) {
-        const targetScroll = oneShot ? window.scrollY + mainContent.getBoundingClientRect().y : chapters[chI].top
-        window.scrollTo({ top: targetScroll })
-        // if (chapters[chI].top > window.scrollY && chapters[chI].top < window.scrollY + window.innerHeight) {
-        //   window.scrollTo({top: targetScroll, behavior: 'smooth'})
-        // } else window.scrollTo({top: targetScroll})
-        onScroll(null, targetScroll)
-      }
-      else {
-        window.location.href = `/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
-      }
+    const navbarHref = chI => {
+      if (oneShot) return '#workskin'
+      if (fullViewMode) return `#chapter-${parseInt(chI) + 1}`
+      if (curChI.value == chI) return `#chapter-${parseInt(chI + 1)}`
+      
+      return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
     }
 
     onMounted(() => {
@@ -156,12 +150,13 @@ export default {
       document.removeEventListener('mouseenter', onMouseEnterDoc)
       document.removeEventListener('mouseleave', onMouseLeaveDoc)
       deactivateMouseMove()
+      deactivateScroll()
     })
 
     return {
-      chapters, chapterInfos, curChI, approxChI, hoveredChI, name, bmInProgress,
+      chapters, chapterInfos, curChI, curChProgress, approxChI, hoveredChI, name, bmInProgress,
       infoPos, mainBM, fullViewMode, navbarElem, stucked, oneShot,
-      navbarBarClass, jumpToChapter
+      navbarBarClass, navbarHref
     }
   }
 }
@@ -183,7 +178,8 @@ export default {
     .ipb-navbar__bar {
       opacity: 1;
 
-      &:not(.ipb-one-chapter-only).ipb-current {
+      &:not(:only-child).ipb-current {
+      // &:not(.ipb-one-chapter-only).ipb-current {
         height: 8px;
 
         &.ipb-focus { height: 17px; }
@@ -203,7 +199,7 @@ export default {
     opacity: 0.5;
     user-select: none;
 
-    &:not(:last-child) { border-right: 1px solid #FFF; }
+    &:not(:last-child) { border-right: 1px solid #FFF; } // not oneshot or not one chapter available
 
     &.has-bm { background-color: #e84f4f; }
 
@@ -212,7 +208,10 @@ export default {
       cursor: pointer;
       opacity: 1;
 
-      &:hover { flex: 200px; z-index: 999999; }
+      &:hover {
+        flex: 200px;
+        z-index: 999999;
+      }
     }
 
     .ipb-navbar__bar__progress-bar {

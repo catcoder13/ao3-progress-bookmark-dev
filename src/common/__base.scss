@@ -70,6 +70,18 @@ body {
     cursor: pointer;
 
     &:hover { border-bottom: 1px solid $link_blue; }
+
+    &.ipb-a-button {
+      outline: none;
+      border-bottom: none;
+
+      &:hover,
+      &:focus,
+      &:visited {
+        border-bottom: none;
+        color: #333;
+      }
+    }
   }
 
   .ipb-style-scrollbar {

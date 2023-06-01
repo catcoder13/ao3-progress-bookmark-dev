@@ -25,13 +25,16 @@ const DEFAULT_SETTING_EXTRA_BUTTONS = {
 }
 
 const EXTRA_BUTTON_INFOS = {
-  backToTop: {label: 'Top', eventKey: 'backToTop', iconProps: { type: 'top'}},
-  firstCh: {label: 'First chapter', eventKey: 'jumpToFirstChapter', iconProps: {type: 'next-last', open: false}, checkIfExternal: true},
-  prevCh: {label: 'Previous chapter', eventKey: 'jumpToPreviousChapter', iconProps: {type: 'next', open: false}, checkIfExternal: true},
-  curCh: {label: 'Current chapter', eventKey: 'jumpToCurrentChapter', iconProps: {type: 'recenter'}},
-  nextCh: {label: 'Next chapter', eventKey: 'jumpToNextChapter', iconProps: {type: 'next', open: true}, checkIfExternal: true},
-  latestCh: {label: 'Latest chapter', eventKey: 'jumpToLastChapter', iconProps: {type: 'next-last', open: true}, checkIfExternal: true},
-  comment: {label: 'Comment section', eventKey: 'onJumpToComment', iconProps: {type: 'speech'}}
+  backToTop: {label: 'Top', eventKey: 'backToTop', iconProps: { type: 'top'}, chICode: -3},
+  firstCh: {label: 'First chapter', eventKey: 'jumpToFirstChapter', iconProps: {type: 'next-last', open: false}, checkIfExternal: true, chICode: -2},
+  prevCh: {label: 'Previous chapter', eventKey: 'jumpToPreviousChapter', iconProps: {type: 'next', open: false}, checkIfExternal: true, chICode: -1},
+  curCh: {label: 'Current chapter', eventKey: 'jumpToCurrentChapter', iconProps: {type: 'recenter'}, chICode: 0},
+  nextCh: {label: 'Next chapter', eventKey: 'jumpToNextChapter', iconProps: {type: 'next', open: true}, checkIfExternal: true, chICode: 1},
+  latestCh: {label: 'Latest chapter', eventKey: 'jumpToLastChapter', iconProps: {type: 'next-last', open: true}, checkIfExternal: true, chICode: 2},
+  comment: {label: 'Comment section', eventKey: 'onJumpToComment', iconProps: {type: 'speech'}, chICode: 3, onClick: () => {
+    const commentBtnElem = document.querySelector('#show_comments_link a')
+    if (commentBtnElem.innerText.indexOf('Hide') === -1) commentBtnElem.click()
+  }}
 }
 
 export {

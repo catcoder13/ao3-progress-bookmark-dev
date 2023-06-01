@@ -6,7 +6,7 @@
       <div class="ipb-setting__option-group">
         <h3>In-page bookmark UI</h3>
         <div class="ipb-setting__option-group__item">
-          <h4>Show chapter navigation bar</h4>
+          <h4>Top chapter progress bar</h4>
           <IpbToggle v-model="settings.progressBar" />
         </div>
         <div class="ipb-setting__option-group__item">

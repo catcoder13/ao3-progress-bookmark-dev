@@ -1,50 +1,46 @@
-import {reactive, ref} from 'vue'
-import {mainContent, chapterDoms, fullViewMode, workID, chapterInfos, oneShot} from './static'
-import { AO3_DOMAIN } from '@/common/variables'
+import {reactive, computed} from 'vue'
+import {mainContent, chapterDoms, fullViewMode, oneShot} from './static'
+import { scrollY, onScroll, activateScroll } from './scroll'
 
 let chapters = null
 const chaptersRef = {}
-const curChI = ref(0)
-const curChITop = ref(0)
+let initCurChI = 0
 
-const view = reactive({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight, scrollY: 0})
+const view = reactive({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight})
 
 if (chapterDoms.length) { // multi chapter
-  curChI.value = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
-  curChITop.value = curChI.value
+  initCurChI = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
 
   chapterDoms.forEach(ch => {
     const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-    chaptersRef[chIndex] = reactive({ top: -1, height: 0, progress: 0, dom: ch })
+    chaptersRef[chIndex] = reactive({ top: -1, height: 0, dom: ch })
   })
 } else { // one shot
-  chaptersRef[0] = reactive({ top: -1, height: 0, progress: 0, dom: mainContent && mainContent.querySelector('#chapters') })
+  chaptersRef[0] = reactive({ top: -1, height: 0, dom: mainContent && mainContent.querySelector('#chapters') })
 }
 
 chapters = chaptersRef
 
-
-
-const onScroll = (e, manualY) => {
-  const scrollBottom = (manualY || window.scrollY) + view.height
-  let curChInView = chapterDoms.length > 0 ? curChI.value : 0
-
-  if (chapterDoms.length > 1) { // if the page is fullViewMode
-    curChInView = Object.keys(chapters).filter(chI => {
-      // const trigger = chapters[chI].top + view.height / 2
-      const trigger = chapters[chI].top
-      return trigger < scrollBottom
-    }).length
-    curChInView = curChInView < 2 ? 0 : curChInView - 1
-  }
-  
-  // const triggerHorizon = chapters[curChInView].top + view.height / 2
-  const triggerHorizon = chapters[curChInView].top
-  chapters[curChInView].progress = (Math.min(1, Math.max(0, (scrollBottom - triggerHorizon) / chapters[curChInView].height)) * 100).toFixed(0)
-  curChI.value = curChInView
-
-  view.scrollY = window.scrollY
+if (!oneShot && fullViewMode && chapterDoms.length > 1) {
+ activateScroll()
 }
+
+const curChI = computed(() => {
+  if (oneShot || chapterDoms.length === 1) return initCurChI
+
+  const scrollBottom = scrollY.value + view.height
+
+  const result = Object.keys(chapters).filter(chI => {
+    return chapters[chI].top < scrollBottom
+  }).length
+
+  return result < 2 ? 0 : result - 1
+})
+
+const curChProgress = computed(() => {
+  const scrollBottom = scrollY.value + view.height
+  return (Math.min(1, Math.max(0, (scrollBottom - chapters[curChI.value].top) / chapters[curChI.value].height)) * 100).toFixed(0)
+})
 
 const onResize = () => {
   view.width = document.documentElement.clientWidth
@@ -60,69 +56,7 @@ const onResize = () => {
   onScroll()
 }
 
-const getCurrentChapter = () => {
-  let curChInView = chapterDoms.length > 0 ? curChI.value : 0
-  const scrollBottom = window.scrollY + window.innerHeight
-
-  if (chapterDoms.length > 1) { // if the page is fullViewMode
-    curChInView = Object.keys(chapters).filter(chI => {
-      const trigger = chapters[chI].top
-      return trigger < scrollBottom
-    }).length
-    curChInView = curChInView < 2 ? 0 : curChInView - 1
-  }
-
-  return curChInView
-}
-
-const jumpToFirstChapter = () => {
-  jumpToChapter(0)
-}
-
-const jumpToPreviousChapter = () => {
-  const prevChI = Math.max(0, getCurrentChapter() - 1)
-  jumpToChapter(prevChI)
-}
-
-const jumpToCurrentChapter = () => {
-  if (oneShot) {
-    mainContent.querySelector('.title').scrollIntoView()
-  } else {
-    chapters[getCurrentChapter()].dom.scrollIntoView()
-  }
-  
-}
-
-const jumpToNextChapter = () => {
-  const nextChI = Math.min(chapterInfos.length - 1, getCurrentChapter() + 1)
-  jumpToChapter(nextChI)
-}
-
-const jumpToLastChapter = () => {
-  jumpToChapter(chapterInfos.length - 1)
-}
-
-const jumpToChapter = chI => {
-  if (oneShot) return
-
-  if (fullViewMode) {
-    document.getElementById(`chapter-${parseInt(chI) + 1}`).scrollIntoView()
-  } else {
-    window.location.href = `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
-  }
-
-  onScroll()
-}
-
-
-window.addEventListener('scroll', onScroll)
 window.addEventListener('resize', onResize)
 onResize()
 
-
-
-export {
-  chapters, curChI, view, onScroll,
-  jumpToChapter, jumpToCurrentChapter,
-  jumpToFirstChapter, jumpToLastChapter, jumpToPreviousChapter, jumpToNextChapter
-}
+export { chapters, curChI, curChProgress, view }

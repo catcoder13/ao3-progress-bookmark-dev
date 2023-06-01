@@ -2,7 +2,7 @@ import { reactive } from "vue"
 
 const mousePos = reactive({x: -1, y:  -1})
 
-let eventRefCount = 0
+let mouseMoveEventCount = 0
 
 const onMouseMove = e => {
   mousePos.x = e.clientX
@@ -10,16 +10,16 @@ const onMouseMove = e => {
 }
 
 const activateMouseMove = (initX = -1, initY = -1) => {
-  if (!eventRefCount) {
+  if (!mouseMoveEventCount) {
     window.addEventListener('mousemove', onMouseMove)
     mousePos.x = initX
     mousePos.y = initY
   }
-  eventRefCount++
+  mouseMoveEventCount++
 }
 const deactivateMouseMove = () => {
-  eventRefCount--
-  if (eventRefCount <= 0) {
+  mouseMoveEventCount--
+  if (mouseMoveEventCount <= 0) {
     window.removeEventListener('mousemove', onMouseMove)
     mousePos.x = -1
     mousePos.y = -1

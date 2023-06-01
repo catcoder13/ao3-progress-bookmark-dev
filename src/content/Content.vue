@@ -12,7 +12,7 @@
 <script>
 import '@/common/__base.scss'
 
-import {ref, computed} from 'vue'
+import {computed} from 'vue'
 import {chapters, curChI} from './js/page'
 import { mainBM, bmInProgress } from './js/bookmark'
 import { fullViewMode, mainContent } from './js/static'

@@ -1,7 +1,7 @@
 <template>
   <div class="ipb-sidebar-group">
     <div class="ipb-sidebar">
-      <button class="ipb-sidebar__button--bookmark" @click="startBookmark" :class="{exceed: mainBM.chI === null && !withinBookmarkLimit}">
+      <a class="ipb-sidebar__button--bookmark ipb-a-button" @click="startBookmark" :class="{exceed: mainBM.chI === null && !withinBookmarkLimit}">
         <template v-if="mainBM.chI === null && !withinBookmarkLimit">
           <div class="ipb-bubble">
             You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
@@ -12,10 +12,10 @@
           <div class="ipb-bubble">{{ mainBM.chI != null ? 'Change bookmark location' : 'Add a new bookmark' }}</div>
         </template>
         
-        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="edit" /></div>
-      </button>
+        <div class="ipb-btn-child"><IpbIcon fill="#FFF" :type="mainBM.chI == null ? 'add' : 'edit'" /></div>
+      </a>
 
-      <button v-if="mainBM.chI != null" @click="jumpToBookmark" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}">
+      <a :href="jumpToBookmarkHref" v-if="mainBM.chI != null" @click="jumpToBookmark" class="ipb-a-button" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}">
         <div class="ipb-bubble">
           <b>Jump to bookmark</b>
           <span v-if="!fullViewMode && mainBM.chI != curChI" class="ipb-warning">
@@ -25,31 +25,29 @@
           </span>
         </div>
         <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="location" /></div>
-      </button>
+      </a>
     </div>
     <div v-if="settings.extraSideBtn" class="ipb-sidebar ipb-sidebar--extra">
-      <button @click="eventRef[eventKey]" v-for="({iconProps, eventKey, btnKey, checkIfExternal}, i) in buttons" :key="i">
+      <a class="ipb-a-button" :href="sidebarHref(chICode)" @click="onClick" v-for="({chICode, iconProps, onClick, btnKey, checkIfExternal}, i) in buttons" :key="i">
+      <!-- <a :href="sidebarHref(targetChI)" @click="eventRef[eventKey]" v-for="({targetChI, iconProps, eventKey, btnKey, checkIfExternal}, i) in buttons" :key="i"> -->
         <div class="ipb-bubble">
           {{ btnLabel(btnKey) }}
           <IpbIcon v-if="checkIfExternal && !fullViewMode && isExternal[btnKey]" type="visit" fill="#999" />
         </div>
         <div class="ipb-btn-child"><IpbIcon v-bind="iconProps" fill="#FFF" /></div>
-      </button>
+      </a>
     </div>
   </div>
 </template>
 
 <script>
 import { computed } from 'vue'
-import {
-  chapters, curChI, onScroll,
-  jumpToChapter, jumpToCurrentChapter,
-  jumpToFirstChapter, jumpToLastChapter, jumpToPreviousChapter, jumpToNextChapter
-} from '../js/page'
+import { chapters, curChI } from '../js/page'
+import {onScroll} from '../js/scroll'
 import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit, withinBookmarkLimit } from '../js/bookmark'
-import { chapterInfos, fullViewMode } from '../js/static'
+import { chapterInfos, fullViewMode, oneShot, workID } from '../js/static'
 import { settings, settingExtraBtn } from '../js/setting'
-import { BOOKMARK_LIMIT, EXTRA_BUTTON_INFOS } from '@/common/variables'
+import { BOOKMARK_LIMIT, EXTRA_BUTTON_INFOS, AO3_DOMAIN } from '@/common/variables'
 
 import IpbIcon from '@/common/IpbIcon.vue'
 
@@ -67,11 +65,12 @@ export default {
         latestCh: curChI.value < chapterInfos.length - 1 
       }
     })
+
     let countDownInt = null
     const jumpToBookmark = () => {
       if (!fullViewMode && mainBM.chI != curChI.value) {
         console.log('bookmark is located at another chapter')
-        jumpToChapter(mainBM.chI)
+        // jumpToChapter(mainBM.chI)
         return
       }
       const {top, height} = chapters[mainBM.chI]
@@ -87,23 +86,30 @@ export default {
         bmFocusCountDown.value = false
       }, 1200)
     }
-    const eventRef = {
-      backToTop: () => document.getElementById('main').scrollIntoView(),
-      jumpToFirstChapter,
-      jumpToPreviousChapter,
-      jumpToCurrentChapter,
-      jumpToNextChapter,
-      jumpToLastChapter,
-      onJumpToComment (e) {
-        const commentBtnElem = document.getElementById('show_comments_link').querySelector('a')
-      
-        if (commentBtnElem.innerText.indexOf('Hide') === -1) {
-          commentBtnElem.click()
-          commentBtnElem.scrollIntoView()
-        } else {
-          document.getElementById('comments_placeholder').scrollIntoView()
-        }
+
+    const jumpToBookmarkHref = computed(() => {
+      if (!fullViewMode && mainBM.chI != curChI.value) {
+        return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}#chapter-${parseInt(mainBM.chI) + 1}`
       }
+
+      return null
+    })
+
+    const sidebarHref = chICode => {
+      if (chICode === -3) return '#main'
+      if (chICode === 3) return '#show_comments_link'
+      if (oneShot) return '#workskin'
+
+      let targetChHash = curChI.value // chICode === 0
+      if (chICode === -2) targetChHash = 0
+      if (chICode === -1) targetChHash = Math.max(0, curChI.value - 1)
+      if (chICode === 1) targetChHash = Math.min(curChI.value + 1, chapterInfos.length - 1)
+      if (chICode === 2) targetChHash = chapterInfos.length - 1
+      
+      if (fullViewMode || chICode === 0) return `#chapter-${targetChHash + 1}`
+      
+      return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[targetChHash].chID}#chapter-${targetChHash + 1}`
+      
     }
 
     const buttons = computed(() => {
@@ -122,9 +128,10 @@ export default {
       }[btnKey] || EXTRA_BUTTON_INFOS[btnKey].label
     }
     return {
-      mainBM, curChI, startBookmark, jumpToBookmark, withinBookmarkLimit, BOOKMARK_LIMIT,
+      sidebarHref,
+      mainBM, curChI, startBookmark, jumpToBookmark, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
       bmInProgress, fullViewMode, settings,
-      buttons, eventRef, btnLabel, isExternal
+      buttons, btnLabel, isExternal
     }
   }
 }
@@ -148,7 +155,7 @@ export default {
   flex-direction: column;
   align-items: flex-end;
 
-  & > button {
+  & > a {
     position: relative;
     line-height: 1;
     cursor: pointer;
@@ -188,6 +195,7 @@ export default {
       line-height: 1;
       display: none;
       text-align: left;
+      white-space: nowrap;
       
       b {
         display: block;
@@ -234,7 +242,7 @@ export default {
   .ipb-sidebar {
     align-items: flex-start;
 
-    & > button {
+    & > a {
       .ipb-bubble {
         right: auto;
         left: 22px;
@@ -251,7 +259,7 @@ export default {
 }
 
 .ipb-sidebar.ipb-sidebar--extra {
-  & > button {
+  & > a {
     & > .ipb-btn-child { background-color: $btn_blue; }
   }
 } 
