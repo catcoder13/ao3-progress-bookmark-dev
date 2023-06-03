@@ -1,11 +1,12 @@
 <template>
-  <div class="ipb-popup" :class="{compact: settings.compact}">
+  <div class="ipb-popup" :class="{compact: settingPopup.compact}">
     <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
     <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
     <div class="ipb-popup__view-mode">
+      <IpbSearch />
       <IpbTab class="ipb-groupby" title="View mode:" :options="VIEW_MODES" v-model="viewMode"></IpbTab>
-      <span :title="settings.compact ? 'Compact layout' : 'Expand layout'">
-        <IpbIcon type="compact" fill="#FFF" :open="!settings.compact" @click="settings.compact = !settings.compact" />
+      <span :title="settingPopup.compact ? 'Compact layout' : 'Expand layout'">
+        <IpbIcon class="ipb-popup__view-mode__icon" type="compact" fill="#FFF" :open="!settingPopup.compact" @click="settingPopup.compact = !settingPopup.compact" />
       </span>
       
     </div>
@@ -58,7 +59,7 @@ import '@/common/__base.scss'
 
 import {computed, ref} from 'vue'
 import {works, worksGroupByAuthor, visitURL} from './js/works'
-import { settings } from './js/setting'
+import { settings, settingPopup } from './js/setting'
 
 import IpbTab from './components/IpbTab.vue'
 import IpbSetting from './components/IpbSetting.vue'
@@ -66,13 +67,14 @@ import IpbPopupItem from './components/IpbPopupItem.vue'
 import IpbDropdown from './components/IpbDropdown.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
 import { BOOKMARK_LIMIT } from '@/common/variables'
+import IpbSearch from './components/IpbSearch.vue'
 
 const VIEW_MODES = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
 const SORT_BY = [{label: 'Recent bookmark', val: 't'}, {label: 'Progress', val: 'perc'}, {label: 'Title', val: 'name'}]
 
 export default {
   name: 'App',
-  components: { IpbTab, IpbSetting, IpbDropdown, IpbPopupItem, IpbIcon },
+  components: { IpbTab, IpbSetting, IpbDropdown, IpbPopupItem, IpbIcon, IpbSearch },
   setup () {
     const sortBy = ref(SORT_BY[0])
     const viewMode = ref(VIEW_MODES[0])
@@ -115,7 +117,7 @@ export default {
 
     return {
       allGroup, worksGroupByAuthor, filteredWorksGroupByAuthor, sortWorks, selectedAuthor,
-      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend, clearLocalStorage,
+      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, settingPopup, ascend, clearLocalStorage,
       BOOKMARK_LIMIT
     }
   }
@@ -179,7 +181,7 @@ $bg: #FFF;
       }
     }
 
-    .ipb-icon {
+    .ipb-popup__view-mode__icon {
       position: absolute;
       width: 15px;
       height: 15px;

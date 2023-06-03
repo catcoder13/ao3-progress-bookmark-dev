@@ -1,6 +1,6 @@
 <template>
-  <template v-if="settings.compact">
-    <div class="ipb-popup-item" :class="{'ipb-popup-item--small': settings.compact}">
+  <template v-if="settingPopup.compact">
+    <div class="ipb-popup-item" :class="{'ipb-popup-item--small': settingPopup.compact}">
       <div class="ipb-info">
         <h3>{{ work.name }} 
           <span>
@@ -77,7 +77,7 @@
 
 <script>
 import { removeWork, visitURL } from '../js/works'
-import { settings } from '../js/setting'
+import { settings, settingPopup } from '../js/setting'
 
 import IpbIcon from '@/common/IpbIcon.vue'
 
@@ -86,7 +86,7 @@ export default {
   props: ['work', 'hideAuthor'],
   components: {IpbIcon},
   setup () {
-    return { removeWork, visitURL, settings } 
+    return { removeWork, visitURL, settings, settingPopup } 
   }
 }
 </script>

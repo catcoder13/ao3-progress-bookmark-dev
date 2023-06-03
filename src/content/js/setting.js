@@ -2,6 +2,7 @@ import { reactive } from 'vue'
 import { DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS } from '@/common/variables'
 
 const settings = reactive({...DEFAULT_SETTINGS})
+
 const settingExtraBtn = reactive({...DEFAULT_SETTING_EXTRA_BUTTONS})
 
 const updateSetting = settingObj => {

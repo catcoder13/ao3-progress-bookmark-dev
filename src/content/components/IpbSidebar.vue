@@ -15,10 +15,10 @@
         <div class="ipb-btn-child"><IpbIcon fill="#FFF" :type="mainBM.chI == null ? 'add' : 'edit'" /></div>
       </a>
 
-      <a :href="jumpToBookmarkHref" v-if="mainBM.chI != null" @click="jumpToBookmark" class="ipb-a-button" :class="{bmOnOtherCh: !fullViewMode && mainBM.chI != curChI}">
+      <a :href="jumpToBookmarkHref" v-if="mainBM.chI != null" @click="jumpToBookmark" class="ipb-a-button" :class="{bmInOtherPage}">
         <div class="ipb-bubble">
           <b>Jump to bookmark</b>
-          <span v-if="!fullViewMode && mainBM.chI != curChI" class="ipb-warning">
+          <span v-if="bmInOtherPage" class="ipb-warning">
             Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
             Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
             <IpbIcon type="visit" fill="#999" />
@@ -66,6 +66,8 @@ export default {
       }
     })
 
+    const bmInOtherPage = computed(() => !fullViewMode && mainBM.chI != curChI.value)
+
     let countDownInt = null
     const jumpToBookmark = () => {
       if (!fullViewMode && mainBM.chI != curChI.value) {
@@ -97,7 +99,10 @@ export default {
 
     const sidebarHref = chICode => {
       if (chICode === -3) return '#main'
-      if (chICode === 3) return '#show_comments_link'
+      if (chICode === 3) {
+        const commentSection = document.getElementById('show_comments_link')
+        return (commentSection && '#show_comments_link') || '#add_comment'
+      }
       if (oneShot) return '#workskin'
 
       let targetChHash = curChI.value // chICode === 0
@@ -130,7 +135,7 @@ export default {
     return {
       sidebarHref,
       mainBM, curChI, startBookmark, jumpToBookmark, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
-      bmInProgress, fullViewMode, settings,
+      bmInProgress, fullViewMode, settings, bmInOtherPage,
       buttons, btnLabel, isExternal
     }
   }
@@ -213,8 +218,9 @@ export default {
       }
     }
 
-    &.bmOnOtherCh {
+    &.bmInOtherPage {
       .ipb-bubble { padding: 7px; }
+      .ipb-btn-child { background-color: grey; }
     }
 
     & > .ipb-btn-child {

@@ -82,11 +82,8 @@ export default {
     input {
       width: 100%;
       height: 100%;
-      outline: none;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-size: 12px;
-      line-height: 1;
       white-space: nowrap;
       padding: 4px 40px 4px 10px;
       box-sizing: border-box;

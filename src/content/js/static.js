@@ -1,7 +1,8 @@
 // retrieve dom reference 
 // mainContent: one-shot title, one-shot chapter section
 // chapterDoms: multiple chapter work's chapter's titles, each chapter's section
-const mainContent = document.querySelector('#workskin')
+const outer = document.getElementById('outer')
+const mainContent = document.getElementById('workskin')
 if (!mainContent) console.warn('[AO3 IPB] URL matches a work page, however #worksin does not exist, thus it is deemed not a work page.')
 
 const chapterDoms = mainContent ? mainContent.querySelectorAll('#chapters > .chapter') : []
@@ -65,5 +66,5 @@ if (chapterListElem) {
 export {
   workID, name, fullViewMode, oneShot,
   author, authorURL,
-  mainContent, chapterDoms, chapterInfos
+  outer, mainContent, chapterDoms, chapterInfos
 }

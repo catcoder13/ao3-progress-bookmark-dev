@@ -20,6 +20,12 @@ body {
     font-weight: normal;
   }
 
+  input {
+    outline: none;
+    font-size: 12px;
+    line-height: 1;
+  }
+
   button {
     position: relative;
     padding: 0;

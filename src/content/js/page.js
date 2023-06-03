@@ -1,5 +1,5 @@
 import {reactive, computed} from 'vue'
-import {mainContent, chapterDoms, fullViewMode, oneShot} from './static'
+import {outer, mainContent, chapterDoms, fullViewMode, oneShot} from './static'
 import { scrollY, onScroll, activateScroll } from './scroll'
 
 let chapters = null
@@ -45,18 +45,30 @@ const curChProgress = computed(() => {
 const onResize = () => {
   view.width = document.documentElement.clientWidth
   view.height = document.documentElement.clientHeight
-  
+  console.log('on resize')
+  onScroll()
+}
+
+const updateChapterDomSize = () => {
+  view.width = document.documentElement.clientWidth
+  view.height = document.documentElement.clientHeight
+
   const chIs = Object.keys(chapters)
   chIs.forEach(chI => {
     const {top, height} = (chapters[chI].dom && chapters[chI].dom.getBoundingClientRect()) || {top: 0, height: 0}
     chapters[chI].top = window.scrollY + top
     chapters[chI].height = height
   })
+  // console.log('on maincontent resize')
 
   onScroll()
 }
 
-window.addEventListener('resize', onResize)
+const resizeObserver = new ResizeObserver(updateChapterDomSize)
+resizeObserver.observe(outer)
+updateChapterDomSize()
+
+// window.addEventListener('resize', onResize)
 onResize()
 
 export { chapters, curChI, curChProgress, view }
