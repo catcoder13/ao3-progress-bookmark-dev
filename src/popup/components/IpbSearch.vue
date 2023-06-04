@@ -1,86 +1,46 @@
 <template>
-  <div class="ipb-search">
+  <div class="ipb-search" :class="{open}">
     <input type="text" :value="selection && selection.text" :style="{opacity: partialText ? 0 : (open ? 0.5 : 1)}"/>
     <input ref="input" type="text" :value="partialText"
       @input="onInput"
+      :placeholder="selection ? '' : 'Search by author name or work title'"
       @focus="onFocus"
       @blur="onBlur"
       @keydown="onKeyDown"
     />
     <span class="ipb-close" v-if="selection" @click="onClear">&#10006;</span>
-
-    <div ref="buttonParent" v-if="open" class="ipb-style-scrollbar">
-      <template v-if="searchResults.length">
-        <button
-          ref="buttons"
-          @mouseenter="curSelectedIndex = i"
-          @click="e => onSelect(e, item)" class="ipb-search-blur-ref" :class="{current: curSelectedIndex === i}" v-for="(item, i) in searchResults" :key="i">
-        <IpbIcon :type="item.type === 'work' ? 'bookmark' : 'author'" fill="#555" />{{
-          item.text
-        }}</button>
-      </template>
-      
-      <template v-else>
-        No matched result.
-      </template>
-    </div>
+    <IpbSearchResult v-if="open" class="ipb-style-scrollbar" v-model:hoverI="curSelectedIndex" @select="onSelect" :options="searchResults" />
     
   </div>
 </template>
 
 <script>
-import {ref, computed, watch} from 'vue'
+import {ref} from 'vue'
 import { works } from '../js/works'
 import { selection, partialText, searchResults} from '../js/search'
-import IpbIcon from '@/common/IpbIcon.vue'
+import IpbSearchResult from './IpbSearchResult.vue'
 
 const [TAB, ESC] = [9, 27]
 const [UP, DOWN, ENTER] = [38, 40, 13]
 
 export default {
     props: ["curSelection"],
+    components: { IpbSearchResult },
     setup() {
-        const buttons = ref(null)
-        const buttonParent = ref(null)
-        const curSelectedIndex = ref(0)
-        
-        watch(() => curSelectedIndex.value,
-        newIndex => {
-          const {top, bottom} = buttons.value[newIndex].getBoundingClientRect()
-          const {top: pTop, height: pHeight} = buttonParent.value.getBoundingClientRect()
-          
-          const btnTop = buttonParent.value.scrollTop + top
-          const btnBottom = buttonParent.value.scrollTop + bottom
-          const containerTop = buttonParent.value.scrollTop + pTop
-          const containerBottom = containerTop + pHeight
-          if (btnBottom > containerBottom) {
-            console.log('exit bottom')
-            const diff = btnBottom - containerBottom
-            buttonParent.value.scrollTo(0, buttonParent.value.scrollTop + diff)
-          } else if (btnTop < containerTop) {
-            console.log('exit top')
-            const diff = containerTop - btnTop
-            buttonParent.value.scrollTo(0, buttonParent.value.scrollTop - diff)
-          }
-          
-        }
-        )
+        const curSelectedIndex = ref(-1)
         const input = ref(null)
-        
         const open = ref(false)
-        const selectSuggest = computed(() => searchResults.value[curSelectedIndex.value])
-
         
-        const onFocus = () => {
+        const onFocus = async () => {
+          open.value = true
           if (selection.value) {
             partialText.value = ''
-            curSelectedIndex.value = selection.value.i
+            console.log(selection.value)
           }
-          open.value = true
         }
 
         const onInput = e => {
-          curSelectedIndex.value = 0
+          curSelectedIndex.value = -1
           partialText.value = e.target.value
         }
 
@@ -94,18 +54,17 @@ export default {
 
         const onSelect = (e, item) => {
           selection.value = item
-          curSelectedIndex.value = 0
           partialText.value = item.text
+          curSelectedIndex.value = -1
           open.value = false
           console.log('on select')
-
-          // if (e) e.stopPropagation()
+          input.value.blur()
         }
 
         const onClear = () => {
           selection.value = null
           partialText.value = ''
-          curSelectedIndex.value = 0
+          curSelectedIndex.value = -1
           input.value.focus()
         }
 
@@ -115,20 +74,19 @@ export default {
                 case ESC:
                     if (partialText.value) {
                         partialText.value = ""
-                        curSelectedIndex.value = 0
+                        curSelectedIndex.value = -1
                     }
-                    else {
-                        e.target.blur()
-                    }
+                    else e.target.blur()
+                    
                     e.preventDefault() // prevent esc cause the entire popup to close
                     break
                 case ENTER:
-                    if (selectSuggest.value) {
-                      onSelect(null, selectSuggest.value)
+                    if (searchResults.value[curSelectedIndex.value]) {
+                      onSelect(null, searchResults.value[curSelectedIndex.value])
                     }
                     break
                 case UP:
-                    curSelectedIndex.value = curSelectedIndex.value === 0 ? searchResults.value.length - 1 : --curSelectedIndex.value
+                    curSelectedIndex.value = curSelectedIndex.value <= 0 ? searchResults.value.length - 1 : --curSelectedIndex.value
                     break
                 case DOWN:
                     curSelectedIndex.value = (curSelectedIndex.value + 1) % searchResults.value.length
@@ -136,33 +94,29 @@ export default {
             }
         }
         return {
-            input,
-            buttons,
-            buttonParent,
-            open,
-            selection,
-            partialText,
-            searchResults,
-            curSelectedIndex,
-            works,
-            onFocus,
-            onSelect,
-            onInput,
-            onBlur,
-            onClear,
-            onKeyDown
+            input, open, selection, partialText, searchResults, curSelectedIndex, works,
+            onFocus, onSelect, onInput, onBlur, onClear, onKeyDown
         }
-    },
-    components: { IpbIcon }
+    }
+    
 }
 </script>
 
 <style lang="scss">
 .ipb-search {
   position: relative;
-  display: inline-block;
+
+  &.open {
+    &::before {
+      transform: rotate(-135deg);
+      top: 8px;
+    }
+
+    .ipb-close { display: none; }
+  }
 
   input {
+    width: 100%;
     padding: 4px 40px 4px 4px;
     box-sizing: border-box;
     outline: none;
@@ -179,7 +133,7 @@ export default {
 
   .ipb-close {
     position: absolute;
-    right: 5px;
+    right: 25px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 14px;
@@ -191,40 +145,29 @@ export default {
     &:hover { transform: translateY(-50%) scale(1.2); color: #333; }
   }
 
-
+  &:before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    transform: rotate(45deg);
+    border-right: 3px solid #888;
+    border-bottom: 3px solid #888;
+    height: 8px;
+    width: 8px;
+    transition: transform 0.2s, border-color 0.2s;
+    pointer-events: none;
+  }
+  
   .ipb-style-scrollbar {
     position: absolute;
     z-index: 1;
     left: 0;
     bottom: 0;
     transform: translateY(100%);
-    display: flex;
-    flex-direction: column;
-    min-width: 100%;
+    max-width: 100%;
     max-height: 150px;
     overflow-y: overlay;
-    background-color: #FFF;
-
-    button {
-      text-align: left;
-      padding: 5px 10px 5px 4px;
-      background-color: #FFF;
-      white-space: nowrap;
-      cursor: pointer;
-
-      &:nth-child(2n+1) {
-        background-color: #eee;
-      }
-
-      &.current {
-        background-color: #555;
-        color: #FFF;
-      }
-
-      &:hover {
-        filter: brightness(0.8);
-      }
-    }
   }
 }
 </style>

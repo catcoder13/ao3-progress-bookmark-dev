@@ -2,53 +2,25 @@
   <div class="ipb-popup" :class="{compact: settingPopup.compact}">
     <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
     <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
-    <div class="ipb-popup__view-mode">
-      <IpbSearch />
-      <IpbTab class="ipb-groupby" title="View mode:" :options="VIEW_MODES" v-model="viewMode"></IpbTab>
-      <span :title="settingPopup.compact ? 'Compact layout' : 'Expand layout'">
-        <IpbIcon class="ipb-popup__view-mode__icon" type="compact" fill="#FFF" :open="!settingPopup.compact" @click="settingPopup.compact = !settingPopup.compact" />
-      </span>
-      
-    </div>
+    <IpbSearch />
     
-    <template v-if="viewMode.val === 'all'">
-      <div class="ipb-popup__filter">
-        <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
-        <span :title="`Sort ${sortBy.label.toLowerCase()} in ${ascend ? 'ascending' : 'descending'} order`">
-          <IpbIcon type="sort" fill="#333" :open="ascend" @click="ascend = !ascend" />
-        </span>
-      </div>
-      <div class="ipb-popup__work-count">{{ allGroup.length }}/{{ BOOKMARK_LIMIT }} work(s)</div>
-      <div class="ipb-popup__wrapper ipb-style-scrollbar">
-        <TransitionGroup name="fade-in">
-          <IpbPopupItem v-for="work in sortWorks(allGroup)" :key="work.workID" :work="work" />
-        </TransitionGroup>
-        <span v-if="!allGroup.length" class="ipb-no-bm-msg">No bookmark added.</span>
-      </div>
-    </template>
-
-    <template v-else>
-      <div class="ipb-popup__filter ipb-popup__filter--author">
-        <IpbDropdown :options="Object.keys(worksGroupByAuthor)" v-model="selectedAuthor" title="Filter by author:"></IpbDropdown>
-        <div :style="{position: 'relative'}" v-if="selectedAuthor && worksGroupByAuthor[selectedAuthor].length > 1">
-          <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
-          <span :title="`Sort ${sortBy.label.toLowerCase()} in ${ascend ? 'ascending' : 'descending'} order`">
-            <IpbIcon type="sort" fill="#333" :open="ascend" @click="ascend = !ascend" />
-          </span>
-        </div>
-      </div>
-      
-      <div class="ipb-popup__wrapper ipb-style-scrollbar">
-        <div class="ipb-popup__author-works" v-for="(authorWorks, author) in filteredWorksGroupByAuthor" :key="author">
-          <a class="ipb-author" @click="() => visitURL(authorWorks[0].authorURL)"><IpbIcon type="author" fill="#166fce"/>{{ author }}</a>
-          <TransitionGroup name="fade-in">
-            <IpbPopupItem v-for="(work, j) in sortWorks(authorWorks)" :key="j" :work="work" :hideAuthor="true" />
-          </TransitionGroup>
-        </div>
-        <span v-if="!Object.keys(filteredWorksGroupByAuthor).length" class="ipb-no-bm-msg">No bookmark added.</span>
-      </div>
-    </template>
-      
+    <div class="ipb-popup__filter">
+      <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
+      <span class="ipb-icon-wrapper" :title="`Sort ${sortBy.label.toLowerCase()} in ${ascend ? 'ascending' : 'descending'} order`">
+        <IpbIcon type="sort" fill="#333" :open="ascend" @click="ascend = !ascend" />
+      </span>
+      <span class="ipb-icon-wrapper" :title="settingPopup.compact ? 'Compact layout' : 'Expand layout'">
+        <IpbIcon type="compact" fill="#333" :open="!settingPopup.compact" @click="settingPopup.compact = !settingPopup.compact" />
+      </span>
+    </div>
+    <div class="ipb-popup__work-count">{{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)</div>
+    
+    <div class="ipb-popup__wrapper ipb-style-scrollbar">
+      <TransitionGroup name="fade-in">
+        <IpbPopupItem v-for="work in sortedWorks" :key="work.workID" :work="work" />
+      </TransitionGroup>
+      <span v-if="!Object.keys(sortedWorks).length" class="ipb-no-bm-msg">No bookmark added.</span>
+    </div>
   </div>
 
   <IpbSetting></IpbSetting>
@@ -58,13 +30,13 @@
 import '@/common/__base.scss'
 
 import {computed, ref} from 'vue'
-import {works, worksGroupByAuthor, visitURL} from './js/works'
+import {works, visitURL} from './js/works'
 import { settings, settingPopup } from './js/setting'
+import { selection } from './js/search'
 
 import IpbTab from './components/IpbTab.vue'
 import IpbSetting from './components/IpbSetting.vue'
 import IpbPopupItem from './components/IpbPopupItem.vue'
-import IpbDropdown from './components/IpbDropdown.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
 import { BOOKMARK_LIMIT } from '@/common/variables'
 import IpbSearch from './components/IpbSearch.vue'
@@ -74,49 +46,42 @@ const SORT_BY = [{label: 'Recent bookmark', val: 't'}, {label: 'Progress', val: 
 
 export default {
   name: 'App',
-  components: { IpbTab, IpbSetting, IpbDropdown, IpbPopupItem, IpbIcon, IpbSearch },
+  components: { IpbTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch },
   setup () {
     const sortBy = ref(SORT_BY[0])
     const viewMode = ref(VIEW_MODES[0])
-    const selectedAuthor = ref(null)
-
     const ascend = ref(true)
 
-    const sortWorks = workGroup => {
+    const applySortBy = workObjs => {
+      const workArr = Object.keys(workObjs).map(workID => works[workID])
       let workArrRef = null
       if (sortBy.value.val == 'name') {
-        workArrRef = workGroup.sort((a, b) => {
+        workArrRef = workArr.sort((a, b) => {
           const tA = a[sortBy.value.val].toUpperCase()
           const tB = b[sortBy.value.val].toUpperCase()
           return tA < tB ? -1 : (tA > tB) ? 1 : 0
         })
       } else {
-        workArrRef = workGroup.sort((a, b) => b[sortBy.value.val] - a[sortBy.value.val])
+        workArrRef = workArr.sort((a, b) => b[sortBy.value.val] - a[sortBy.value.val])
       }
 
       return ascend.value ? workArrRef : workArrRef.reverse()
     }
 
-    const allGroup = computed(() => {
-      return Object.keys(works).map(workID => ({workID, ...works[workID]}))
+    const sortedWorks = computed(() => {
+      let targetWorks = works
+      if (selection.value) targetWorks = selection.value.works
+      
+      return applySortBy(targetWorks)
     })
 
-    const filteredWorksGroupByAuthor = computed(() => {
-      if (selectedAuthor.value) {
-        return {[selectedAuthor.value]: worksGroupByAuthor.value[selectedAuthor.value]}
-      }
-
-      return worksGroupByAuthor.value
-    })
-
-    
     const clearLocalStorage =  () => {
       chrome.storage.sync.clear()
     }
 
 
     return {
-      allGroup, worksGroupByAuthor, filteredWorksGroupByAuthor, sortWorks, selectedAuthor,
+      works, selection, sortedWorks,
       sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, settingPopup, ascend, clearLocalStorage,
       BOOKMARK_LIMIT
     }
@@ -149,52 +114,6 @@ $bg: #FFF;
     text-align: center;
     background: linear-gradient(to bottom, #4c0000 0%, transparent);
   }
-
-  .ipb-popup__view-mode {
-    position: relative;
-
-    .ipb-groupby {
-      border-bottom: 4px solid $bm_filter_bar_color;
-      font-size: 14px;
-      text-align: center;
-
-      h2 {
-        color: #FFF;
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-      }
-
-      span {
-        vertical-align: bottom;
-        padding: 6px 10px;
-        opacity: 0.7;
-        color: #FFF;
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
-        transition: opacity 0.2s;
-
-        &.current { background-color: $bm_filter_bar_color; opacity: 1; color: #333; font-weight: bold; }
-
-        &:hover { opacity: 1; }
-      }
-    }
-
-    .ipb-popup__view-mode__icon {
-      position: absolute;
-      width: 15px;
-      height: 15px;
-      right: 7px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      opacity: 0.8;
-      transition: opacity 0.2s;
-      &:hover { opacity: 1; }
-    }
-  }
-  
 
   .ipb-sortby {
     span {
@@ -237,7 +156,7 @@ $bg: #FFF;
       }
     }
 
-    .ipb-icon {
+    .ipb-icon-wrapper {
       position: absolute;
       right: 5px;
       top: 5px;
@@ -246,11 +165,14 @@ $bg: #FFF;
       transition: opacity 0.2s;
 
       &:hover { opacity: 1; }
+
+      &:first-of-type { right: 25px; }
     }
   }
 
   .ipb-popup__work-count {
-    padding: 5px 10px;
+    line-height: 1;
+    padding: 2px 10px;
     background-color: #FFF;
   }
 

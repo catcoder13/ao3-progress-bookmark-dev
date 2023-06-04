@@ -1,26 +1,27 @@
-import {reactive, computed} from 'vue'
+import {reactive} from 'vue'
 import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS, AO3_DOMAIN } from '@/common/variables'
+import { partialText, selection } from './search'
 
 const works = reactive({})
 
-const worksGroupByAuthor = computed(() => {
-  const workGroupObj = Object.keys(works)
-    .reduce((acc, workID) => {
-      const work = works[workID]
-      if (!acc[work.author]) acc[work.author] = []
+// const worksGroupByAuthor = computed(() => {
+//   const workGroupObj = Object.keys(works)
+//     .reduce((acc, workID) => {
+//       const work = works[workID]
+//       if (!acc[work.author]) acc[work.author] = []
 
-      acc[work.author].push({workID, ...works[workID]})
+//       acc[work.author].push({workID, ...works[workID]})
 
-      return acc
-    }, {})
+//       return acc
+//     }, {})
 
-    return Object.keys(workGroupObj)
-      .sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()))
-      .reduce((acc, curAuthor) => {
-        acc[curAuthor] = workGroupObj[curAuthor]
-        return acc
-      }, {})
-})
+//     return Object.keys(workGroupObj)
+//       .sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+//       .reduce((acc, curAuthor) => {
+//         acc[curAuthor] = workGroupObj[curAuthor]
+//         return acc
+//       }, {})
+// })
 
 const fetchSyncData = () => {
   chrome.storage.sync.get(STORE_ALL_WORK_KEYS)
@@ -37,6 +38,7 @@ const fetchSyncData = () => {
         workObjs.forEach((workObj, i) => {
           const work = workObj[STORE_WORK_KEY_PREFIX + workIDs[i]]
           if (work) {
+            work.workID = workIDs[i]
             works[workIDs[i]] = work
           } else {
             console.log(workIDs[i], 'object not found')
@@ -49,9 +51,19 @@ const fetchSyncData = () => {
 fetchSyncData()
 
 const removeWork = workID => {
-  chrome.storage.sync.remove(STORE_WORK_KEY_PREFIX + workID)
+  if (selection.value) {
+    console.log(selection.value, works[workID])
+    if ((selection.value.type === 'work' && selection.value.val === workID) ||
+      (selection.value.type === 'author' && selection.value.val === works[workID].author)) {
+        selection.value = null
+        partialText.value = ''
+    }
+  }
+
   delete works[workID]
 
+  chrome.storage.sync.remove(STORE_WORK_KEY_PREFIX + workID)
+  
   chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
     chrome.storage.sync.set({ [STORE_ALL_WORK_KEYS]: workIDs.filter(wID => wID !== workID) })
@@ -59,6 +71,8 @@ const removeWork = workID => {
 }
 
 const removeAllWorks = () => {
+  selection.value = null
+  partialText.value = ''
   chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
 
@@ -82,4 +96,4 @@ const visitURL = subURL => {
   )
 }
 
-export {works, worksGroupByAuthor, removeWork, removeAllWorks, visitURL, fetchSyncData}
+export {works, removeWork, removeAllWorks, visitURL, fetchSyncData}
