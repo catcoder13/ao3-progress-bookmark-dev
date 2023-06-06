@@ -4,25 +4,6 @@ import { partialText, selection } from './search'
 
 const works = reactive({})
 
-// const worksGroupByAuthor = computed(() => {
-//   const workGroupObj = Object.keys(works)
-//     .reduce((acc, workID) => {
-//       const work = works[workID]
-//       if (!acc[work.author]) acc[work.author] = []
-
-//       acc[work.author].push({workID, ...works[workID]})
-
-//       return acc
-//     }, {})
-
-//     return Object.keys(workGroupObj)
-//       .sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()))
-//       .reduce((acc, curAuthor) => {
-//         acc[curAuthor] = workGroupObj[curAuthor]
-//         return acc
-//       }, {})
-// })
-
 const fetchSyncData = () => {
   chrome.storage.sync.get(STORE_ALL_WORK_KEYS)
     .then(obj => obj[STORE_ALL_WORK_KEYS])
@@ -33,7 +14,6 @@ const fetchSyncData = () => {
 
       Promise.all(
         workIDs.map(workID => chrome.storage.sync.get(STORE_WORK_KEY_PREFIX + workID))
-        // workIDs.map(workID => chrome.storage.local.get(STORE_WORK_KEY_PREFIX + workID))
       ).then(workObjs => {
         workObjs.forEach((workObj, i) => {
           const work = workObj[STORE_WORK_KEY_PREFIX + workIDs[i]]

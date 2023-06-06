@@ -44,7 +44,7 @@ import { computed, onMounted, ref, reactive, onUnmounted } from 'vue'
 import { AO3_DOMAIN } from '@/common/variables'
 import { mainBM, bmInProgress } from '../js/bookmark'
 import { chapters, curChI, curChProgress, view } from '../js/page'
-import {chapterInfos, fullViewMode, workID, oneShot, name} from '../js/static'
+import { outer, chapterInfos, fullViewMode, workID, oneShot, name} from '../js/static'
 import {mousePos, activateMouseMove, deactivateMouseMove} from '../js/mousePos'
 import { scrollY, activateScroll, deactivateScroll } from '../js/scroll'
 
@@ -83,6 +83,8 @@ export default {
       onLocalScroll()
     }
 
+    const resizeObserver = new ResizeObserver(onLocalResize)
+    resizeObserver.observe(outer)
 
     const inView = ref(true)
 
@@ -149,6 +151,7 @@ export default {
       window.removeEventListener('resize', onLocalResize)
       document.removeEventListener('mouseenter', onMouseEnterDoc)
       document.removeEventListener('mouseleave', onMouseLeaveDoc)
+      resizeObserver.unobserve(outer)
       deactivateMouseMove()
       deactivateScroll()
     })

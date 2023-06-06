@@ -1,7 +1,8 @@
 <template>
   <div class="ipb-sidebar-group">
     <div class="ipb-sidebar">
-      <a class="ipb-sidebar__button--bookmark ipb-a-button" @click="startBookmark" :class="{exceed: mainBM.chI === null && !withinBookmarkLimit}">
+      <a class="ipb-sidebar__button--bookmark ipb-a-button" @click="onBookmarkEntryClick"
+        :class="{exceed: mainBM.chI === null && !withinBookmarkLimit, bmInOtherPage}" :href="jumpToBookmarkHref">
         <template v-if="mainBM.chI === null && !withinBookmarkLimit">
           <div class="ipb-bubble">
             You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
@@ -9,22 +10,24 @@
           </div>
         </template>
         <template v-else>
-          <div class="ipb-bubble">{{ mainBM.chI != null ? 'Change bookmark location' : 'Add a new bookmark' }}</div>
+          
+          <div v-if="mainBM.chI != null" class="ipb-sidebar__button--bookmark__detail">
+            <IpbIcon @click="editBookmark" fill="#FFF" type="edit" />
+            <div class="ipb-bubble">Update bookmark location.</div>
+          </div>
+
+          <div v-if="mainBM.chI != null && bmInOtherPage" class="ipb-bubble">
+            <b>Jump to bookmark</b>
+            <span class="ipb-warning">
+              Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
+              Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
+              <IpbIcon type="visit" fill="#999" />
+            </span>
+          </div>
+          <div v-else class="ipb-bubble">{{mainBM.chI == null ? 'Add a new bookmark' : 'Jump to bookmark'}}</div>
         </template>
         
-        <div class="ipb-btn-child"><IpbIcon fill="#FFF" :type="mainBM.chI == null ? 'add' : 'edit'" /></div>
-      </a>
-
-      <a :href="jumpToBookmarkHref" v-if="mainBM.chI != null" @click="jumpToBookmark" class="ipb-a-button" :class="{bmInOtherPage}">
-        <div class="ipb-bubble">
-          <b>Jump to bookmark</b>
-          <span v-if="bmInOtherPage" class="ipb-warning">
-            Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
-            Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
-            <IpbIcon type="visit" fill="#999" />
-          </span>
-        </div>
-        <div class="ipb-btn-child"><IpbIcon fill="#FFF" type="location" /></div>
+        <div class="ipb-btn-child"><IpbIcon fill="#FFF" :type="mainBM.chI == null ? 'add' : 'location'" /></div>
       </a>
     </div>
     <div v-if="settings.extraSideBtn" class="ipb-sidebar ipb-sidebar--extra">
@@ -54,8 +57,19 @@ import IpbIcon from '@/common/IpbIcon.vue'
 export default {
   components: { IpbIcon },
   setup () {
+    const onBookmarkEntryClick = e => {
+      if (mainBM.chI == null) {
+        startBookmarkEdit(e, chapters)
+      } else {
+        jumpToBookmark()
+      }
+    }
 
-    const startBookmark = e => startBookmarkEdit(e, chapters)
+    const editBookmark = e => {
+      startBookmarkEdit(e, chapters)
+      e.stopPropagation() // prevent hover event propagate back to <a>
+      e.preventDefault() // prevent <a> href directing
+    }
 
     const isExternal = computed(() => {
       return {
@@ -90,7 +104,7 @@ export default {
     }
 
     const jumpToBookmarkHref = computed(() => {
-      if (!fullViewMode && mainBM.chI != curChI.value) {
+      if (!fullViewMode && mainBM.chI != null &&  mainBM.chI != curChI.value) {
         return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}#chapter-${parseInt(mainBM.chI) + 1}`
       }
 
@@ -134,7 +148,7 @@ export default {
     }
     return {
       sidebarHref,
-      mainBM, curChI, startBookmark, jumpToBookmark, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
+      mainBM, curChI, editBookmark, onBookmarkEntryClick, jumpToBookmark, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
       bmInProgress, fullViewMode, settings, bmInOtherPage,
       buttons, btnLabel, isExternal
     }
@@ -175,16 +189,58 @@ export default {
       .ipb-bubble { display: block; }
     }
 
-    &.ipb-sidebar__button--bookmark.exceed {
-      cursor: not-allowed;
+    &.ipb-sidebar__button--bookmark {
+      &.exceed {
+        cursor: not-allowed;
 
-      &:hover {
-        opacity: inherit;
-        z-index: inherit;
+        &:hover {
+          opacity: inherit;
+          z-index: inherit;
+        }
+
+        .ipb-btn-child {
+          background-color: #333;
+        }
       }
 
-      .ipb-btn-child {
-        background-color: #333;
+      &:hover {
+        & > .ipb-btn-child {
+          border-radius: 0;
+          transition: border-radius 0.2s;
+        }
+
+        .ipb-sidebar__button--bookmark__detail {
+          display: block;
+
+          &:hover {
+            & > .ipb-icon { transform: scale(1.2);}
+            & ~ .ipb-btn-child .ipb-icon {
+              transition: transform 0.2s;
+              transform: scale(0.8);
+            }
+            & ~ .ipb-bubble { display: none; }
+            & > .ipb-bubble { display: block; }
+          } 
+        }
+      } 
+
+      .ipb-sidebar__button--bookmark__detail {
+        display: none;
+        position: absolute;
+        right: 24px;
+        padding: 5px;
+        box-sizing: border-box;
+        height: 100%;
+        background-color: #900;
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+        font-size: 12px;
+        & > .ipb-icon { transition: transform 0.2s;}
+
+        & > .ipb-bubble {
+          display: none;
+          right: 4px;
+        }
       }
     }
 
@@ -260,14 +316,34 @@ export default {
         border-top-right-radius: 3px;
         border-bottom-right-radius: 3px;
       }
+
+      &:hover > .ipb-btn-child { border-radius: 0; }
+
+      &.ipb-sidebar__button--bookmark {
+        .ipb-sidebar__button--bookmark__detail {
+          right: auto;
+          left: 24px;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+          border-top-right-radius: 3px;
+          border-bottom-right-radius: 3px;
+
+          & > .ipb-bubble {
+          right: auto;
+          left: 4px;
+        }
+        } 
+      }
     }
   }
 }
+
+
 
 .ipb-sidebar.ipb-sidebar--extra {
   & > a {
     & > .ipb-btn-child { background-color: $btn_blue; }
   }
-} 
+}
   
 </style>

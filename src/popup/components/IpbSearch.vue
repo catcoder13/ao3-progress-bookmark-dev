@@ -1,7 +1,7 @@
 <template>
   <div class="ipb-search" :class="{open}">
     <input type="text" :value="selection && selection.text" :style="{opacity: partialText ? 0 : (open ? 0.5 : 1)}"/>
-    <input ref="input" type="text" :value="partialText"
+    <input class="ipb-search_main" ref="input" type="text" :value="partialText"
       @input="onInput"
       :placeholder="selection ? '' : 'Search by author name or work title'"
       @focus="onFocus"
@@ -65,7 +65,7 @@ export default {
           selection.value = null
           partialText.value = ''
           curSelectedIndex.value = -1
-          input.value.focus()
+          // input.value.focus()
         }
 
         const onKeyDown = e => {
@@ -120,6 +120,8 @@ export default {
     padding: 4px 40px 4px 4px;
     box-sizing: border-box;
     outline: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   input:first-child {
@@ -165,8 +167,8 @@ export default {
     left: 0;
     bottom: 0;
     transform: translateY(100%);
-    max-width: 100%;
-    max-height: 150px;
+    width: 100%;
+    max-height: 100px;
     overflow-y: overlay;
   }
 }

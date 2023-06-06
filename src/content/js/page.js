@@ -59,16 +59,15 @@ const updateChapterDomSize = () => {
     chapters[chI].top = window.scrollY + top
     chapters[chI].height = height
   })
-  // console.log('on maincontent resize')
-
   onScroll()
+  // console.log('on maincontent resize')
 }
 
 const resizeObserver = new ResizeObserver(updateChapterDomSize)
 resizeObserver.observe(outer)
 updateChapterDomSize()
 
-// window.addEventListener('resize', onResize)
+window.addEventListener('resize', onResize)
 onResize()
 
 export { chapters, curChI, curChProgress, view }

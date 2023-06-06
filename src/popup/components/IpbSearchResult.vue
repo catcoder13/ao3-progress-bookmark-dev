@@ -8,7 +8,10 @@
       @click="$emit('select', $event, item)" class="ipb-search-blur-ref" :class="{current: hoverI === i, [item.type]: true}" >
       <IpbIcon v-if="item.type === 'work'" fill="#888" />
       <IpbIcon v-else type="author" fill="#84b4e7" />
-      {{ item.text }}
+      <span>
+        {{ item.text }}
+      </span>
+      <span class="ipb-author" v-if="item.type === 'work'">by {{ item.works[item.val].author }}</span>
     </button>
     
     <template v-if="!options.length">
@@ -76,12 +79,24 @@ export default {
     box-shadow: 0 2px 4px #888;
 
     button {
+      position: relative;
       text-align: left;
-      padding: 5px 10px 5px 4px;
+      padding: 5px 10px 5px 20px;
       background-color: #FFF;
-      white-space: nowrap;
       cursor: pointer;
       color: #555;
+
+      & > * {
+        line-height: 1;
+        vertical-align: middle;
+      }
+
+      .ipb-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 5px;
+      }
 
       &:nth-child(2n+1) {
         background-color: #eee;
@@ -96,6 +111,19 @@ export default {
       &.author {
         color: #166fce;
       }
+
+      span {
+        &:first-of-type {
+          padding-right: 8px;
+        }
+
+        &.ipb-author {
+          opacity: 0.7;
+          font-size: 10px;
+        }
+      }
+
+      
     }
   }
 </style>
