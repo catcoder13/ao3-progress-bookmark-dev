@@ -84,6 +84,7 @@ body {
     &:hover { border-bottom: 1px solid $link_blue; }
 
     &.ipb-a-button {
+      position: relative;
       outline: none;
       border-bottom: none;
 
@@ -92,6 +93,23 @@ body {
       &:visited {
         border-bottom: none;
         color: #333;
+      }
+
+      &:active::before,
+      &:active .ipb-btn-child::before {
+        opacity: 1;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(#FFF, 0.1);
+        opacity: 0;
+        pointer-events: none;
       }
     }
   }

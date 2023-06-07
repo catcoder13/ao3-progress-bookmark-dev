@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AO3 In-page Bookmark",
-  "version": "1.0",
-  "description": "Improve navigating experience on AO3's work page, helps to keep track on reading progress with in-page bookmark and progress visuals",
+  "version": "0.1.0",
+  "description": "Enhance in-page navigating experience on AO3's work page with in-page bookmark, chapter progress bar, and more.",
   "icons":  {
     "128": "imgs/bavy_w.png"
   },

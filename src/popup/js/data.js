@@ -9,7 +9,6 @@ import {
 
  const importData = obj => {
   chrome.storage.sync.set(obj).then(res => {
-    console.log('on import end', res)
     fetchSyncData()
   })
  }
@@ -33,15 +32,13 @@ const downloadData = () => {
           acc[workKey] = workObj[workKey]
           return acc
         }, {})
-      // console.log(workObjResemble)
+        
       const downloadObj = {
         // [STORE_SETTING_KEY]: settingObj,
         // [STORE_SETTING_EXTRA_BTN_KEY]: settingExtraBtnObj,
         [STORE_ALL_WORK_KEYS]: workIDs,
         ...workObjResemble
       }
-
-      console.log('download', downloadObj)
 
       // download obj
       const a = document.createElement('a')

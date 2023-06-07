@@ -45,7 +45,6 @@ const curChProgress = computed(() => {
 const onResize = () => {
   view.width = document.documentElement.clientWidth
   view.height = document.documentElement.clientHeight
-  console.log('on resize')
   onScroll()
 }
 
@@ -60,7 +59,7 @@ const updateChapterDomSize = () => {
     chapters[chI].height = height
   })
   onScroll()
-  // console.log('on maincontent resize')
+  
 }
 
 const resizeObserver = new ResizeObserver(updateChapterDomSize)

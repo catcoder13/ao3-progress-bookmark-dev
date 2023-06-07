@@ -13,13 +13,6 @@ const onResetSetting = () => {
   Object.keys(DEFAULT_SETTINGS).forEach(setKey => settings[setKey] = DEFAULT_SETTINGS[setKey])
   Object.keys(DEFAULT_POPUP_SETTINGS).forEach(setKey => settingPopup[setKey] = DEFAULT_POPUP_SETTINGS[setKey])
   Object.keys(DEFAULT_SETTING_EXTRA_BUTTONS).forEach(setKey => settingExtraBtn[setKey] = DEFAULT_SETTING_EXTRA_BUTTONS[setKey])
-
-  // chrome.storage.sync.set({
-  //   [STORE_SETTING_KEY]: DEFAULT_SETTINGS,
-  //   [STORE_SETTING_EXTRA_BTN_KEY]: DEFAULT_SETTING_EXTRA_BUTTONS
-  // }).catch(err => console.warn('[AO3 IPB] Error occurs on reset setting', err))
-
-  console.log('reset setting')
 }
 
 Promise.all([
@@ -43,20 +36,20 @@ Promise.all([
   watch(() => settingExtraBtn,
   () => {
     chrome.storage.sync.set({ [STORE_SETTING_EXTRA_BTN_KEY]: settingExtraBtn})
-    console.log('new setting extra button', settingExtraBtn)
+    // console.log('new setting extra button', settingExtraBtn)
   }
   , {deep: true})
 
   watch(() => settings,
   () => {
     chrome.storage.sync.set({ [STORE_SETTING_KEY]: settings})
-    console.log('new setting', settings)
+    // console.log('new setting', settings)
   }, {deep: true})
 
   watch(() => settingPopup,
   () => {
     chrome.storage.sync.set({ [STORE_SETTING_POPUP_KEY]: settingPopup})
-    console.log('new setting', settingPopup)
+    // console.log('new setting', settingPopup)
   }, {deep: true})
 })
 

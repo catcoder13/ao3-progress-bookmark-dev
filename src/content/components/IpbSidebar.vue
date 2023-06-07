@@ -1,43 +1,46 @@
 <template>
   <div class="ipb-sidebar-group">
     <div class="ipb-sidebar">
-      <a class="ipb-sidebar__button--bookmark ipb-a-button" @click="onBookmarkEntryClick"
-        :class="{exceed: mainBM.chI === null && !withinBookmarkLimit, bmInOtherPage}" :href="jumpToBookmarkHref">
-        <template v-if="mainBM.chI === null && !withinBookmarkLimit">
-          <div class="ipb-bubble">
-            You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
-            Try to delete some of the existing bookmark to free out more space for new bookmark.
-          </div>
+      <div class="ipb-sidebar__button--bookmark">
+        <template v-if="mainBM.chI == null">
+          <a class="ipb-a-button" @click="onBookmarkEntryClick" :class="{exceed: !withinBookmarkLimit}">
+            <IpbIcon fill="#FFF" type="add" />
+              <div class="ipb-bubble">
+                <template  v-if="!withinBookmarkLimit">
+                  You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
+                  Try to delete some of the existing bookmark to free out more space for new bookmark.
+                </template>
+                <template v-else>Add a new bookmark</template>
+              </div>
+          </a>
         </template>
         <template v-else>
-          
-          <div v-if="mainBM.chI != null" class="ipb-sidebar__button--bookmark__detail">
-            <IpbIcon @click="editBookmark" fill="#FFF" type="edit" />
-            <div class="ipb-bubble">Update bookmark location.</div>
-          </div>
-
-          <div v-if="mainBM.chI != null && bmInOtherPage" class="ipb-bubble">
-            <b>Jump to bookmark</b>
-            <span class="ipb-warning">
-              Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
-              Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
-              <IpbIcon type="visit" fill="#999" />
-            </span>
-          </div>
-          <div v-else class="ipb-bubble">{{mainBM.chI == null ? 'Add a new bookmark' : 'Jump to bookmark'}}</div>
+          <a class="ipb-a-button" :href="jumpToBookmarkHref" :class="{bmInOtherPage}" @click="jumpToBookmark">
+            <IpbIcon fill="#FFF" type="location" />
+            <div class="ipb-bubble">
+              <b>Jump to bookmark</b>
+              <span v-if="bmInOtherPage" class="ipb-warning">
+                Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
+                Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
+                <IpbIcon type="visit" fill="#999" />
+              </span>
+            </div>
+          </a>
+          <a class="ipb-a-button ipb-edit" @click="editBookmark">
+            <IpbIcon fill="#FFF" type="edit" />
+            <div class="ipb-bubble">Change bookmark location</div>
+          </a>
         </template>
-        
-        <div class="ipb-btn-child"><IpbIcon fill="#FFF" :type="mainBM.chI == null ? 'add' : 'location'" /></div>
-      </a>
+      </div>
+
     </div>
     <div v-if="settings.extraSideBtn" class="ipb-sidebar ipb-sidebar--extra">
       <a class="ipb-a-button" :href="sidebarHref(chICode)" @click="onClick" v-for="({chICode, iconProps, onClick, btnKey, checkIfExternal}, i) in buttons" :key="i">
-      <!-- <a :href="sidebarHref(targetChI)" @click="eventRef[eventKey]" v-for="({targetChI, iconProps, eventKey, btnKey, checkIfExternal}, i) in buttons" :key="i"> -->
         <div class="ipb-bubble">
           {{ btnLabel(btnKey) }}
           <IpbIcon v-if="checkIfExternal && !fullViewMode && isExternal[btnKey]" type="visit" fill="#999" />
         </div>
-        <div class="ipb-btn-child"><IpbIcon v-bind="iconProps" fill="#FFF" /></div>
+        <IpbIcon v-bind="iconProps" fill="#FFF" />
       </a>
     </div>
   </div>
@@ -57,18 +60,10 @@ import IpbIcon from '@/common/IpbIcon.vue'
 export default {
   components: { IpbIcon },
   setup () {
-    const onBookmarkEntryClick = e => {
-      if (mainBM.chI == null) {
-        startBookmarkEdit(e, chapters)
-      } else {
-        jumpToBookmark()
-      }
-    }
+    const onBookmarkEntryClick = e => startBookmarkEdit(e, chapters)
 
     const editBookmark = e => {
       startBookmarkEdit(e, chapters)
-      e.stopPropagation() // prevent hover event propagate back to <a>
-      e.preventDefault() // prevent <a> href directing
     }
 
     const isExternal = computed(() => {
@@ -84,11 +79,8 @@ export default {
 
     let countDownInt = null
     const jumpToBookmark = () => {
-      if (!fullViewMode && mainBM.chI != curChI.value) {
-        console.log('bookmark is located at another chapter')
-        // jumpToChapter(mainBM.chI)
-        return
-      }
+      if (!fullViewMode && mainBM.chI != curChI.value) return
+      
       const {top, height} = chapters[mainBM.chI]
       const bmPos = top + height * mainBM.perc
       const targetScroll = bmPos - window.innerHeight / 2
@@ -140,9 +132,9 @@ export default {
     const btnLabel = btnKey => {
       const curChIStr = parseInt(curChI.value) + 1
       return {
-        prevCh: curChIStr === 1 ? 'Previous (already at chapter 1)' : 'Previous: Chapter ' + Math.max(1, curChIStr - 1),
+        prevCh: 'Previous: Chapter ' + Math.max(1, curChIStr - 1),
         curCh: 'Current: Chapter ' + curChIStr,
-        nextCh: curChIStr === chapterInfos.length ? 'Next (already at the latest chapter)' : 'Next: Chapter ' + Math.min(chapterInfos.length, curChIStr + 1),
+        nextCh: 'Next: Chapter ' + Math.min(chapterInfos.length, curChIStr + 1),
         latestCh: 'Latest: Chapter ' + chapterInfos.length
       }[btnKey] || EXTRA_BUTTON_INFOS[btnKey].label
     }
@@ -165,7 +157,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  pointer-events: none;
 }
 
 .ipb-sidebar {
@@ -174,127 +165,91 @@ export default {
   flex-direction: column;
   align-items: flex-end;
 
-  & > a {
+  a.ipb-a-button {
     position: relative;
-    line-height: 1;
-    cursor: pointer;
+    background-color: $ao3_red;
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+    box-sizing: border-box;
     opacity: 0.5;
-    pointer-events: all;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
 
     &:hover {
       opacity: 1;
-      z-index: 1;
-      transition: transform 0.2s, opacity 0.2s;
+      transition: opacity 0.2s;
 
-      .ipb-bubble { display: block; }
+      .ipb-bubble {
+        display: block;
+      }
     }
 
-    &.ipb-sidebar__button--bookmark {
-      &.exceed {
-        cursor: not-allowed;
-
-        &:hover {
-          opacity: inherit;
-          z-index: inherit;
-        }
-
-        .ipb-btn-child {
-          background-color: #333;
-        }
-      }
-
-      &:hover {
-        & > .ipb-btn-child {
-          border-radius: 0;
-          transition: border-radius 0.2s;
-        }
-
-        .ipb-sidebar__button--bookmark__detail {
-          display: block;
-
-          &:hover {
-            & > .ipb-icon { transform: scale(1.2);}
-            & ~ .ipb-btn-child .ipb-icon {
-              transition: transform 0.2s;
-              transform: scale(0.8);
-            }
-            & ~ .ipb-bubble { display: none; }
-            & > .ipb-bubble { display: block; }
-          } 
-        }
-      } 
-
-      .ipb-sidebar__button--bookmark__detail {
-        display: none;
-        position: absolute;
-        right: 24px;
-        padding: 5px;
-        box-sizing: border-box;
-        height: 100%;
-        background-color: #900;
-        border-top-left-radius: 3px;
-        border-bottom-left-radius: 3px;
-        font-size: 12px;
-        & > .ipb-icon { transition: transform 0.2s;}
-
-        & > .ipb-bubble {
-          display: none;
-          right: 4px;
-        }
-      }
+    & > .ipb-icon {
+      transition: transform 0.2s;
+      width: 100%;
+      height: 100%;
     }
 
     .ipb-bubble {
+      display: none;
       position: absolute;
-      padding: 3px 8px;
+      z-index: 1;
+      padding: 5px;
       background-color: #ddd;
       bottom: 0;
       transform: translateY(calc(100% + 5px));
       right: 22px;
       pointer-events: none;
       font-size: 11px;
+      color: #333;
       line-height: 1;
-      display: none;
       text-align: left;
       white-space: nowrap;
-      
-      b {
-        display: block;
-        padding-bottom: 5px;
-
-        &:only-child {
-          font-weight: normal;
-          padding-bottom: 0;
-        }
-      }
-
-      .ipb-warning {
-        display: block;
-        color: #397ce1;
-      }
-    }
-
-    &.bmInOtherPage {
-      .ipb-bubble { padding: 7px; }
-      .ipb-btn-child { background-color: grey; }
-    }
-
-    & > .ipb-btn-child {
-      background-color: $ao3_red;
-      width: 24px;
-      height: 24px;
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px;
-
-      .ipb-icon {
-        width: 100%;
-        height: 100%;
-        padding: 3px;
-        box-sizing: border-box;
-      }
-
     }
   }
+
+  .ipb-sidebar__button--bookmark {
+    display: flex;
+    flex-direction: row-reverse;
+
+    &:hover {
+      a.ipb-a-button:not(.ipb-edit) { border-radius: 0; }
+      a.ipb-a-button.ipb-edit { display: block; }
+    }
+
+    a.ipb-a-button {
+      &:hover {
+        & > .ipb-icon { transform: scale(1.1);}
+        & ~ .ipb-a-button { opacity: 0.5; }
+      }
+
+      &.ipb-edit {
+        display: none;
+
+        .ipb-bubble { right: 4px; }
+      }
+
+      &.bmInOtherPage { background-color: grey; }
+
+      .ipb-bubble {
+        b {
+          display: block;
+          padding-bottom: 5px;
+
+          &:only-child {
+            font-weight: normal;
+            padding-bottom: 0;
+          }
+        }
+
+        .ipb-warning {
+          display: block;
+          color: #397ce1;
+        }
+      }
+    }
+  } //.ipb-sidebar__button--bookmark
 } // .ipb-sidebar
 
 .ipb-left .ipb-sidebar-group {
@@ -304,46 +259,33 @@ export default {
   .ipb-sidebar {
     align-items: flex-start;
 
-    & > a {
+    a.ipb-a-button {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+
       .ipb-bubble {
         right: auto;
         left: 22px;
       }
+    }
+
+    .ipb-sidebar__button--bookmark {
+      flex-direction: row;
       
-      & > .ipb-btn-child {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 3px;
-        border-bottom-right-radius: 3px;
-      }
-
-      &:hover > .ipb-btn-child { border-radius: 0; }
-
-      &.ipb-sidebar__button--bookmark {
-        .ipb-sidebar__button--bookmark__detail {
+      & > a.ipb-a-button {
+        .ipb-bubble {
           right: auto;
-          left: 24px;
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-          border-top-right-radius: 3px;
-          border-bottom-right-radius: 3px;
-
-          & > .ipb-bubble {
-          right: auto;
-          left: 4px;
+          left: 22px;
         }
-        } 
+
+        &.ipb-edit .ipb-bubble { right: auto; left: 4px; }
       }
     }
   }
 }
 
+.ipb-sidebar.ipb-sidebar--extra > a { background-color: $btn_blue; }
 
-
-.ipb-sidebar.ipb-sidebar--extra {
-  & > a {
-    & > .ipb-btn-child { background-color: $btn_blue; }
-  }
-}
-  
 </style>

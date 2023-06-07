@@ -35,7 +35,6 @@ export default {
           open.value = true
           if (selection.value) {
             partialText.value = ''
-            console.log(selection.value)
           }
         }
 
@@ -49,7 +48,6 @@ export default {
               open.value = false
               partialText.value = ''
             }
-            console.log('on blur', e)
         }
 
         const onSelect = (e, item) => {
@@ -57,7 +55,6 @@ export default {
           partialText.value = item.text
           curSelectedIndex.value = -1
           open.value = false
-          console.log('on select')
           input.value.blur()
         }
 

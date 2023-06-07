@@ -1,6 +1,6 @@
 <template>
   <div class="ipb-popup" :class="{compact: settingPopup.compact}">
-    <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
+    <!-- <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button> -->
     <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
     <IpbSearch />
     

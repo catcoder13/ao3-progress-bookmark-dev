@@ -43,11 +43,9 @@ export default {
       const containerTop = buttonParent.value.scrollTop + pTop
       const containerBottom = containerTop + pHeight
       if (btnBottom > containerBottom) {
-        console.log('exit bottom')
         const diff = btnBottom - containerBottom
         buttonParent.value.scrollTo(0, buttonParent.value.scrollTop + diff)
       } else if (btnTop < containerTop) {
-        console.log('exit top')
         const diff = containerTop - btnTop
         buttonParent.value.scrollTo(0, buttonParent.value.scrollTop - diff)
       }

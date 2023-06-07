@@ -23,12 +23,11 @@ const initStoreData = () => {
   ]).then(([workObj, settingObj, settingExtraBtnObj, workIDObjArr]) => {
 
     if (workObj) work.value = workObj
-    else console.log('no bookmark in this work yet')
 
     updateSetting(settingObj)
     
     updateSettingExtraBtn(settingExtraBtnObj)
-    console.log('work arr', workIDArr)
+    
     workIDs.value = workIDObjArr
     workIDArr = workIDObjArr
   })
@@ -36,25 +35,21 @@ const initStoreData = () => {
   chrome.storage.onChanged.addListener(obj => {
     if (obj[STORE_WORK_KEY]) {
       work.value = obj[STORE_WORK_KEY].newValue
-      console.log('data change', obj)
     }
 
     if (obj[STORE_SETTING_KEY]) {
       const settingObj = obj[STORE_SETTING_KEY].newValue || {}
       updateSetting(settingObj)
-      console.log('data change', obj)
     }
 
     if (obj[STORE_SETTING_EXTRA_BTN_KEY]) {
       const settingExtraBtnObj = obj[STORE_SETTING_EXTRA_BTN_KEY].newValue || {}
       updateSettingExtraBtn(settingExtraBtnObj)
-      console.log('data change', obj)
     }
 
     if (obj[STORE_ALL_WORK_KEYS]) {
       workIDArr = obj[STORE_ALL_WORK_KEYS].newValue || []
       workIDs.value = workIDArr
-      console.log('data change', obj)
     }
     
   })

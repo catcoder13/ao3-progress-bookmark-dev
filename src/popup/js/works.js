@@ -10,8 +10,6 @@ const fetchSyncData = () => {
     .then(workIDs => {
       if (!workIDs) return
 
-      console.log('workIDs', workIDs)
-
       Promise.all(
         workIDs.map(workID => chrome.storage.sync.get(STORE_WORK_KEY_PREFIX + workID))
       ).then(workObjs => {
@@ -21,7 +19,7 @@ const fetchSyncData = () => {
             work.workID = workIDs[i]
             works[workIDs[i]] = work
           } else {
-            console.log(workIDs[i], 'object not found')
+            console.warn('[AO3 IPB]', workIDs[i], 'exist in array but bm item does not exist')
           }
     
         })
@@ -70,9 +68,9 @@ const removeAllWorks = () => {
 const visitURL = subURL => {
   chrome.runtime.sendMessage(
     {type: 'tab', url: AO3_DOMAIN + subURL},
-    res => {
-      console.log(res)
-    }
+    // res => {
+    //   console.log(res)
+    // }
   )
 }
 

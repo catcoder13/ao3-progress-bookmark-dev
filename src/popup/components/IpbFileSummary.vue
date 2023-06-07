@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="ipb-remark">
-        Note: All existing bookmark will be <b>deleted/overwritten</b>!
+        <b>Note: All existing bookmark will be deleted/overwritten</b>!
       </div>
     </div>
     
@@ -42,9 +42,10 @@ export default {
         const summaries = reactive({ workCount: 0, authors: {} })
         let resultObj = {}
         const onFileRead = () => {
+          try {
             resultObj = JSON.parse(reader.result)
             const { [STORE_ALL_WORK_KEYS]: workIDs } = resultObj
-            console.log('to import ', resultObj)
+            
             summaries.workCount = workIDs.length
             summaries.authors = workIDs.reduce((acc, workID) => {
                 const { author } = resultObj[STORE_WORK_KEY_PREFIX + workID]
@@ -52,6 +53,10 @@ export default {
                 acc[author]++
                 return acc
             }, {})
+          } catch (e) {
+            console.warn('[AO3 IPB] Error occurs when parsing the imported bookmark data')
+          }
+            
         }
         reader.addEventListener("load", onFileRead)
         reader.readAsText(p.file)
@@ -107,8 +112,8 @@ export default {
   
 
   .ipb-remark {
-    opacity: 0.7;
     font-size: 13px;
+    color: red;
   }
 
   .ipb-button {

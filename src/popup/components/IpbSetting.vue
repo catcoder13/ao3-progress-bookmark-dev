@@ -1,6 +1,10 @@
 <template>
   <div class="ipb-setting" :class="{open: toggle}" @click="onClickedAreaCheck">
-    <IpbIcon class="ipb-setting__entry" type="menu" fill="#FFF" :open="toggle" @click="onToggle" />
+    <div class="ipb-setting__entry" @click="onToggle">
+      <IpbIcon v-if="!toggle" type="menu" fill="#FFF" :open="false"/>
+      <span v-else>&#10006;</span>
+    </div>
+    
     <div class="ipb-style-scrollbar">
       <h2>Settings</h2>
       <div class="ipb-setting__option-group">
@@ -52,7 +56,7 @@
         </div>
       </div>
       
-      <button class="ipb-setting__reset" @click="onResetSetting">Reset all settings</button>
+      <button class="ipb-setting__reset" @click="onResetSetting">Reset to default settings</button>
     </div>
 
     <div v-if="importMsgOn" class="ipb-setting__overlay-msg">
@@ -61,8 +65,10 @@
 
     <div v-if="deleteMsgOn" class="ipb-setting__overlay-msg">
       <div class="ipb-text">
-        <span>Are you sure you want to delete all bookmark data?</span>
-        <span>Before delete, you may want to download your bookmark data via "Download" button under the setting panel.</span>
+        <span>
+          <b>Are you sure you want to delete all bookmark data?</b>
+          <br />
+          Before proceeding, it is advised to download your bookmark data using the "Download" button under the "Download bookmark data" setting section for potential recovery.</span>
       </div>
       <div class="ipb-button">
         <button class="ipb-delete" @click="onDeleteAllBookmarkData">Confirm delete</button>
@@ -149,8 +155,7 @@ export default {
     .ipb-style-scrollbar { transform: translateX(0); }
 
     .ipb-setting__entry {
-
-      line { stroke: #333; }
+      // line { stroke: #333; }
 
       &:hover { background-color: rgba(#FFF, 0.8); }
     }
@@ -167,7 +172,23 @@ export default {
     cursor: pointer;
     pointer-events: all;
 
-    line { transition: stroke 0.2s; }
+    & > * {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      line-height: 1;
+      font-size: 20px;
+      color: #666;
+    }
+
+    .ipb-icon {
+      width: 25px;
+      height: 25px;
+    }
+
+    // line { transition: stroke 0.2s; }
 
     &:hover { background-color: rgba(#FFF, 0.1); }
   }
