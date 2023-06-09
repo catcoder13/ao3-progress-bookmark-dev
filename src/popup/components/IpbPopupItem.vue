@@ -2,36 +2,26 @@
   <template v-if="settingPopup.compact">
     <div class="ipb-popup-item" :class="{'ipb-popup-item--small': settingPopup.compact}">
       <div class="ipb-info">
-        <h3>{{ work.name }} 
-          <span>
-            <a v-if="!hideAuthor" class="ipb-author" :title="work.author" @click="() => visitURL(work.authorURL)"><IpbIcon type="author" fill="#166fce"/></a>
-            <a :title="`Bookmarked at ${(new Date(work.t)).toLocaleString()}`"><IpbIcon type="clock" fill="#555"/></a>
-          </span>
-          
-        </h3>
-        <div class="ipb-btn">
-          <button :title="`One-shot: ${work.name}`" v-if="work.oneShot" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
-          <template v-else>
-            <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}?view_full_work=true#chapter-${parseInt(work.chI) + 1}`)">Entire work</button>
-            <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">Chapter {{parseInt(work.chI) + 1}}</button>
-          </template>
-        </div>
+        <h3>{{ work.name }} </h3>
+          <span class="ipb-author">by <a @click="() => visitURL(work.authorURL)">{{ work.author }}</a></span>
+          <span class="ipb-popup__item__datetime"><IpbIcon type="clock" fill="#555"/>{{ (new Date(work.t)).toLocaleString() }}</span>
       </div>
 
       <div class="ipb-record">
         <div class="ipb-record-content">
-          <b v-if="work.oneShot"><IpbIcon type="bookmark" fill="#555" />One-shot</b>
-          <b v-else>
-            <IpbIcon type="bookmark" fill="#555" />
-            {{`Chapter ${parseInt(work.chI) + 1}`}}
-          </b>
-          
-          <b class="ipb-perc"><IpbIcon type="location" fill="#555" />{{ (work.perc * 100).toFixed(2) }}%</b>
+          <p>
+            <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.workID}`)">
+              <IpbIcon type="bookmark" fill="#555" />One-shot</button>
+            <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">
+              <IpbIcon type="bookmark" fill="#555" />Chapter {{parseInt(work.chI) + 1}}</button>
+          </p>
+          <p>
+            <IpbIcon type="location" fill="#555" /><b>{{ (work.perc * 100).toFixed(2) }}%</b>
+        </p> 
         </div>
       </div>
 
       <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(work.workID)">&#10006;</span>
-
     </div>
   </template>
 
@@ -39,33 +29,24 @@
     <div class="ipb-popup-item">
       <div class="ipb-info">
         <h3>{{ work.name }}</h3>
-        <span v-if="!hideAuthor">by <a @click="() => visitURL(work.authorURL)">{{ work.author }}</a></span>
-        <p>Visit bookmarked page via:</p>
-        <div class="ipb-btn">
-          <button :title="`One-shot: ${work.name}`" v-if="work.oneShot" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
-        <template v-else>
-          <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}?view_full_work=true#chapter-${parseInt(work.chI) + 1}`)">Entire work</button>
-          <button :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">Chapter {{parseInt(work.chI) + 1}}</button>
-        </template>
-        </div>
-
+        <span>by <a @click="() => visitURL(work.authorURL)">{{ work.author }}</a></span>
         <span class="ipb-popup__item__datetime"><IpbIcon type="clock" fill="#555"/>Bookmarked at {{ (new Date(work.t)).toLocaleString() }}</span>
       </div>
 
       <div class="ipb-record">
         <div class="ipb-record-content">
-            
-            <p v-if="!work.oneShot">
-              <IpbIcon type="bookmark" fill="#555"></IpbIcon>Bookmarked at<br />
-              <b>{{`Chapter ${parseInt(work.chI) + 1}`}}</b>
+            <p>
+              <span class="ipb-pretitle">
+                <IpbIcon type="bookmark" fill="#555"></IpbIcon>
+                <b v-if="work.oneShot">One-shot</b>
+                <span v-else>Bookmarked at</span><br />
+            </span>
+              <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
+              <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">Chapter {{parseInt(work.chI) + 1}}</button>
             </p>
-            <p v-else>
-              <IpbIcon type="bookmark" fill="#555"></IpbIcon>
-              <b>One-shot</b></p>
-              <p>
-                <IpbIcon type="location" fill="#555"></IpbIcon>Progress<br />
-                <b class="ipb-perc">{{ (work.perc * 100).toFixed(2) }}%</b>
-            </p>
+            <p>
+              <IpbIcon type="location" fill="#555"></IpbIcon><b>{{ (work.perc * 100).toFixed(2) }}%</b>
+            </p> 
             
         </div>
       </div>
@@ -83,7 +64,7 @@ import IpbIcon from '@/common/IpbIcon.vue'
 
 
 export default {
-  props: ['work', 'hideAuthor'],
+  props: ['work'],
   components: {IpbIcon},
   setup () {
     return { removeWork, visitURL, settings, settingPopup } 
@@ -95,46 +76,29 @@ export default {
 .ipb-popup-item {
   position: relative;
   background-color: #eee;
-  padding: 10px;
   margin-bottom: 15px;
   box-shadow: 0 0 3px #999;
 
+  & > * { box-sizing: border-box; }
+  
   .ipb-info {
-    padding-right: 120px;
+    padding: 10px;
+    width: calc(100% - 135px);
 
     h3 {
       font-family: Georgia, serif;
       font-size: 18px;
       line-height: 1.2;
-      min-width: 150px;
     }
 
-    p {
-      margin: 10px 0 5px;
-    }
+    p { margin: 10px 0 5px; }
 
-    .ipb-btn {
-      display: flex;
-
-      button {
-        border: 1px solid #bbb;
-        border-bottom: 1px solid #aaa;
-        border-radius: 0.25em;
-        background: linear-gradient(#fff 2%,#ddd 95%,#bbb 100%);;
-        margin-right: 5px;
-        font-size: 12px;
-        line-height: 1;
-        cursor: pointer;
-        padding: 5px 10px;
-
-        &:hover {filter: brightness(0.95)};
-      }
-    }
+    .ipb-author { font-size: 13px; }
 
     .ipb-popup__item__datetime {
+      display: block;
       font-size: 11px;
       line-height: 1;
-      display: inline-block;
       padding: 2px;
       color: #555;
       margin-top: 10px;
@@ -151,38 +115,42 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
+    width: 135px;
     height: 100%;
-    width: 120px;
+    padding: 8px;
+    padding-right: 20px;
     background-color: #ccc;
+    
 
     .ipb-record-content {
       position: absolute;
-      top: calc(50% + 5px);
-      left: 50%;
-      transform: translate(-50%, -50%);
-      // text-align: right;
-      width: 100%;
-      padding: 0 10px;
-      box-sizing: border-box;
+      top: 50%;
+      transform: translateY(-50%);
 
       p {
         font-size: 12px;
         line-height: 1;
         color: #555;
-        &:not(:last-child) { margin-bottom: 15px; }
+
+        .ipb-pretitle {
+          white-space: nowrap;
+        }
+
+        button {
+          padding: 2px 5px;
+          margin: 2px 0;
+          cursor: pointer;
+
+          &:hover { filter: brightness(0.9); }
+          &:active { filter: brightness(0.95); }
+        }
       }
 
-      .ipb-icon {
-        vertical-align: bottom;
-      }
+      .ipb-icon { vertical-align: bottom; }
 
       b {
         color: #444;
         font-size: 14px;
-      }
-
-      b.ipb-perc {
-        font-size: 20px;
       }
       
     }
@@ -208,43 +176,26 @@ export default {
   margin-bottom: 5px;
   
   .ipb-info {
-    h3 {
-      font-size: 16px;
+    padding: 8px;
+    
+    h3 { font-size: 16px; }
 
-      span {
-        padding-right: 5px;
-        white-space: nowrap;
+    .ipb-author { font-size: 11px; }
 
-        a {
-          border: none;
-          cursor: default;
-        }
+    .ipb-popup__item__datetime {
+      margin-top: 4px;
+      vertical-align: text-bottom;
+      font-size: 11px;
 
-        a.ipb-author {
-          cursor: pointer;
-          opacity: 0.7;
-          padding-right: 2px;
-
-          &:hover { opacity: 1; }
-        }
-
-        .ipb-icon {
-          display: inline-block;
-        }
-      }
+      .ipb-icon { width: 13px; height: 13px;}
     }
   }
 
   .ipb-record {
     .ipb-record-content {
       b {
-        display: block;
         line-height: 1;
         font-size: 12px;
-
-        &.ipb-perc { font-size: 17px; }
-
-        &:not(:last-child) { margin-bottom: 5px; }
       }
     }
   }

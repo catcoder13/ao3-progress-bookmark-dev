@@ -8,22 +8,22 @@ import {
  import { fetchSyncData } from '@/popup/js/works'
 
  const importData = obj => {
-  chrome.storage.sync.set(obj).then(res => {
+  chrome.storage.local.set(obj).then(res => {
     fetchSyncData()
   })
  }
  
 const downloadData = () => {
   Promise.all([
-    // chrome.storage.sync.get(STORE_SETTING_KEY).then(obj => obj[STORE_SETTING_KEY] || {}),
-    // chrome.storage.sync.get(STORE_SETTING_EXTRA_BTN_KEY).then(obj => obj[STORE_SETTING_EXTRA_BTN_KEY] || {}),
-    chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(obj => obj[STORE_ALL_WORK_KEYS] || [])
+    // chrome.storage.local.get(STORE_SETTING_KEY).then(obj => obj[STORE_SETTING_KEY] || {}),
+    // chrome.storage.local.get(STORE_SETTING_EXTRA_BTN_KEY).then(obj => obj[STORE_SETTING_EXTRA_BTN_KEY] || {}),
+    chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => obj[STORE_ALL_WORK_KEYS] || [])
   ]).then(([
     // settingObj, settingExtraBtnObj,
     workIDs
   ]) => {
     Promise.all(
-      workIDs.map(workID => chrome.storage.sync.get(STORE_WORK_KEY_PREFIX + workID))
+      workIDs.map(workID => chrome.storage.local.get(STORE_WORK_KEY_PREFIX + workID))
     ).then(workObjs => {
       const workObjResemble = workObjs
         .filter(workObjs => workObjs)

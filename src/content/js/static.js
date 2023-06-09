@@ -5,6 +5,9 @@ const outer = document.getElementById('outer')
 const mainContent = document.getElementById('workskin')
 if (!mainContent) console.warn('[AO3 IPB] URL matches a work page, however #worksin does not exist, thus it is deemed not a work page.')
 
+const innerDivWorkWrapper = document.querySelector('#inner #main .wrapper')
+if (!innerDivWorkWrapper) console.warn('[AO3 IPB] URL matches a work page, however (#inner #main .wrapper) does not exist, thus it is deemed not a work page.')
+
 const chapterDoms = mainContent ? mainContent.querySelectorAll('#chapters > .chapter') : []
 
 // initialise mainContent class name
@@ -64,5 +67,5 @@ if (chapterListElem) {
 export {
   workID, name, fullViewMode, oneShot,
   author, authorURL,
-  outer, mainContent, chapterDoms, chapterInfos
+  outer, mainContent, innerDivWorkWrapper, chapterDoms, chapterInfos
 }

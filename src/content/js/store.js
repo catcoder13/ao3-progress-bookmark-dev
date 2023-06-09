@@ -16,10 +16,10 @@ const workIDs = ref(workIDArr)
 
 const initStoreData = () => {
   Promise.all([
-    chrome.storage.sync.get(STORE_WORK_KEY).then(obj => obj[STORE_WORK_KEY]),
-    chrome.storage.sync.get(STORE_SETTING_KEY).then(obj => obj[STORE_SETTING_KEY] || {...DEFAULT_SETTINGS}),
-    chrome.storage.sync.get(STORE_SETTING_EXTRA_BTN_KEY).then(obj => obj[STORE_SETTING_EXTRA_BTN_KEY] || {...DEFAULT_SETTING_EXTRA_BUTTONS}),
-    chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(obj => obj[STORE_ALL_WORK_KEYS] || [])
+    chrome.storage.local.get(STORE_WORK_KEY).then(obj => obj[STORE_WORK_KEY]),
+    chrome.storage.local.get(STORE_SETTING_KEY).then(obj => obj[STORE_SETTING_KEY] || {...DEFAULT_SETTINGS}),
+    chrome.storage.local.get(STORE_SETTING_EXTRA_BTN_KEY).then(obj => obj[STORE_SETTING_EXTRA_BTN_KEY] || {...DEFAULT_SETTING_EXTRA_BUTTONS}),
+    chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => obj[STORE_ALL_WORK_KEYS] || [])
   ]).then(([workObj, settingObj, settingExtraBtnObj, workIDObjArr]) => {
 
     if (workObj) work.value = workObj
@@ -61,19 +61,19 @@ const updateBookmarkStore = (chI, perc, chID, chTitle) => {
   workIDs.value = workIDArr
 
   const t = Date.now()
-  chrome.storage.sync.set({
+  chrome.storage.local.set({
     [STORE_WORK_KEY]: { authorURL, author, chI, chID, oneShot, perc, t, chTitle, name},
     [STORE_ALL_WORK_KEYS]: workIDArr
   })
 }
 
 const removeBookmarkStore = () => {
-  chrome.storage.sync.remove(STORE_WORK_KEY)
+  chrome.storage.local.remove(STORE_WORK_KEY)
   
   workIDArr = workIDArr.filter(wID => wID !== workID)
   workIDs.value = workIDArr
 
-  chrome.storage.sync.set({[STORE_ALL_WORK_KEYS]: workIDArr})
+  chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: workIDArr})
 }
 
 export {work, workIDs, updateBookmarkStore, removeBookmarkStore}

@@ -44,7 +44,7 @@ import { computed, onMounted, ref, reactive, onUnmounted } from 'vue'
 import { AO3_DOMAIN } from '@/common/variables'
 import { mainBM, bmInProgress } from '../js/bookmark'
 import { chapters, curChI, curChProgress, view } from '../js/page'
-import { outer, chapterInfos, fullViewMode, workID, oneShot, name} from '../js/static'
+import { outer, innerDivWorkWrapper, chapterInfos, fullViewMode, workID, oneShot, name} from '../js/static'
 import {mousePos, activateMouseMove, deactivateMouseMove} from '../js/mousePos'
 import { scrollY, activateScroll, deactivateScroll } from '../js/scroll'
 
@@ -54,6 +54,7 @@ export default {
   name: 'IpbNavbar',
   components: { IpbIcon },
   setup() {
+    if (!innerDivWorkWrapper) return
     activateMouseMove()
     activateScroll()
 
@@ -63,7 +64,7 @@ export default {
     let mainContentTop = 0
     let wrapperWidth = 0
     let wrapperLeft = 0
-    const innerDivWorkWrapper = document.querySelector('#inner #main .wrapper')
+    // const innerDivWorkWrapper = document.querySelector('#inner #main .wrapper')
 
     const onLocalScroll = () => {
       stucked.value = window.scrollY > mainContentTop

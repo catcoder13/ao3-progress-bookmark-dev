@@ -3,12 +3,12 @@ import { onScroll } from "@/content/js/scroll"
 const STORE_SETTING_KEY = 'AO3_IPB_SETTINGS'
 const STORE_SETTING_POPUP_KEY = 'AO3_IPB_SETTINGS_POPUP'
 const STORE_SETTING_EXTRA_BTN_KEY = 'AO3_IPB_SETTING_EXTRA_BTN_KEY'
-const STORE_WORK_KEY_PREFIX = `AO3_IPB_WORK_`
+const STORE_WORK_KEY_PREFIX = `AO3IPB`
 const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 
 const AO3_DOMAIN = "https://archiveofourown.org"
 
-const BOOKMARK_LIMIT = 100
+const BOOKMARK_LIMIT = 1000
 
 const DEFAULT_SETTINGS = {
   // compact: false,

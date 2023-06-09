@@ -5,14 +5,18 @@ import { partialText, selection } from './search'
 const works = reactive({})
 
 const fetchSyncData = () => {
-  chrome.storage.sync.get(STORE_ALL_WORK_KEYS)
+  chrome.storage.local.get(STORE_ALL_WORK_KEYS)
     .then(obj => obj[STORE_ALL_WORK_KEYS])
     .then(workIDs => {
       if (!workIDs) return
 
       Promise.all(
-        workIDs.map(workID => chrome.storage.sync.get(STORE_WORK_KEY_PREFIX + workID))
+        workIDs.map(workID => chrome.storage.local.get(STORE_WORK_KEY_PREFIX + workID))
       ).then(workObjs => {
+        const existingWorkKeys = Object.keys(works)
+        existingWorkKeys.forEach(key => {
+          delete works[key]
+        })
         workObjs.forEach((workObj, i) => {
           const work = workObj[STORE_WORK_KEY_PREFIX + workIDs[i]]
           if (work) {
@@ -40,28 +44,28 @@ const removeWork = workID => {
 
   delete works[workID]
 
-  chrome.storage.sync.remove(STORE_WORK_KEY_PREFIX + workID)
+  chrome.storage.local.remove(STORE_WORK_KEY_PREFIX + workID)
   
-  chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(obj => {
+  chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
-    chrome.storage.sync.set({ [STORE_ALL_WORK_KEYS]: workIDs.filter(wID => wID !== workID) })
+    chrome.storage.local.set({ [STORE_ALL_WORK_KEYS]: workIDs.filter(wID => wID !== workID) })
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))
 }
 
 const removeAllWorks = () => {
   selection.value = null
   partialText.value = ''
-  chrome.storage.sync.get(STORE_ALL_WORK_KEYS).then(obj => {
+  chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
 
-    chrome.storage.sync.remove([
+    chrome.storage.local.remove([
       ...workIDs.map(workID => STORE_WORK_KEY_PREFIX + workID),
       STORE_ALL_WORK_KEYS
     ])
 
     workIDs.forEach(workID => delete works[workID])
     
-    // chrome.storage.sync.set({ [STORE_ALL_WORK_KEYS]: [] })
+    // chrome.storage.local.set({ [STORE_ALL_WORK_KEYS]: [] })
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))
 }
 
