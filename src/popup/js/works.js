@@ -1,6 +1,5 @@
 import {reactive} from 'vue'
 import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS, AO3_DOMAIN } from '@/common/variables'
-import { partialText, selection } from './search'
 
 const works = reactive({})
 
@@ -33,15 +32,6 @@ const fetchSyncData = () => {
 fetchSyncData()
 
 const removeWork = workID => {
-  if (selection.value) {
-    console.log(selection.value, works[workID])
-    if ((selection.value.type === 'work' && selection.value.val === workID) ||
-      (selection.value.type === 'author' && selection.value.val === works[workID].author)) {
-        selection.value = null
-        partialText.value = ''
-    }
-  }
-
   delete works[workID]
 
   chrome.storage.local.remove(STORE_WORK_KEY_PREFIX + workID)
@@ -53,8 +43,8 @@ const removeWork = workID => {
 }
 
 const removeAllWorks = () => {
-  selection.value = null
-  partialText.value = ''
+  // selection.value = null
+  // partialText.value = ''
   chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
 

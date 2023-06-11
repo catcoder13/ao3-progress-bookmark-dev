@@ -29,10 +29,10 @@
 <script>
 import '@/common/__base.scss'
 
-import {computed, ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 import {works, visitURL} from './js/works'
 import { settings, settingPopup } from './js/setting'
-import { selection } from './js/search'
+import { partialText, selection } from './js/search'
 
 import IpbTab from './components/IpbTab.vue'
 import IpbSetting from './components/IpbSetting.vue'
@@ -52,8 +52,14 @@ export default {
     const viewMode = ref(VIEW_MODES[0])
     const ascend = ref(true)
 
-    const applySortBy = workObjs => {
-      const workArr = Object.keys(workObjs).map(workID => works[workID])
+    const sortedWorks = computed(() => {
+      if (selection.value) targetWorks = selection.value.works
+
+      const workArr = Object.keys(selection.value ? selection.value.works : works)
+        .filter(workID => !!works[workID]) // selection.value.works is not reactive, thus need manual filtering to filter out deleted work
+        .map(workID => works[workID])
+
+      // sort works
       let workArrRef = null
       if (sortBy.value.val == 'name') {
         workArrRef = workArr.sort((a, b) => {
@@ -66,13 +72,16 @@ export default {
       }
 
       return ascend.value ? workArrRef : workArrRef.reverse()
-    }
+    })
 
-    const sortedWorks = computed(() => {
-      let targetWorks = works
-      if (selection.value) targetWorks = selection.value.works
-      
-      return applySortBy(targetWorks)
+    watch(() => sortedWorks.value,
+    newSortedWorks => {
+      console.log('new sorted work', newSortedWorks)
+      if (selection.value && !newSortedWorks.length) {
+        selection.value = null
+        partialText.value = ''
+        console.log('result become empty. clear selection')
+      }
     })
 
     const clearLocalStorage =  () => {
