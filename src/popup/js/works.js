@@ -43,8 +43,6 @@ const removeWork = workID => {
 }
 
 const removeAllWorks = () => {
-  // selection.value = null
-  // partialText.value = ''
   chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
 

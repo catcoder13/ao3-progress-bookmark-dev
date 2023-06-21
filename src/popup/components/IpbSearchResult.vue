@@ -1,5 +1,5 @@
 <template>
-  <div ref="buttonParent" class="ipb-search-result">
+  <IpbScrollWrapper class="ipb-search-result" @ready="onWrapperReady">
     <button
       ref="buttons"
       :id="`ipb-item-${item.i}`"
@@ -13,28 +13,33 @@
       </span>
       <span class="ipb-author" v-if="item.type === 'work'">by {{ item.works[item.val].author }}</span>
     </button>
-    
+
     <template v-if="!options.length">
       No matched result.
     </template>
-  </div>
+  </IpbScrollWrapper>
+  <!-- <div ref="buttonParent" class="ipb-search-result">
+    
+     
+  </div> -->
 </template>
 
 <script>
 import { onMounted, ref, watch } from 'vue'
 import { selection } from '../js/search'
 
+import IpbScrollWrapper from './IpbScrollWrapper.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
 
 export default {
   props: ['options', 'hoverI'],
-  components: {IpbIcon},
+  components: { IpbIcon, IpbScrollWrapper },
   setup (p, {emit}) {
     const buttons = ref([])
     const buttonParent = ref(null)
 
     const correctScrollPos = targetElem => {
-      if (!targetElem) return
+      if (!targetElem || !buttonParent.value) return
       const {top, bottom} = targetElem.getBoundingClientRect()
       const {top: pTop, height: pHeight} = buttonParent.value.getBoundingClientRect()
       
@@ -44,7 +49,7 @@ export default {
       const containerBottom = containerTop + pHeight
       if (btnBottom > containerBottom) {
         const diff = btnBottom - containerBottom
-        buttonParent.value.scrollTo(0, buttonParent.value.scrollTop + diff)
+        buttonParent.value.scrollTo(0, buttonParent.value.scrollTop + diff - 1) // -1 to prevent accidentally hover to the next item
       } else if (btnTop < containerTop) {
         const diff = containerTop - btnTop
         buttonParent.value.scrollTo(0, buttonParent.value.scrollTop - diff)
@@ -64,7 +69,12 @@ export default {
       }
     })
 
-    return { buttons, buttonParent }
+    const onWrapperReady = el => {
+      buttonParent.value = el
+      console.log('ready', buttonParent.value)
+    }
+ 
+    return { buttons, onWrapperReady}
   }
 }
 </script>

@@ -9,7 +9,7 @@
       @keydown="onKeyDown"
     />
     <span class="ipb-close" v-if="selection" @click="onClear">&#10006;</span>
-    <IpbSearchResult v-if="open" class="ipb-style-scrollbar" v-model:hoverI="curSelectedIndex" @select="onSelect" :options="searchResults" />
+    <IpbSearchResult v-if="open" v-model:hoverI="curSelectedIndex" @select="onSelect" :options="searchResults" />
     
   </div>
 </template>
@@ -83,10 +83,12 @@ export default {
                     }
                     break
                 case UP:
-                    curSelectedIndex.value = curSelectedIndex.value <= 0 ? searchResults.value.length - 1 : --curSelectedIndex.value
+                    curSelectedIndex.value = curSelectedIndex.value === 0 ? 0 : --curSelectedIndex.value
+                    // curSelectedIndex.value = curSelectedIndex.value <= 0 ? searchResults.value.length - 1 : --curSelectedIndex.value
                     break
                 case DOWN:
-                    curSelectedIndex.value = (curSelectedIndex.value + 1) % searchResults.value.length
+                    // curSelectedIndex.value = (curSelectedIndex.value + 1) % searchResults.value.length
+                    curSelectedIndex.value = curSelectedIndex.value === searchResults.value.length - 1 ? curSelectedIndex.value : ++curSelectedIndex.value
                     break
             }
         }
@@ -158,7 +160,7 @@ export default {
     pointer-events: none;
   }
   
-  .ipb-style-scrollbar {
+  .ipb-search-result {
     position: absolute;
     z-index: 1;
     left: 0;
@@ -166,7 +168,7 @@ export default {
     transform: translateY(100%);
     width: 100%;
     max-height: 100px;
-    overflow-y: overlay;
+    overflow-y: auto;
   }
 }
 </style>

@@ -3,7 +3,7 @@
     <div class="ipb-popup-item" :class="{'ipb-popup-item--small': settingPopup.compact}">
       <div class="ipb-info">
         <h3>{{ work.name }} </h3>
-          <span class="ipb-author">by <a @click="() => visitURL(work.authorURL)">{{ work.author }}</a></span>
+          <span v-if="!selection || selection.type !== 'author'" class="ipb-author">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
           <span class="ipb-popup__item__datetime"><IpbIcon type="clock" fill="#555"/>{{ (new Date(work.t)).toLocaleString() }}</span>
       </div>
 
@@ -29,7 +29,7 @@
     <div class="ipb-popup-item">
       <div class="ipb-info">
         <h3>{{ work.name }}</h3>
-        <span>by <a @click="() => visitURL(work.authorURL)">{{ work.author }}</a></span>
+        <span v-if="!selection || selection.type !== 'author'">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
         <span class="ipb-popup__item__datetime"><IpbIcon type="clock" fill="#555"/>Bookmarked at {{ (new Date(work.t)).toLocaleString() }}</span>
       </div>
 
@@ -59,7 +59,7 @@
 <script>
 import { removeWork, visitURL } from '../js/works'
 import { settings, settingPopup } from '../js/setting'
-
+import { selectAuthor, selection } from '../js/search'
 import IpbIcon from '@/common/IpbIcon.vue'
 
 
@@ -67,7 +67,7 @@ export default {
   props: ['work'],
   components: {IpbIcon},
   setup () {
-    return { removeWork, visitURL, settings, settingPopup } 
+    return { removeWork, visitURL, settings, settingPopup, selectAuthor, selection } 
   }
 }
 </script>
@@ -76,7 +76,7 @@ export default {
 .ipb-popup-item {
   position: relative;
   background-color: #eee;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   box-shadow: 0 0 3px #999;
 
   & > * { box-sizing: border-box; }

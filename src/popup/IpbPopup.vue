@@ -13,7 +13,13 @@
         <IpbIcon type="compact" fill="#333" :open="!settingPopup.compact" @click="settingPopup.compact = !settingPopup.compact" />
       </span>
     </div>
-    <div class="ipb-popup__work-count">{{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)</div>
+    <div class="ipb-popup__subhead">
+      {{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)
+      <div class="ipb-popup__subhead__author" v-if="selection && selection.type === 'author'">
+        <IpbIcon type="author" fill="#166fce" />
+        <a :title="`Visit ${selection.val}'s AO3 page`" @click="() => visitURL(selection.authorURL)">{{ selection.val }}</a>
+      </div>
+    </div>
     
     <div class="ipb-popup__wrapper ipb-style-scrollbar">
       <TransitionGroup name="fade-in">
@@ -53,8 +59,6 @@ export default {
     const ascend = ref(true)
 
     const sortedWorks = computed(() => {
-      if (selection.value) targetWorks = selection.value.works
-
       const workArr = Object.keys(selection.value ? selection.value.works : works)
         .filter(workID => !!works[workID]) // selection.value.works is not reactive, thus need manual filtering to filter out deleted work
         .map(workID => works[workID])
@@ -76,11 +80,9 @@ export default {
 
     watch(() => sortedWorks.value,
     newSortedWorks => {
-      console.log('new sorted work', newSortedWorks)
       if (selection.value && !newSortedWorks.length) {
         selection.value = null
         partialText.value = ''
-        console.log('result become empty. clear selection')
       }
     })
 
@@ -179,16 +181,22 @@ $bg: #FFF;
     }
   }
 
-  .ipb-popup__work-count {
+  .ipb-popup__subhead {
     line-height: 1;
     padding: 2px 10px;
     background-color: #FFF;
+
+    .ipb-popup__subhead__author {
+      padding-top: 5px;
+      font-size: 14px;
+      font-weight: bold;
+    }
   }
 
   .ipb-popup__wrapper {
     position: relative;
     min-height: 200px;
-    padding: 15px 15px;
+    padding: 5px 15px 15px;
     box-sizing: border-box;
     border-top: 2px solid $bg;
     border-bottom: 5px solid $bg;
