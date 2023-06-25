@@ -1,11 +1,24 @@
-import { computed, ref } from 'vue'
+import { computed, ref, reactive, nextTick } from 'vue'
 
 import { works } from "./works"
 
 const partialText = ref('')
 const selection = ref(null)
+const curSelectedIndex = reactive({
+  viaNav: false, // false: via hover, true: via up/down
+  i: -1
+})
 
-const MAX_DISPLAY_SEARCH_RESULT = 10
+
+const MAX_RESULT_DISPLAY = 20
+const APPEND_OFFSET = 4
+
+const resultAnchor = reactive({min: 0, max: MAX_RESULT_DISPLAY})
+
+const resetResultAnchor = () => {
+  resultAnchor.min = 0
+  resultAnchor.max = MAX_RESULT_DISPLAY
+}
 
 const searchItems = computed(() => {
   const authorRef = {}
@@ -32,12 +45,31 @@ const searchResults = computed(() => {
   return searchItems.value.filter(item => item.text.toLocaleLowerCase().indexOf(lowerPartialInput) !== -1)
 })
 
-const onShiftDown = () => {
+const searchResultWindow = computed(() => {
+  return searchResults.value.filter((item, i) => {
+    return i >= resultAnchor.min && i < resultAnchor.max
+  })
+})
+const resultAppendDown = async () => {
+  const newMax = Math.min(searchResults.value.length, resultAnchor.max + APPEND_OFFSET)
+  const diff = newMax - resultAnchor.max
   
+  resultAnchor.max = newMax
+  resultAnchor.min = Math.max(0, resultAnchor.max - MAX_RESULT_DISPLAY)
+  // console.log('append d')
+  
+  curSelectedIndex.i -= diff
 }
 
-const onShiftUp = () => {
+const resultAppendUp = async () => {
+  const newMin = Math.max(0, resultAnchor.min - APPEND_OFFSET)
+  const diff = resultAnchor.min - newMin
+  resultAnchor.min = newMin
+  resultAnchor.max = Math.min(searchResults.value.length, resultAnchor.min + MAX_RESULT_DISPLAY)
 
+  curSelectedIndex.i += diff
+
+  // console.log('append u')
 }
 
 const selectAuthor = author => {
@@ -47,8 +79,11 @@ const selectAuthor = author => {
 
 export {
   selection,
+  curSelectedIndex,
   partialText,
-  searchItems,
   selectAuthor,
-  searchResults
+  resetResultAnchor,
+  searchResultWindow,
+  resultAppendUp,
+  resultAppendDown
 }

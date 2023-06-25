@@ -9,7 +9,7 @@
       @keydown="onKeyDown"
     />
     <span class="ipb-close" v-if="selection" @click="onClear">&#10006;</span>
-    <IpbSearchResult v-if="open" v-model:hoverI="curSelectedIndex" @select="onSelect" :options="searchResults" />
+    <IpbSearchResult v-if="open" @select="onSelect" :options="searchResultWindow" />
     
   </div>
 </template>
@@ -17,7 +17,7 @@
 <script>
 import {ref} from 'vue'
 import { works } from '../js/works'
-import { selection, partialText, searchResults} from '../js/search'
+import { selection, curSelectedIndex, partialText, searchResultWindow, resultAppendUp, resultAppendDown, resetResultAnchor} from '../js/search'
 import IpbSearchResult from './IpbSearchResult.vue'
 
 const [TAB, ESC] = [9, 27]
@@ -27,7 +27,6 @@ export default {
     props: ["curSelection"],
     components: { IpbSearchResult },
     setup() {
-        const curSelectedIndex = ref(-1)
         const input = ref(null)
         const open = ref(false)
         
@@ -39,8 +38,9 @@ export default {
         }
 
         const onInput = e => {
-          curSelectedIndex.value = -1
+          curSelectedIndex.i = -1
           partialText.value = e.target.value
+          resetResultAnchor()
         }
 
         const onBlur = e => {
@@ -52,8 +52,9 @@ export default {
 
         const onSelect = (e, item) => {
           selection.value = item
+          // partialText.value = ''
           partialText.value = item.text
-          curSelectedIndex.value = -1
+          curSelectedIndex.i = -1
           open.value = false
           input.value.blur()
         }
@@ -61,7 +62,8 @@ export default {
         const onClear = () => {
           selection.value = null
           partialText.value = ''
-          curSelectedIndex.value = -1
+          curSelectedIndex.i = -1
+          resetResultAnchor()
           // input.value.focus()
         }
 
@@ -71,29 +73,33 @@ export default {
                 case ESC:
                     if (partialText.value) {
                         partialText.value = ""
-                        curSelectedIndex.value = -1
+                        curSelectedIndex.i = -1
                     }
                     else e.target.blur()
                     
                     e.preventDefault() // prevent esc cause the entire popup to close
                     break
                 case ENTER:
-                    if (searchResults.value[curSelectedIndex.value]) {
-                      onSelect(null, searchResults.value[curSelectedIndex.value])
+                    if (searchResultWindow.value[curSelectedIndex.i]) {
+                      onSelect(null, searchResultWindow.value[curSelectedIndex.i])
                     }
                     break
                 case UP:
-                    curSelectedIndex.value = curSelectedIndex.value === 0 ? 0 : --curSelectedIndex.value
-                    // curSelectedIndex.value = curSelectedIndex.value <= 0 ? searchResults.value.length - 1 : --curSelectedIndex.value
+                    curSelectedIndex.viaNav = true
+                    curSelectedIndex.i = curSelectedIndex.i === 0 ? 0 : --curSelectedIndex.i
+                    
+                    if (curSelectedIndex.i === 0) resultAppendUp()
                     break
                 case DOWN:
-                    // curSelectedIndex.value = (curSelectedIndex.value + 1) % searchResults.value.length
-                    curSelectedIndex.value = curSelectedIndex.value === searchResults.value.length - 1 ? curSelectedIndex.value : ++curSelectedIndex.value
+                    curSelectedIndex.viaNav = true
+                    curSelectedIndex.i = curSelectedIndex.i === searchResultWindow.value.length - 1 ? curSelectedIndex.i : ++curSelectedIndex.i
+                    
+                    if (curSelectedIndex.i === searchResultWindow.value.length - 1) resultAppendDown()
                     break
             }
         }
         return {
-            input, open, selection, partialText, searchResults, curSelectedIndex, works,
+            input, open, selection, partialText, searchResultWindow, curSelectedIndex, works,
             onFocus, onSelect, onInput, onBlur, onClear, onKeyDown
         }
     }
@@ -167,7 +173,7 @@ export default {
     bottom: 0;
     transform: translateY(100%);
     width: 100%;
-    max-height: 100px;
+    max-height: 150px;
     overflow-y: auto;
   }
 }
