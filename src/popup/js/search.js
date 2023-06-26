@@ -4,20 +4,33 @@ import { works } from "./works"
 
 const partialText = ref('')
 const selection = ref(null)
-const curSelectedIndex = reactive({
+const lastScrollPos = ref(0)
+const hoverredItem = reactive({
   viaNav: false, // false: via hover, true: via up/down
-  i: -1
+  i: -1,
+  id: null,
+  // elem: null
 })
 
+const activeSearchResults = ref([])
 
-const MAX_RESULT_DISPLAY = 20
-const APPEND_OFFSET = 4
 
-const resultAnchor = reactive({min: 0, max: MAX_RESULT_DISPLAY})
+// const MAX_RESULT_DISPLAY = 20
+// const APPEND_OFFSET = 4
 
-const resetResultAnchor = () => {
-  resultAnchor.min = 0
-  resultAnchor.max = MAX_RESULT_DISPLAY
+// const resultAnchor = reactive({min: 0, max: MAX_RESULT_DISPLAY})
+
+// const resetResultAnchor = () => {
+//   resultAnchor.min = 0
+//   resultAnchor.max = MAX_RESULT_DISPLAY
+//   lastScrollPos.value = 0
+// }
+
+const resetHoverredItem = () => {
+  hoverredItem.viaNav = false
+  hoverredItem.i = -1
+  hoverredItem.id = null
+  // hoverredItem.elem = null
 }
 
 const searchItems = computed(() => {
@@ -25,52 +38,33 @@ const searchItems = computed(() => {
   const workArr = Object.keys(works).map((workID, i) => {
     if (!authorRef[works[workID].author]) authorRef[works[workID].author] = {}
     authorRef[works[workID].author][workID] = works[workID]
-    return {type: 'work', val: workID, i, text: works[workID].name, works: {[workID]: works[workID]}}
+    return {type: 'work', val: workID, text: works[workID].name, works: {[workID]: works[workID]}}
+    // return {type: 'work', val: workID, i, text: works[workID].name, works: {[workID]: works[workID]}}
   })
 
   const authorArr = Object.keys(authorRef).map((author, i) => {
     return {
-      type: 'author', val: author, i: workArr.length + i, text: author, works: authorRef[author],
+      type: 'author', val: author, text: author, works: authorRef[author],
+      // type: 'author', val: author, i: workArr.length + i, text: author, works: authorRef[author],
       authorURL: authorRef[author][Object.keys(authorRef[author])[0]].authorURL
     }
   })
 
-  return [...workArr, ...authorArr].sort((a,b) => a.text.toLowerCase().localeCompare(b.text.toLowerCase()))
+   return [...workArr, ...authorArr]
+    .sort((a,b) => a.text.toLowerCase().localeCompare(b.text.toLowerCase()))
+    .map((item, i) => ({...item, id: i}))
+
+
+  // return sortedAllSearchItems
 })
 
 const searchResults = computed(() => {
-  if (!partialText.value.length) return searchItems.value
+  let results = searchItems.value.map((item, i) => ({...item, i}))
+  if (!partialText.value.length) return results
 
   const lowerPartialInput = partialText.value.toLocaleLowerCase()
-  return searchItems.value.filter(item => item.text.toLocaleLowerCase().indexOf(lowerPartialInput) !== -1)
+  return results.filter(item => item.text.toLocaleLowerCase().indexOf(lowerPartialInput) !== -1)
 })
-
-const searchResultWindow = computed(() => {
-  return searchResults.value.filter((item, i) => {
-    return i >= resultAnchor.min && i < resultAnchor.max
-  })
-})
-const resultAppendDown = async () => {
-  const newMax = Math.min(searchResults.value.length, resultAnchor.max + APPEND_OFFSET)
-  const diff = newMax - resultAnchor.max
-  
-  resultAnchor.max = newMax
-  resultAnchor.min = Math.max(0, resultAnchor.max - MAX_RESULT_DISPLAY)
-  // console.log('append d')
-  
-  curSelectedIndex.i -= diff
-}
-
-const resultAppendUp = async () => {
-  const newMin = Math.max(0, resultAnchor.min - APPEND_OFFSET)
-  const diff = resultAnchor.min - newMin
-  resultAnchor.min = newMin
-  resultAnchor.max = Math.min(searchResults.value.length, resultAnchor.min + MAX_RESULT_DISPLAY)
-
-  curSelectedIndex.i += diff
-
-  // console.log('append u')
-}
 
 const selectAuthor = author => {
   partialText.value = author
@@ -79,11 +73,11 @@ const selectAuthor = author => {
 
 export {
   selection,
-  curSelectedIndex,
+  hoverredItem,
+  resetHoverredItem,
   partialText,
+  lastScrollPos,
   selectAuthor,
-  resetResultAnchor,
-  searchResultWindow,
-  resultAppendUp,
-  resultAppendDown
+  searchResults,
+  activeSearchResults
 }

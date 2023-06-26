@@ -9,7 +9,7 @@
       @keydown="onKeyDown"
     />
     <span class="ipb-close" v-if="selection" @click="onClear">&#10006;</span>
-    <IpbSearchResult v-if="open" @select="onSelect" :options="searchResultWindow" />
+    <IpbSearchResult v-if="open" @select="onSelect" :options="searchResults" />
     
   </div>
 </template>
@@ -17,7 +17,9 @@
 <script>
 import {ref} from 'vue'
 import { works } from '../js/works'
-import { selection, curSelectedIndex, partialText, searchResultWindow, resultAppendUp, resultAppendDown, resetResultAnchor} from '../js/search'
+import {
+  selection, hoverredItem, resetHoverredItem,
+  partialText, searchResults, activeSearchResults} from '../js/search'
 import IpbSearchResult from './IpbSearchResult.vue'
 
 const [TAB, ESC] = [9, 27]
@@ -38,9 +40,8 @@ export default {
         }
 
         const onInput = e => {
-          curSelectedIndex.i = -1
+          resetHoverredItem()
           partialText.value = e.target.value
-          resetResultAnchor()
         }
 
         const onBlur = e => {
@@ -54,7 +55,7 @@ export default {
           selection.value = item
           // partialText.value = ''
           partialText.value = item.text
-          curSelectedIndex.i = -1
+          resetHoverredItem()
           open.value = false
           input.value.blur()
         }
@@ -62,44 +63,49 @@ export default {
         const onClear = () => {
           selection.value = null
           partialText.value = ''
-          curSelectedIndex.i = -1
-          resetResultAnchor()
+          resetHoverredItem()
           // input.value.focus()
         }
 
         const onKeyDown = e => {
+            let newI = hoverredItem.i
             switch (e.keyCode) {
                 case TAB:
                 case ESC:
                     if (partialText.value) {
                         partialText.value = ""
-                        curSelectedIndex.i = -1
+                        resetHoverredItem()
                     }
                     else e.target.blur()
                     
                     e.preventDefault() // prevent esc cause the entire popup to close
                     break
                 case ENTER:
-                    if (searchResultWindow.value[curSelectedIndex.i]) {
-                      onSelect(null, searchResultWindow.value[curSelectedIndex.i])
+                    if (searchResults.value[hoverredItem.i]) {
+                      onSelect(null, searchResults.value[hoverredItem.i])
                     }
                     break
                 case UP:
-                    curSelectedIndex.viaNav = true
-                    curSelectedIndex.i = curSelectedIndex.i === 0 ? 0 : --curSelectedIndex.i
-                    
-                    if (curSelectedIndex.i === 0) resultAppendUp()
+                    hoverredItem.viaNav = true
+                    if (searchResults.value.length === 1) {
+                      newI = 0
+                    } else {
+                      newI = hoverredItem.i <= 0 ? 0 : hoverredItem.i - 1
+                    }
+                    hoverredItem.id = searchResults.value[newI].id
+                    hoverredItem.i = newI
                     break
                 case DOWN:
-                    curSelectedIndex.viaNav = true
-                    curSelectedIndex.i = curSelectedIndex.i === searchResultWindow.value.length - 1 ? curSelectedIndex.i : ++curSelectedIndex.i
-                    
-                    if (curSelectedIndex.i === searchResultWindow.value.length - 1) resultAppendDown()
+                    hoverredItem.viaNav = true
+                    newI = (hoverredItem.i < searchResults.value.length - 1) ? hoverredItem.i + 1 : searchResults.value.length - 1
+                    hoverredItem.id = searchResults.value[newI].id
+                    hoverredItem.i = newI
                     break
             }
         }
         return {
-            input, open, selection, partialText, searchResultWindow, curSelectedIndex, works,
+            input, open, selection, partialText, hoverredItem, works,
+            searchResults,
             onFocus, onSelect, onInput, onBlur, onClear, onKeyDown
         }
     }
