@@ -13,6 +13,7 @@
         <IpbIcon type="compact" fill="#333" :open="!settingPopup.compact" @click="settingPopup.compact = !settingPopup.compact" />
       </span>
     </div>
+
     <div class="ipb-popup__subhead">
       {{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)
       <div class="ipb-popup__subhead__author" v-if="selection && selection.type === 'author'">
@@ -21,12 +22,14 @@
       </div>
     </div>
     
-    <div class="ipb-popup__wrapper ipb-style-scrollbar">
-      <TransitionGroup name="fade-in">
-        <IpbPopupItem v-for="work in sortedWorks" :key="work.workID" :work="work" />
-      </TransitionGroup>
+    <IpbScrollWrapper class="ipb-popup__wrapper ipb-style-scrollbar" :options="sortedWorks" :animate="true" :maxResultAllowed="10">
+      <template v-slot:item="{item}">
+        <IpbPopupItem :work="item" />
+        {{ item.i }}
+      </template>
+      
       <span v-if="!Object.keys(sortedWorks).length" class="ipb-no-bm-msg">No bookmark added.</span>
-    </div>
+    </IpbScrollWrapper>
   </div>
 
   <IpbSetting></IpbSetting>
@@ -39,20 +42,22 @@ import {computed, ref, watch} from 'vue'
 import {works, visitURL} from './js/works'
 import { settings, settingPopup } from './js/setting'
 import { partialText, selection } from './js/search'
+import { BOOKMARK_LIMIT } from '@/common/variables'
 
 import IpbTab from './components/IpbTab.vue'
 import IpbSetting from './components/IpbSetting.vue'
 import IpbPopupItem from './components/IpbPopupItem.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
-import { BOOKMARK_LIMIT } from '@/common/variables'
+
 import IpbSearch from './components/IpbSearch.vue'
+import IpbScrollWrapper from './components/IpbScrollWrapper.vue'
 
 const VIEW_MODES = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
 const SORT_BY = [{label: 'Recent bookmark', val: 't'}, {label: 'Progress', val: 'perc'}, {label: 'Title', val: 'name'}]
 
 export default {
   name: 'App',
-  components: { IpbTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch },
+  components: { IpbTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch, IpbScrollWrapper },
   setup () {
     const sortBy = ref(SORT_BY[0])
     const viewMode = ref(VIEW_MODES[0])

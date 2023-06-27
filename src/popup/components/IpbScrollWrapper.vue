@@ -1,8 +1,16 @@
 <template>
   <div ref="wrapper" class="ipb-scroll-wrapper" @scroll="onScroll">
-    <div class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
+    <template v-if="animate">
+      <TransitionGroup name="fade-in">
+        <div class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
+          <slot name="item" v-bind="{item}"></slot>
+        </div>
+      </TransitionGroup>
+    </template>
+    <div v-else class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
       <slot name="item" v-bind="{item}"></slot>
     </div>
+    
     <slot></slot>
   </div>
 </template>
@@ -13,6 +21,10 @@ import { onMounted, ref, onUpdated, reactive, computed, nextTick, watch } from '
 export default {
   props: {
     options: Array,
+    animate: {
+      type: Boolean,
+      default: false
+    },
     anchorMin: { type: Number, default: 0 },
     maxResultAllowed: { type: Number, default: 20 },
     appendOffset: { type: Number, default: 4 }
@@ -51,8 +63,11 @@ export default {
         await nextTick()
 
         const prevFirstItem = wrapper.value.querySelector(prevID)
-        const diff = wrapper.value.getBoundingClientRect().top - prevFirstItem.getBoundingClientRect().top
-        wrapper.value.scrollTo(0, wrapper.value.scrollTop - diff)
+        if (prevFirstItem) {
+          const diff = wrapper.value.getBoundingClientRect().top - prevFirstItem.getBoundingClientRect().top
+          wrapper.value.scrollTo(0, wrapper.value.scrollTop - diff)
+        }
+        
         
         emit('top', anchor.min, anchor.max)
 

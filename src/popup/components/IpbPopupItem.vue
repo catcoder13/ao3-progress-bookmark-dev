@@ -10,9 +10,9 @@
       <div class="ipb-record">
         <div class="ipb-record-content">
           <p>
-            <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.workID}`)">
+            <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.id}`)">
               <IpbIcon type="bookmark" fill="#555" />One-shot</button>
-            <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">
+            <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">
               <IpbIcon type="bookmark" fill="#555" />Chapter {{parseInt(work.chI) + 1}}</button>
           </p>
           <p>
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(work.workID)">&#10006;</span>
+      <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(work.id)">&#10006;</span>
     </div>
   </template>
 
@@ -41,8 +41,8 @@
                 <b v-if="work.oneShot">One-shot</b>
                 <span v-else>Bookmarked at</span><br />
             </span>
-              <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.workID}`)">Entire work</button>
-              <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.workID}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">Chapter {{parseInt(work.chI) + 1}}</button>
+              <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.id}`)">Entire work</button>
+              <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}`)">Chapter {{parseInt(work.chI) + 1}}</button>
             </p>
             <p>
               <IpbIcon type="location" fill="#555"></IpbIcon><b>{{ (work.perc * 100).toFixed(2) }}%</b>
@@ -50,7 +50,7 @@
             
         </div>
       </div>
-      <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(work.workID)">&#10006;</span>
+      <span title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(work.id)">&#10006;</span>
     </div>
   </template>
   

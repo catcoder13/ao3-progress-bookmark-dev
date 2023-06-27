@@ -19,7 +19,7 @@ const fetchSyncData = () => {
         workObjs.forEach((workObj, i) => {
           const work = workObj[STORE_WORK_KEY_PREFIX + workIDs[i]]
           if (work) {
-            work.workID = workIDs[i]
+            work.id = workIDs[i]
             works[workIDs[i]] = work
           } else {
             console.warn('[AO3 IPB]', workIDs[i], 'exist in array but bm item does not exist')
