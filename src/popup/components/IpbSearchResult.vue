@@ -1,9 +1,8 @@
 <template>
-  <IpbScrollWrapper class="ipb-search-result" :options="options"
+  <IpbScrollWrapper class="ipb-search-result" :options="options" :anchorMin="anchorMin"
     @mounted="onWrapperMounted"
     @optionChange="newOpts => activeSearchResults = newOpts"
-    @top="onTop" @bottom="onBottom"
-    @scroll="onScroll">
+    @top="onReachEdge" @bottom="onReachEdge">
       <template v-slot:item="{item}">
         <button
             @mouseenter="e => onNewItemHover(item)"
@@ -26,7 +25,7 @@
 
 <script>
 import { ref, watch, reactive } from 'vue'
-import { hoverredItem, lastScrollPos, activeSearchResults } from '../js/search'
+import { selection, hoverredItem, activeSearchResults } from '../js/search'
 
 import IpbScrollWrapper from './IpbScrollWrapper.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
@@ -35,9 +34,8 @@ export default {
   props: ['options'],
   components: { IpbIcon, IpbScrollWrapper },
   setup (p) {
-    const buttons = ref([])
     const scrollWrapper = ref(null)
-
+    const anchorMin = ref((selection.value && selection.value.id - 4) || 0)
     const anchorRef = reactive({min: 0, max: 20})
 
     const correctScrollPos = (targetElem, i) => {
@@ -51,11 +49,11 @@ export default {
       const containerBottom = containerTop + pHeight
       if (btnBottom + 2 >=containerBottom) {
         const diff = btnBottom - containerBottom
-        scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollTop + diff) // -1 to prevent accidentally hover to the next item
+        scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollTop + diff) // trigger scroll wrapper scroll event
         // console.log('exceed bottom')
       } else if (btnTop < containerTop) {
         const diff = containerTop - btnTop
-        scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollTop - diff)
+        scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollTop - diff) // trigger scroll wrapper scroll event
         // console.log('exceed top')
       }
     }
@@ -67,49 +65,39 @@ export default {
           console.log('newI', newI)
           const targetElem = activeSearchResults.value[newI - anchorRef.min]
           correctScrollPos(targetElem, newI)
-          // await nextTick()
+
           if (newI === anchorRef.min) {
-            scrollWrapper.value.scrollTo(0,0)
-            console.log('nav reach top item')
+            scrollWrapper.value.scrollTo(0,0) // trigger scroll wrapper scroll event
+            // console.log('nav reach top item')
           } else if (newI === anchorRef.max) {
-            scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollHeight)
-            console.log('nav reach last item')
+            scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollHeight) // trigger scroll wrapper scroll event
+            // console.log('nav reach last item')
           }
         }
+      } else {
+        scrollWrapper.value.scrollTo(0, 0)
+        anchorMin.value = 0
       }
     })
 
     const onWrapperMounted = el => {
       scrollWrapper.value = el
-      
-
-      // const targetID = (selection.value && selection.value.id) || hoverredItem.id
-      // const targetElem = document.querySelector(`#ipb-item-${targetID}`)
-      
-      // if (targetElem) {
-      //   console.log('target elem exist???', targetID, targetElem)
-      //   if (document.querySelector(`#ipb-item-${targetID}`)) {
-      //     for (var i=0;i<activeSearchResults.value.length;i++) {
-      //       if (activeSearchResults.value[i].getAttribute('id') === `ipb-item-${targetID}`) {
-      //         hoverredItem.viaNav = true
-      //         hoverredItem.i = i
-      //         hoverredItem.id = targetID
-      //         hoverredItem.elem = activeSearchResults.value[i]
-      //         activeSearchResults.value[i].scrollIntoView()
-      //         console.log('unless')
-      //         break
-      //       }
-      //     }
-      //   }
-      // }
+      if (selection.value) {
+        onNewItemHover(selection.value)
+        for (var i=0; i< activeSearchResults.value.length;i++) {
+          const elem = activeSearchResults.value[i]
+          if (elem.getAttribute('id') === `ipb-item-${selection.value.id}`) {
+            hoverredItem.viaNav = false
+            hoverredItem.id = selection.value.id
+            hoverredItem.i = selection.value.id
+            elem.scrollIntoView()
+            break
+          }
+        }
+      }
     }
 
-    const onTop = (min, max) => {
-      anchorRef.min = min
-      anchorRef.max = max
-    }
-
-    const onBottom = (min, max) => {
+    const onReachEdge = (min, max) => {
       anchorRef.min = min
       anchorRef.max = max
     }
@@ -119,14 +107,9 @@ export default {
       hoverredItem.id = item.id
       hoverredItem.i = item.i
     }
-
-    const onScroll = e => {
-      lastScrollPos.value = e.target.scrollTop
-    }
  
     return {
-      buttons,
-      onScroll, onTop, onBottom,
+      anchorMin, onReachEdge,
       onWrapperMounted, onNewItemHover, hoverredItem, activeSearchResults }
   }
 }

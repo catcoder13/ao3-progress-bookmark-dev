@@ -16,10 +16,11 @@
 
 <script>
 import {ref} from 'vue'
-import { works } from '../js/works'
 import {
   selection, hoverredItem, resetHoverredItem,
-  partialText, searchResults, activeSearchResults} from '../js/search'
+  partialText, searchResults
+} from '../js/search'
+
 import IpbSearchResult from './IpbSearchResult.vue'
 
 const [TAB, ESC] = [9, 27]
@@ -53,8 +54,7 @@ export default {
 
         const onSelect = (e, item) => {
           selection.value = item
-          // partialText.value = ''
-          partialText.value = item.text
+          partialText.value = ''
           resetHoverredItem()
           open.value = false
           input.value.blur()
@@ -104,8 +104,8 @@ export default {
             }
         }
         return {
-            input, open, selection, partialText, hoverredItem, works,
-            searchResults,
+            input, open,
+            selection, partialText, hoverredItem, searchResults,
             onFocus, onSelect, onInput, onBlur, onClear, onKeyDown
         }
     }
