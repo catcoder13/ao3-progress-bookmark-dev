@@ -21,7 +21,7 @@ const author = mainContent && mainContent.querySelector('.byline a[rel=author]')
 const authorURL = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
 
 let fullViewMode = false
-
+let jumpToBMOnLoad = false
 const match1 = (window.location.href).match(/chapters\/(\d+)/)
 const match2 = (window.location.href).match(/\/works\/(\d+)/)
 
@@ -31,8 +31,13 @@ if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
 } else if (match2) { // pattern: https://archiveofourown.org/works/xxxxxxxxx/...
   workID = match2[1]
 
-  const urlParams = (new URLSearchParams(window.location.search)).get('view_full_work')
-  fullViewMode = (urlParams && urlParams.toLowerCase() === 'true') ? 1 : 0
+  const url = new URL(window.location.href)
+
+  // const urlParams = new URLSearchParams(window.location.search)
+  const fullViewParam = url.searchParams.get('view_full_work')
+  jumpToBMOnLoad = url.searchParams.has('jumptobm')
+  console.log('test jumptobm', jumpToBMOnLoad)
+  fullViewMode = (fullViewParam && fullViewParam.toLowerCase() === 'true') ? 1 : 0
 } else {
   console.warn('url not match, workID not found')
 }
@@ -65,7 +70,7 @@ if (chapterListElem) {
 }
 
 export {
-  workID, name, fullViewMode, oneShot,
+  workID, name, fullViewMode, jumpToBMOnLoad, oneShot,
   author, authorURL,
   outer, mainContent, innerDivWorkWrapper, chapterDoms, chapterInfos
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="ipb-popup" :class="{compact: settingPopup.compact}">
+  <div class="ipb-popup">
     <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
     <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
     <IpbSearch />
@@ -8,9 +8,6 @@
       <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
       <span class="ipb-icon-wrapper" :title="`Sort ${sortBy.label.toLowerCase()} in ${ascend ? 'ascending' : 'descending'} order`">
         <IpbIcon type="sort" fill="#333" :open="ascend" @click="ascend = !ascend" />
-      </span>
-      <span class="ipb-icon-wrapper" :title="settingPopup.compact ? 'Compact layout' : 'Expand layout'">
-        <IpbIcon type="compact" fill="#333" :open="!settingPopup.compact" @click="settingPopup.compact = !settingPopup.compact" />
       </span>
     </div>
 
@@ -40,7 +37,7 @@ import '@/common/__base.scss'
 
 import {computed, ref, watch} from 'vue'
 import {works, visitURL} from './js/works'
-import { settings, settingPopup } from './js/setting'
+import { settings } from './js/setting'
 import { partialText, selection } from './js/search'
 import { BOOKMARK_LIMIT } from '@/common/variables'
 
@@ -98,7 +95,7 @@ export default {
 
     return {
       works, selection, sortedWorks,
-      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, settingPopup, ascend, clearLocalStorage,
+      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend, clearLocalStorage,
       BOOKMARK_LIMIT
     }
   }
@@ -117,8 +114,6 @@ $bg: #FFF;
   text-align: left;
   background-color: $ao3_red;
   user-select: none;
-
-  &.compact .ipb-popup__author-works .ipb-author { font-size: 16px; }
 
   .ipb-popup__title {
     display: block;
@@ -181,8 +176,6 @@ $bg: #FFF;
       transition: opacity 0.2s;
 
       &:hover { opacity: 1; }
-
-      &:first-of-type { right: 25px; }
     }
   }
 
@@ -201,11 +194,12 @@ $bg: #FFF;
   .ipb-popup__wrapper {
     position: relative;
     min-height: 200px;
-    padding: 5px 15px 15px;
+    padding: 5px 5px 15px 15px;
     box-sizing: border-box;
     border-top: 2px solid $bg;
     border-bottom: 5px solid $bg;
     background-color: $bg;
+    overflow-y: overlay;
 
     .ipb-no-bm-msg {
       position: absolute;
@@ -217,7 +211,7 @@ $bg: #FFF;
     }
 
     a.ipb-author {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       display: inline-block;
       line-height: 1;

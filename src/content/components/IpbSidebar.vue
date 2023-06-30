@@ -51,7 +51,7 @@ import { computed } from 'vue'
 import { chapters, curChI } from '../js/page'
 import {onScroll} from '../js/scroll'
 import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit, withinBookmarkLimit } from '../js/bookmark'
-import { chapterInfos, fullViewMode, oneShot, workID } from '../js/static'
+import { chapterInfos, fullViewMode, jumpToBMOnLoad, oneShot, workID } from '../js/static'
 import { settings, settingExtraBtn } from '../js/setting'
 import { BOOKMARK_LIMIT, EXTRA_BUTTON_INFOS, AO3_DOMAIN } from '@/common/variables'
 
@@ -60,6 +60,11 @@ import IpbIcon from '@/common/IpbIcon.vue'
 export default {
   components: { IpbIcon },
   setup () {
+    console.log('jump to bm on load', jumpToBMOnLoad)
+    if (jumpToBMOnLoad) {
+      
+      jumpToBookmark()
+    }
     const onBookmarkEntryClick = e => startBookmarkEdit(e, chapters)
 
     const editBookmark = e => {
