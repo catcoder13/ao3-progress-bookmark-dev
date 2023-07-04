@@ -8,7 +8,7 @@
       @blur="onBlur"
       @keydown="onKeyDown"
     />
-    <span class="ipb-close" v-if="selection" @click="onClear">&#10006;</span>
+    <span class="ipb-close" v-if="selection" @click="clearSelection" title="Clear search result">&#10006;</span>
     <IpbSearchResult v-if="open" @select="onSelect" :options="searchResults" />
     
   </div>
@@ -17,7 +17,7 @@
 <script>
 import {ref} from 'vue'
 import {
-  selection, hoverredItem, resetHoverredItem,
+  selection, hoverredItem, resetHoverredItem, clearSelection,
   partialText, searchResults
 } from '../js/search'
 
@@ -60,13 +60,6 @@ export default {
           input.value.blur()
         }
 
-        const onClear = () => {
-          selection.value = null
-          partialText.value = ''
-          resetHoverredItem()
-          // input.value.focus()
-        }
-
         const onKeyDown = e => {
             let newI = hoverredItem.i
             switch (e.keyCode) {
@@ -106,7 +99,7 @@ export default {
         return {
             input, open,
             selection, partialText, hoverredItem, searchResults,
-            onFocus, onSelect, onInput, onBlur, onClear, onKeyDown
+            onFocus, onSelect, onInput, onBlur, clearSelection, onKeyDown
         }
     }
     
@@ -175,8 +168,8 @@ export default {
   .ipb-search-result {
     position: absolute;
     z-index: 1;
-    left: 0;
     bottom: 0;
+    // left: 50%;
     transform: translateY(100%);
     width: 100%;
     max-height: 150px;

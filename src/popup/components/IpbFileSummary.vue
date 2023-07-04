@@ -9,7 +9,7 @@
     </div>
     <div v-else class="ipb-file-summary__content">
       <h4>Total work(s) from file: {{ summaries.workCount }}</h4>
-      <div class="ipb-author-work ipb-style-scrollbar">
+      <div class="ipb-author-work">
         <h4>Authors</h4>
         <div class="" v-for="(authorWorkCount, authorName) in summaries.authors" :key=authorName>
           <IpbIcon type="author" fill="#999" />

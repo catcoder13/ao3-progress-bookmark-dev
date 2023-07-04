@@ -1,5 +1,5 @@
 <template>
-  <div class="ipb-popup-item ipb-popup-item--small">
+  <div class="ipb-popup-item">
     <div class="ipb-info">
       <h3>{{ work.name }} </h3>
         <span v-if="!selection || selection.type !== 'author'" class="ipb-author">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
@@ -9,9 +9,9 @@
     <div class="ipb-record">
       <div class="ipb-record-content">
         <p>
-          <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.id}?jumptobm`)">
+          <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.id}?jumptobm=true`)">
             <IpbIcon type="bookmark" fill="#555" />One-shot</button>
-          <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm`)">
+          <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm=true`)">
             <IpbIcon type="bookmark" fill="#555" />Chapter {{parseInt(work.chI) + 1}}</button>
         </p>
         <p>
@@ -50,6 +50,8 @@ export default {
   box-shadow: 0 0 3px #999;
 
   & > * { box-sizing: border-box; }
+  
+  &:hover .ipb-close-btn { display: block; }
   
   .ipb-info {
     padding: 8px;
@@ -112,7 +114,7 @@ export default {
 
         button {
           padding: 2px 5px;
-          margin: 2px 0;
+          margin: 4px 0;
           cursor: pointer;
 
           &:hover { filter: brightness(0.9); }
@@ -132,6 +134,7 @@ export default {
   } // ipb-record
 
   .ipb-close-btn {
+    display: none;
     position: absolute;
     right: 0;
     top: 0;

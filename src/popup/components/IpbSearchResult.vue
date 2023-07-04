@@ -5,7 +5,7 @@
     @top="onReachEdge" @bottom="onReachEdge">
       <template v-slot:item="{item}">
         <button
-            @mouseenter="e => onNewItemHover(item)"
+            @mousemove="() => onNewItemHover(item)"
             @click="$emit('select', $event, item)"
             class="ipb-search-blur-ref" :class="{current: hoverredItem.i === item.i, [item.type]: true}" >
             <IpbIcon v-if="item.type === 'work'" fill="#888" />
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, reactive, onMounted, onUnmounted } from 'vue'
 import { selection, hoverredItem, activeSearchResults } from '../js/search'
 
 import IpbScrollWrapper from './IpbScrollWrapper.vue'
@@ -61,8 +61,8 @@ export default {
     watch(() => hoverredItem.i,
     async newI => {
       if (newI >= 0) {
+        // console.log('newI', newI, hoverredItem.viaNav)
         if (hoverredItem.viaNav) {
-          console.log('newI', newI)
           const targetElem = activeSearchResults.value[newI - anchorRef.min]
           correctScrollPos(targetElem, newI)
 
@@ -95,6 +95,8 @@ export default {
           }
         }
       }
+
+      
     }
 
     const onReachEdge = (min, max) => {
@@ -103,6 +105,9 @@ export default {
     }
 
     const onNewItemHover = item => {
+      // using mousemove instead of mouseenter to prevent phantom cursor get wrongly recognize as mouseenter event
+      if (hoverredItem.id === item.id) return
+
       hoverredItem.viaNav = false
       hoverredItem.id = item.id
       hoverredItem.i = item.i

@@ -35,14 +35,14 @@ if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
 
   // const urlParams = new URLSearchParams(window.location.search)
   const fullViewParam = url.searchParams.get('view_full_work')
-  jumpToBMOnLoad = url.searchParams.has('jumptobm')
-  console.log('test jumptobm', jumpToBMOnLoad)
+  const jumpToBMParam = url.searchParams.get('jumptobm')
   fullViewMode = (fullViewParam && fullViewParam.toLowerCase() === 'true') ? 1 : 0
+  jumpToBMOnLoad = (jumpToBMParam && jumpToBMParam.toLowerCase() === 'true') ? 1 : 0
 } else {
   console.warn('url not match, workID not found')
 }
 
-// console.log(fullViewMode, workID, name, author, authorURL)
+console.log(fullViewMode, jumpToBMOnLoad, workID, name, author, authorURL)
 
 const chapterListElem = document.getElementById('selected_id')
 let chapterInfos = null 

@@ -53,10 +53,17 @@ const selectAuthor = author => {
   selection.value = searchItems.value.filter(item => item.type === 'author' && item.val === author)[0]
 }
 
+const clearSelection = () => {
+  selection.value = null
+  partialText.value = ''
+  resetHoverredItem()
+}
+
 export {
   selection,
   hoverredItem,
   resetHoverredItem,
+  clearSelection,
   partialText,
   selectAuthor,
   searchResults,

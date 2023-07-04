@@ -39,6 +39,13 @@ export default {
       return p.options.filter((opt, i) => i >= anchor.min && i <= anchor.max)
     })
 
+    watch(() => p.options,
+    () => {
+      console.log('list change, reset anchor')
+      anchor.min = 0
+      anchor.max = p.maxResultAllowed
+    })
+
     watch(() => p.anchorMin, 
     newAnchorMin => {
       const initMin = Math.min(p.options.length - 1 - p.maxResultAllowed, (newAnchorMin || 0))
@@ -61,11 +68,11 @@ export default {
         anchor.max = Math.min(anchor.min + p.maxResultAllowed, p.options.length - 1)
 
         await nextTick()
-
-        const prevFirstItem = wrapper.value.querySelector(prevID)
+        // console.log('e', e.target, 'wrapper', wrapper.value)
+        const prevFirstItem = scrollContainer.querySelector(prevID)
         if (prevFirstItem) {
-          const diff = wrapper.value.getBoundingClientRect().top - prevFirstItem.getBoundingClientRect().top
-          wrapper.value.scrollTo(0, wrapper.value.scrollTop - diff)
+          const diff = scrollContainer.getBoundingClientRect().top - prevFirstItem.getBoundingClientRect().top
+          scrollContainer.scrollTo(0, scrollContainer.scrollTop - diff)
         }
         
         

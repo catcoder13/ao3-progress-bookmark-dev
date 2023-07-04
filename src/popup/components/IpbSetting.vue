@@ -259,9 +259,10 @@ export default {
             justify-content: space-between;
             margin-bottom: 5px;
 
-            input {
+            input[type=file] {
               font-size: 12px;
               width: 170px;
+              cursor: pointer;
               
               &:invalid ~ button {
                 opacity: 0.5;

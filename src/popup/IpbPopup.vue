@@ -12,14 +12,18 @@
     </div>
 
     <div class="ipb-popup__subhead">
-      {{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)
+      <div class="ipb-popup__subhead__summary">
+        <button v-if="selection" @click="clearSelection">&#10006; Clear search result</button>
+        <span>{{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)</span>
+      </div>
+      
       <div class="ipb-popup__subhead__author" v-if="selection && selection.type === 'author'">
         <IpbIcon type="author" fill="#166fce" />
         <a :title="`Visit ${selection.val}'s AO3 page`" @click="() => visitURL(selection.authorURL)">{{ selection.val }}</a>
       </div>
     </div>
     
-    <IpbScrollWrapper class="ipb-popup__wrapper ipb-style-scrollbar" :options="sortedWorks" :animate="true" :maxResultAllowed="10">
+    <IpbScrollWrapper class="ipb-popup__wrapper" :options="sortedWorks" :animate="true" :maxResultAllowed="10">
       <template v-slot:item="{item}">
         <IpbPopupItem :work="item" />
         {{ item.i }}
@@ -38,7 +42,7 @@ import '@/common/__base.scss'
 import {computed, ref, watch} from 'vue'
 import {works, visitURL} from './js/works'
 import { settings } from './js/setting'
-import { partialText, selection } from './js/search'
+import { partialText, selection, clearSelection } from './js/search'
 import { BOOKMARK_LIMIT } from '@/common/variables'
 
 import IpbTab from './components/IpbTab.vue'
@@ -95,6 +99,7 @@ export default {
 
     return {
       works, selection, sortedWorks,
+      clearSelection, 
       sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend, clearLocalStorage,
       BOOKMARK_LIMIT
     }
@@ -153,7 +158,6 @@ $bg: #FFF;
   .ipb-popup__filter {
     position: relative;
     background-color: $bm_filter_bar_color;
-    padding-bottom: 2px;
 
     & > div {
       display: block;
@@ -184,6 +188,19 @@ $bg: #FFF;
     padding: 2px 10px;
     background-color: #FFF;
 
+    .ipb-popup__subhead__summary {
+      button {
+        border: 1px solid #888888;
+        padding: 3px 8px;
+        box-sizing: border-box;
+        border-radius: 18px;
+        margin: 5px 0;
+        cursor: pointer;
+      }
+
+      span { float: right; }
+    }
+
     .ipb-popup__subhead__author {
       padding-top: 5px;
       font-size: 14px;
@@ -194,7 +211,7 @@ $bg: #FFF;
   .ipb-popup__wrapper {
     position: relative;
     min-height: 200px;
-    padding: 5px 5px 15px 15px;
+    padding: 5px 15px 15px;
     box-sizing: border-box;
     border-top: 2px solid $bg;
     border-bottom: 5px solid $bg;
