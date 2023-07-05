@@ -21,14 +21,15 @@
               <b>Jump to bookmark</b>
               <span v-if="bmInOtherPage" class="ipb-warning">
                 Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
-                Click to visit Chapter {{ parseInt(mainBM.chI) + 1 }}
+                Click to redirect to Chapter {{ parseInt(mainBM.chI) + 1 }}
                 <IpbIcon type="visit" fill="#999" />
               </span>
             </div>
           </a>
-          <a class="ipb-a-button ipb-edit" @click="editBookmark">
-            <IpbIcon fill="#FFF" type="edit" />
-            <div class="ipb-bubble">Change bookmark location</div>
+          <a class="ipb-a-button ipb-edit" @click="removeBookmark">
+            <span>&#10006;</span>
+            <!-- <IpbIcon fill="#FFF" type="edit" /> -->
+            <div class="ipb-bubble">Remove bookmark</div>
           </a>
         </template>
       </div>
@@ -49,7 +50,7 @@
 <script>
 import { computed } from 'vue'
 import { chapters, curChI } from '../js/page'
-import { mainBM, bmInProgress, startBookmarkEdit, withinBookmarkLimit, jumpToBookmark } from '../js/bookmark'
+import { mainBM, bmInProgress, startBookmarkEdit, withinBookmarkLimit, jumpToBookmark, removeBookmark } from '../js/bookmark'
 import { chapterInfos, fullViewMode, oneShot, workID } from '../js/static'
 import { settings, settingExtraBtn } from '../js/setting'
 import { BOOKMARK_LIMIT, EXTRA_BUTTON_INFOS, AO3_DOMAIN } from '@/common/variables'
@@ -60,10 +61,6 @@ export default {
   components: { IpbIcon },
   setup () {
     const onBookmarkEntryClick = e => startBookmarkEdit(e, chapters)
-
-    const editBookmark = e => {
-      startBookmarkEdit(e, chapters)
-    }
 
     const isExternal = computed(() => {
       return {
@@ -83,7 +80,7 @@ export default {
 
     const jumpToBookmarkHref = computed(() => {
       if (!fullViewMode && mainBM.chI != null &&  mainBM.chI != curChI.value) {
-        return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}#chapter-${parseInt(mainBM.chI) + 1}`
+        return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}#chapter-${parseInt(mainBM.chI) + 1}?jumptobm`
       }
 
       return null
@@ -128,7 +125,7 @@ export default {
 
     return {
       sidebarHref,
-      mainBM, curChI, editBookmark, onBookmarkEntryClick, jumpToBM, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
+      mainBM, curChI, removeBookmark, onBookmarkEntryClick, jumpToBM, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
       bmInProgress, fullViewMode, settings, bmInOtherPage,
       buttons, btnLabel, isExternal
     }
@@ -214,6 +211,8 @@ export default {
 
       &.ipb-edit {
         display: none;
+        color: #FFFFFF;
+        text-align: center;
 
         .ipb-bubble { right: 4px; }
       }
