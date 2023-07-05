@@ -1,28 +1,14 @@
-import {ref, reactive, watch, computed } from 'vue'
-import { work, workIDs, updateBookmarkStore, removeBookmarkStore } from './store'
-import { workID, chapterInfos, mainContent } from './static'
+import {ref, reactive, computed } from 'vue'
+import { workIDs, updateBookmarkStore, removeBookmarkStore } from './store'
+import { workID, chapterInfos, mainContent, fullViewMode } from './static'
 import { activateMouseMove, deactivateMouseMove } from './mousePos'
 import { BOOKMARK_LIMIT } from '@/common/variables'
+import {onScroll} from './scroll'
 
 const mainBM = reactive({chI: null, perc: null, chID: null, link: null, fwLink: null})
 
 const bmInProgress = ref(false)
 const bmFocusCountDown = ref(0)
-
-watch(() => work.value,
-newWork => {
-  if (!newWork) {
-    mainBM.chI = null
-  } else {
-    const {chI, perc, chID} = newWork
-    mainBM.chI = chI
-    mainBM.perc = perc
-    mainBM.chID = chID
-    mainBM.link = `/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
-    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
-  }
-  
-})
 
 const withinBookmarkLimit = computed(() => workIDs.value.length < BOOKMARK_LIMIT)
 
@@ -80,7 +66,24 @@ const startBookmarkEdit = (e, chapters) => {
   }
 }
 
+let countDownInt = null
+const jumpToBookmark = (chapters, curChI) => {
+  if (!fullViewMode && mainBM.chI != curChI.value) return
+      
+  const {top, height} = chapters[mainBM.chI]
+  const bmPos = top + height * mainBM.perc
+  const targetScroll = bmPos - window.innerHeight / 2
+  window.scrollTo({top: targetScroll })
+  onScroll(null, targetScroll)
+
+  bmFocusCountDown.value = true
+  if (!countDownInt) clearTimeout(countDownInt)
+  countDownInt = setTimeout(() => {
+    bmFocusCountDown.value = false
+  }, 1200)
+}
+
 export {
   mainBM, bmInProgress, bmFocusCountDown, withinBookmarkLimit,
-  startBookmarkEdit, updateBookmark, removeBookmark, stopBookmarkEdit
+  startBookmarkEdit, updateBookmark, removeBookmark, stopBookmarkEdit, jumpToBookmark
 }

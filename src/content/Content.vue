@@ -1,4 +1,4 @@
-<template v-if="chapters">
+<template v-if="ready">
   <div :class="{'ipb-left': !settings.alignRight}">
     <IpbSidebar v-if="!bmInProgress"></IpbSidebar>
     <IpbEditor v-else :chapters="chapters"></IpbEditor>
@@ -12,10 +12,11 @@
 <script>
 import '@/common/__base.scss'
 
-import {computed} from 'vue'
-import {chapters, curChI} from './js/page'
-import { mainBM, bmInProgress } from './js/bookmark'
-import { fullViewMode, mainContent } from './js/static'
+import { computed, watch } from 'vue'
+import { storeReady } from './js/store'
+import {chapters, curChI, pageReady, windowLoaded } from './js/page'
+import { mainBM, bmInProgress, jumpToBookmark } from './js/bookmark'
+import { fullViewMode, mainContent, jumpToBMOnLoad } from './js/static'
 import { settings } from './js/setting'
 
 import IpbBookmark from './components/IpbBookmark.vue'
@@ -34,8 +35,18 @@ export default {
       return mainBM.chI == curChI.value
     })
 
+    const ready = computed(() => windowLoaded.value && storeReady.value && pageReady.value)
+
+    watch(() => ready.value,
+    () => {
+      if (jumpToBMOnLoad) {
+        jumpToBookmark(chapters, curChI)
+        console.log('jump to bm on load')
+      }
+    })
+
     return {
-      chapters,
+      chapters, ready,
       bmInProgress, canShowBookmark, mainContent,
       settings
     }

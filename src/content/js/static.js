@@ -21,9 +21,11 @@ const author = mainContent && mainContent.querySelector('.byline a[rel=author]')
 const authorURL = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
 
 let fullViewMode = false
-let jumpToBMOnLoad = false
+const jumpToBMOnLoad = !!(window.location.href).match(/jumptobm/)
 const match1 = (window.location.href).match(/chapters\/(\d+)/)
 const match2 = (window.location.href).match(/\/works\/(\d+)/)
+
+if (jumpToBMOnLoad && history.scrollRestoration) history.scrollRestoration = 'manual'
 
 if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
   // workID not found on window.location.href, extract from dom element instead
@@ -33,11 +35,8 @@ if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
 
   const url = new URL(window.location.href)
 
-  // const urlParams = new URLSearchParams(window.location.search)
   const fullViewParam = url.searchParams.get('view_full_work')
-  const jumpToBMParam = url.searchParams.get('jumptobm')
   fullViewMode = (fullViewParam && fullViewParam.toLowerCase() === 'true') ? 1 : 0
-  jumpToBMOnLoad = (jumpToBMParam && jumpToBMParam.toLowerCase() === 'true') ? 1 : 0
 } else {
   console.warn('url not match, workID not found')
 }

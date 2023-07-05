@@ -15,7 +15,7 @@
           </a>
         </template>
         <template v-else>
-          <a class="ipb-a-button" :href="jumpToBookmarkHref" :class="{bmInOtherPage}" @click="jumpToBookmark">
+          <a class="ipb-a-button" :href="jumpToBookmarkHref" :class="{bmInOtherPage}" @click="jumpToBM">
             <IpbIcon fill="#FFF" type="location" />
             <div class="ipb-bubble">
               <b>Jump to bookmark</b>
@@ -49,9 +49,8 @@
 <script>
 import { computed } from 'vue'
 import { chapters, curChI } from '../js/page'
-import {onScroll} from '../js/scroll'
-import { mainBM, bmInProgress, bmFocusCountDown, startBookmarkEdit, withinBookmarkLimit } from '../js/bookmark'
-import { chapterInfos, fullViewMode, jumpToBMOnLoad, oneShot, workID } from '../js/static'
+import { mainBM, bmInProgress, startBookmarkEdit, withinBookmarkLimit, jumpToBookmark } from '../js/bookmark'
+import { chapterInfos, fullViewMode, oneShot, workID } from '../js/static'
 import { settings, settingExtraBtn } from '../js/setting'
 import { BOOKMARK_LIMIT, EXTRA_BUTTON_INFOS, AO3_DOMAIN } from '@/common/variables'
 
@@ -60,11 +59,6 @@ import IpbIcon from '@/common/IpbIcon.vue'
 export default {
   components: { IpbIcon },
   setup () {
-    console.log('jump to bm on load', jumpToBMOnLoad)
-    if (jumpToBMOnLoad) {
-      
-      jumpToBookmark()
-    }
     const onBookmarkEntryClick = e => startBookmarkEdit(e, chapters)
 
     const editBookmark = e => {
@@ -82,22 +76,9 @@ export default {
 
     const bmInOtherPage = computed(() => !fullViewMode && mainBM.chI != curChI.value)
 
-    let countDownInt = null
-    const jumpToBookmark = () => {
-      if (!fullViewMode && mainBM.chI != curChI.value) return
-      
-      const {top, height} = chapters[mainBM.chI]
-      const bmPos = top + height * mainBM.perc
-      const targetScroll = bmPos - window.innerHeight / 2
-
-      window.scrollTo({top: targetScroll })
-      onScroll(null, targetScroll)
-
-      bmFocusCountDown.value = true
-      if (!countDownInt) clearTimeout(countDownInt)
-      countDownInt = setTimeout(() => {
-        bmFocusCountDown.value = false
-      }, 1200)
+    // let countDownInt = null
+    const jumpToBM = () => {
+      jumpToBookmark(chapters, curChI)
     }
 
     const jumpToBookmarkHref = computed(() => {
@@ -143,9 +124,11 @@ export default {
         latestCh: 'Latest: Chapter ' + chapterInfos.length
       }[btnKey] || EXTRA_BUTTON_INFOS[btnKey].label
     }
+
+
     return {
       sidebarHref,
-      mainBM, curChI, editBookmark, onBookmarkEntryClick, jumpToBookmark, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
+      mainBM, curChI, editBookmark, onBookmarkEntryClick, jumpToBM, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
       bmInProgress, fullViewMode, settings, bmInOtherPage,
       buttons, btnLabel, isExternal
     }

@@ -1,6 +1,7 @@
 import { ref } from "vue"
 import { workID, name, author, authorURL, oneShot } from "./static"
 import { updateSetting, updateSettingExtraBtn } from './setting'
+import { mainBM } from "./bookmark"
 import {
   DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS,
   STORE_ALL_WORK_KEYS, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_KEY, STORE_WORK_KEY_PREFIX
@@ -9,6 +10,7 @@ import {
 const STORE_WORK_KEY = STORE_WORK_KEY_PREFIX + workID
 
 const work = ref(null)
+const storeReady = ref(false)
 
 let workIDArr = []
 const workIDs = ref(workIDArr)
@@ -22,7 +24,16 @@ const initStoreData = () => {
     chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => obj[STORE_ALL_WORK_KEYS] || [])
   ]).then(([workObj, settingObj, settingExtraBtnObj, workIDObjArr]) => {
 
-    if (workObj) work.value = workObj
+    if (workObj) {
+      work.value = workObj
+
+      const {chI, perc, chID} = workObj
+      mainBM.chI = chI
+      mainBM.perc = perc
+      mainBM.chID = chID
+      mainBM.link = `/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
+      mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+    }
 
     updateSetting(settingObj)
     
@@ -30,6 +41,8 @@ const initStoreData = () => {
     
     workIDs.value = workIDObjArr
     workIDArr = workIDObjArr
+
+    storeReady.value = true
   })
 
   chrome.storage.onChanged.addListener(obj => {
@@ -76,4 +89,4 @@ const removeBookmarkStore = () => {
   chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: workIDArr})
 }
 
-export {work, workIDs, updateBookmarkStore, removeBookmarkStore}
+export {work, workIDs, storeReady, updateBookmarkStore, removeBookmarkStore}

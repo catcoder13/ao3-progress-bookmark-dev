@@ -41,7 +41,7 @@ export default {
 
     watch(() => p.options,
     () => {
-      console.log('list change, reset anchor')
+      // console.log('list change, reset anchor')
       anchor.min = 0
       anchor.max = p.maxResultAllowed
     })

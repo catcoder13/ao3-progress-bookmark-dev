@@ -9,9 +9,9 @@
     <div class="ipb-record">
       <div class="ipb-record-content">
         <p>
-          <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.id}?jumptobm=true`)">
+          <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.id}?jumptobm`)">
             <IpbIcon type="bookmark" fill="#555" />One-shot</button>
-          <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm=true`)">
+          <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm`)">
             <IpbIcon type="bookmark" fill="#555" />Chapter {{parseInt(work.chI) + 1}}</button>
         </p>
         <p>
@@ -113,9 +113,11 @@ export default {
         }
 
         button {
-          padding: 2px 5px;
+          padding: 4px 12px;
           margin: 4px 0;
           cursor: pointer;
+          border-radius: 12px;
+          border: 1px solid #888888;
 
           &:hover { filter: brightness(0.9); }
           &:active { filter: brightness(0.95); }
@@ -140,14 +142,16 @@ export default {
     top: 0;
     padding: 0;
     height: 100%;
-    width: 13px;
+    width: 10px;
     background-color: red;
-    opacity: 0.3;
+    opacity: 0.2;
     transition: opacity 0.2s;
     cursor: pointer;
 
     &:hover {
+      transition: width 0.2s, opacity 0.2s;
       opacity: 1;
+      width: 13px;
     }
 
     span {

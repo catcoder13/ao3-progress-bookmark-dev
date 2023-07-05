@@ -1,29 +1,15 @@
-import {reactive, computed} from 'vue'
+import {reactive, computed, ref} from 'vue'
 import {outer, mainContent, chapterDoms, fullViewMode, oneShot} from './static'
 import { scrollY, onScroll, activateScroll } from './scroll'
+
+const pageReady = ref(false)
+const windowLoaded = ref(false)
 
 let chapters = null
 const chaptersRef = {}
 let initCurChI = 0
 
 const view = reactive({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight})
-
-if (chapterDoms.length) { // multi chapter
-  initCurChI = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
-
-  chapterDoms.forEach(ch => {
-    const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-    chaptersRef[chIndex] = reactive({ top: -1, height: 0, dom: ch })
-  })
-} else { // one shot
-  chaptersRef[0] = reactive({ top: -1, height: 0, dom: mainContent && mainContent.querySelector('#chapters') })
-}
-
-chapters = chaptersRef
-
-if (!oneShot && fullViewMode && chapterDoms.length > 1) {
- activateScroll()
-}
 
 const curChI = computed(() => {
   if (oneShot || chapterDoms.length === 1) return initCurChI
@@ -62,6 +48,22 @@ const updateChapterDomSize = () => {
   
 }
 
+// init
+if (chapterDoms.length) { // multi chapter
+  initCurChI = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
+
+  chapterDoms.forEach(ch => {
+    const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
+    chaptersRef[chIndex] = reactive({ top: -1, height: 0, dom: ch })
+  })
+} else { // one shot
+  chaptersRef[0] = reactive({ top: -1, height: 0, dom: mainContent && mainContent.querySelector('#chapters') })
+}
+
+if (!oneShot && fullViewMode && chapterDoms.length > 1) activateScroll()
+
+chapters = chaptersRef
+
 const resizeObserver = new ResizeObserver(updateChapterDomSize)
 resizeObserver.observe(outer)
 updateChapterDomSize()
@@ -69,4 +71,9 @@ updateChapterDomSize()
 window.addEventListener('resize', onResize)
 onResize()
 
-export { chapters, curChI, curChProgress, view }
+window.addEventListener('load', () => {
+  windowLoaded.value = true
+})
+pageReady.value = true
+
+export { chapters, curChI, curChProgress, view, pageReady, windowLoaded }
