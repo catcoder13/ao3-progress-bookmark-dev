@@ -4,16 +4,15 @@
   "version": "0.1.0",
   "description": "Enhance in-page navigating experience on AO3's work page with in-page bookmark, chapter progress bar, and more.",
   "icons":  {
-    "128": "imgs/bavy_w.png"
+    "128": "imgs/ipb.png",
+    "32": "imgs/ipb32.png"
   },
   "permissions": ["storage"],
-  "background": {
-    "service_worker": "background.js"
-  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "128": "imgs/bavy_w.png"
+      "128": "imgs/ipb.png",
+      "32": "imgs/ipb32.png"
     }
   },
   "content_scripts": [

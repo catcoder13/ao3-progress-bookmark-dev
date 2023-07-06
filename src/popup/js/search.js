@@ -1,4 +1,4 @@
-import { computed, ref, reactive, nextTick } from 'vue'
+import { computed, ref, reactive } from 'vue'
 
 import { works } from "./works"
 
@@ -20,13 +20,13 @@ const resetHoverredItem = () => {
 
 const searchItems = computed(() => {
   const authorRef = {}
-  const workArr = Object.keys(works).map((workID, i) => {
+  const workArr = Object.keys(works).map(workID => {
     if (!authorRef[works[workID].author]) authorRef[works[workID].author] = {}
     authorRef[works[workID].author][workID] = works[workID]
     return {type: 'work', val: workID, text: works[workID].name, works: {[workID]: works[workID]}}
   })
 
-  const authorArr = Object.keys(authorRef).map((author, i) => {
+  const authorArr = Object.keys(authorRef).map(author => {
     return {
       type: 'author', val: author, text: author, works: authorRef[author],
       authorURL: authorRef[author][Object.keys(authorRef[author])[0]].authorURL

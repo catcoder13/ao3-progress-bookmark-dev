@@ -2,12 +2,12 @@
   <div ref="wrapper" class="ipb-scroll-wrapper" @scroll="onScroll">
     <template v-if="animate">
       <TransitionGroup name="fade-in">
-        <div class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
+        <div class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
           <slot name="item" v-bind="{item}"></slot>
         </div>
       </TransitionGroup>
     </template>
-    <div v-else class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
+    <div v-else class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
       <slot name="item" v-bind="{item}"></slot>
     </div>
     

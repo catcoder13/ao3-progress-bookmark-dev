@@ -58,12 +58,9 @@ const removeAllWorks = () => {
 }
 
 const visitURL = subURL => {
-  chrome.runtime.sendMessage(
-    {type: 'tab', url: AO3_DOMAIN + subURL},
-    // res => {
-    //   console.log(res)
-    // }
-  )
+  chrome.tabs.create({ url: AO3_DOMAIN + subURL }, () => {
+    window.close()
+  })
 }
 
 export {works, removeWork, removeAllWorks, visitURL, fetchSyncData}

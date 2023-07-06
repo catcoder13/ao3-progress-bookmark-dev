@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, watch, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, watch, reactive } from 'vue'
 import { selection, hoverredItem, activeSearchResults } from '../js/search'
 
 import IpbScrollWrapper from './IpbScrollWrapper.vue'
@@ -33,12 +33,12 @@ import IpbIcon from '@/common/IpbIcon.vue'
 export default {
   props: ['options'],
   components: { IpbIcon, IpbScrollWrapper },
-  setup (p) {
+  setup () {
     const scrollWrapper = ref(null)
     const anchorMin = ref((selection.value && selection.value.id - 4) || 0)
     const anchorRef = reactive({min: 0, max: 20})
 
-    const correctScrollPos = (targetElem, i) => {
+    const correctScrollPos = targetElem => {
       if (!targetElem || !scrollWrapper.value) return
       const {top, bottom} = targetElem.getBoundingClientRect()
       const {top: pTop, height: pHeight} = scrollWrapper.value.getBoundingClientRect()
@@ -64,7 +64,7 @@ export default {
         // console.log('newI', newI, hoverredItem.viaNav)
         if (hoverredItem.viaNav) {
           const targetElem = activeSearchResults.value[newI - anchorRef.min]
-          correctScrollPos(targetElem, newI)
+          correctScrollPos(targetElem)
 
           if (newI === anchorRef.min) {
             scrollWrapper.value.scrollTo(0,0) // trigger scroll wrapper scroll event

@@ -8,7 +8,7 @@ import {
  import { fetchSyncData } from '@/popup/js/works'
 
  const importData = obj => {
-  chrome.storage.local.set(obj).then(res => {
+  chrome.storage.local.set(obj).then(() => {
     fetchSyncData()
   })
  }
