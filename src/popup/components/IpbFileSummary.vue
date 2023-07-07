@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="ipb-remark">
-        <b>Note: All existing bookmark will be deleted/overwritten</b>!
+        <b>Note: All existing bookmark(s) will be deleted!</b>!
       </div>
     </div>
     

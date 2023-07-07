@@ -5,11 +5,13 @@ import {
   STORE_ALL_WORK_KEYS
  } from '@/common/variables'
 
- import { fetchSyncData } from '@/popup/js/works'
+ import { fetchSyncData, removeAllWorks } from '@/popup/js/works'
 
  const importData = obj => {
-  chrome.storage.local.set(obj).then(() => {
-    fetchSyncData()
+  removeAllWorks(() => {
+    chrome.storage.local.set(obj).then(() => {
+      fetchSyncData()
+    })
   })
  }
  

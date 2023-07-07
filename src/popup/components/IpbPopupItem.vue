@@ -61,6 +61,7 @@ export default {
       font-family: Georgia, serif;
       font-size: 16px;
       line-height: 1.2;
+      word-wrap: break-word;
     }
 
     p { margin: 10px 0 5px; }

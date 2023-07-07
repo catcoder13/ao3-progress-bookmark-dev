@@ -1,5 +1,5 @@
-import {ref, reactive, computed } from 'vue'
-import { workIDs, updateBookmarkStore, removeBookmarkStore } from './store'
+import {ref, reactive, computed, watch } from 'vue'
+import { workIDs, updateBookmarkStore, removeBookmarkStore, work } from './store'
 import { workID, chapterInfos, mainContent, fullViewMode } from './static'
 import { activateMouseMove, deactivateMouseMove } from './mousePos'
 import { BOOKMARK_LIMIT } from '@/common/variables'
@@ -11,6 +11,21 @@ const bmInProgress = ref(false)
 const bmFocusCountDown = ref(0)
 
 const withinBookmarkLimit = computed(() => workIDs.value.length < BOOKMARK_LIMIT)
+
+watch(() => work.value,
+newWork => {
+  if (newWork) {
+    const {chI, perc, chID} = newWork
+    mainBM.chI = chI
+    mainBM.perc = perc
+    mainBM.chID = chID
+    mainBM.link = `/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
+    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+  } else {
+    mainBM.chI = null
+  }
+  
+})
 
 const updateBookmark = (chI, perc) => {
   if (mainBM.chI != null || withinBookmarkLimit.value) {

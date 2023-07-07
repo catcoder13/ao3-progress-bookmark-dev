@@ -39,10 +39,7 @@ export default {
 
     watch(() => ready.value,
     () => {
-      if (jumpToBMOnLoad) {
-        jumpToBookmark(chapters, curChI)
-        console.log('jump to bm on load')
-      }
+      if (jumpToBMOnLoad) jumpToBookmark(chapters, curChI)
     })
 
     return {

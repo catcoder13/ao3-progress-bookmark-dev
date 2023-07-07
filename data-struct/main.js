@@ -53,12 +53,13 @@ const generateWork = () => {
 }
 
 const workObjs = {}
-const workIDs = {}
+// const workIDs = {}
+const workIDs = []
 
 for (var i = 0; i < NUM_OF_WORKS; i++) {
   const [workID, work] = generateWork()
-  // workIDs.push(workID)
-  workIDs[workID] = work.name
+  workIDs.push(workID)
+  // workIDs[workID] = work.name
   workObjs['AO3IPB' + workID] = work
 }
 

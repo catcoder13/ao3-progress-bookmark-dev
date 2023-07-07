@@ -1,7 +1,6 @@
 import { ref } from "vue"
 import { workID, name, author, authorURL, oneShot } from "./static"
 import { updateSetting, updateSettingExtraBtn } from './setting'
-import { mainBM } from "./bookmark"
 import {
   DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS,
   STORE_ALL_WORK_KEYS, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_KEY, STORE_WORK_KEY_PREFIX
@@ -24,16 +23,7 @@ const initStoreData = () => {
     chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => obj[STORE_ALL_WORK_KEYS] || [])
   ]).then(([workObj, settingObj, settingExtraBtnObj, workIDObjArr]) => {
 
-    if (workObj) {
-      work.value = workObj
-
-      const {chI, perc, chID} = workObj
-      mainBM.chI = chI
-      mainBM.perc = perc
-      mainBM.chID = chID
-      mainBM.link = `/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
-      mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
-    }
+    if (workObj) work.value = workObj
 
     updateSetting(settingObj)
     
@@ -65,6 +55,7 @@ const initStoreData = () => {
       workIDs.value = workIDArr
     }
     
+    console.log(obj)
   })
 }
 initStoreData()

@@ -42,16 +42,21 @@ const removeWork = workID => {
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))
 }
 
-const removeAllWorks = () => {
+const removeAllWorks = cb => {
   chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => {
     const workIDs = obj[STORE_ALL_WORK_KEYS] || []
 
     chrome.storage.local.remove([
       ...workIDs.map(workID => STORE_WORK_KEY_PREFIX + workID),
       STORE_ALL_WORK_KEYS
-    ])
+    ]).then(res => {
+      console.log('removed complete in store', res)
+      workIDs.forEach(workID => delete works[workID])
 
-    workIDs.forEach(workID => delete works[workID])
+      if (cb) cb()
+    })
+
+    // workIDs.forEach(workID => delete works[workID])
     
     // chrome.storage.local.set({ [STORE_ALL_WORK_KEYS]: [] })
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))

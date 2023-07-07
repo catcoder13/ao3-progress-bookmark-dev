@@ -233,7 +233,8 @@ export default {
           cursor: pointer;
           padding: 3px 5px;
           line-height: 1;
-          color: #333;
+          color: #FFF;
+          background-color: #666;
 
           &:hover {
             background-color: #333;
@@ -268,6 +269,8 @@ export default {
                 opacity: 0.5;
                 pointer-events: none;
                 cursor: default;
+                color: #333;
+                background-color: transparent;
               }
             }
           }
@@ -295,8 +298,8 @@ export default {
 
           &.checked { 
             opacity: 1;
-            border: 1px solid #1c73b5;
-            color: #1c73b5;
+            border: 1px solid $btn_blue;
+            color: $btn_blue;
             font-weight: bold;
           }
 
@@ -356,17 +359,13 @@ export default {
   }
 
   .ipb-setting__reset {
-    border: 1px solid #777;
-    color: #333;
+    background-color: #666;
+    color: #FFF;
     line-height: 1;
     cursor: pointer;
     padding: 3px 5px;
 
-    &:hover {
-      background-color: #333;
-      border: 1px solid #333;
-      color: #FFF;
-    }
+    &:hover { background-color: #333; }
   }
 } // .ipb-setting
 
@@ -374,7 +373,7 @@ export default {
   display: flex;
 
   span {
-    background-color: #777;
+    background-color: $btn_blue;
     color: #FFF;
     padding: 5px 10px;
     line-height: 1;
@@ -390,7 +389,7 @@ export default {
     }
 
     &:hover {
-      opacity: 0.9;
+      opacity: 1;
     }
 
   }
