@@ -6,8 +6,8 @@
     
     <div class="ipb-popup__filter">
       <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
-      <span class="ipb-icon-wrapper" :title="`Sort ${sortBy.label.toLowerCase()} in ${ascend ? 'ascending' : 'descending'} order`">
-        <IpbIcon type="sort" fill="#333" :open="ascend" @click="ascend = !ascend" />
+      <span class="ipb-icon-wrapper" :title="`Sort ${sortBy.label.toLowerCase()} in ${descend ? 'descending' : 'descending'} order`">
+        <IpbIcon type="sort" fill="#333" :open="!descend" @click="descend = !descend" />
       </span>
     </div>
 
@@ -62,7 +62,7 @@ export default {
   setup () {
     const sortBy = ref(SORT_BY[0])
     const viewMode = ref(VIEW_MODES[0])
-    const ascend = ref(true)
+    const descend = ref(true)
 
     const sortedWorks = computed(() => {
       const workArr = Object.keys(selection.value ? selection.value.works : works)
@@ -72,16 +72,16 @@ export default {
       // sort works
       let workArrRef = null
       if (sortBy.value.val == 'name') {
-        workArrRef = workArr.sort((a, b) => {
+        workArrRef = workArr.sort((a,b) => {
           const tA = a[sortBy.value.val].toUpperCase()
           const tB = b[sortBy.value.val].toUpperCase()
-          return tA < tB ? -1 : (tA > tB) ? 1 : 0
+          return tB.localeCompare(tA) // descend by default
         })
       } else {
-        workArrRef = workArr.sort((a, b) => b[sortBy.value.val] - a[sortBy.value.val])
+        workArrRef = workArr.sort((a, b) => b[sortBy.value.val] - a[sortBy.value.val]) // descend by default
       }
 
-      return ascend.value ? workArrRef : workArrRef.reverse()
+      return descend.value ? workArrRef : workArrRef.reverse()
     })
 
     watch(() => sortedWorks.value,
@@ -100,7 +100,7 @@ export default {
     return {
       works, selection, sortedWorks,
       clearSelection, 
-      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, ascend, clearLocalStorage,
+      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, descend, clearLocalStorage,
       BOOKMARK_LIMIT
     }
   }
@@ -196,6 +196,9 @@ $bg: #FFF;
         border-radius: 18px;
         margin: 5px 0;
         cursor: pointer;
+        opacity: 0.5;
+
+        &:hover { opacity: 1; }
       }
 
       span { float: right; }

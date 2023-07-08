@@ -66,7 +66,10 @@ export default {
 
     p { margin: 10px 0 5px; }
 
-    .ipb-author { font-size: 11px; }
+    .ipb-author {
+      font-size: 11px;
+      word-wrap: break-word;
+    }
 
     .ipb-popup__item__datetime {
       display: block;
@@ -144,7 +147,7 @@ export default {
     padding: 0;
     height: 100%;
     width: 10px;
-    background-color: red;
+    background-color: #666;
     opacity: 0.2;
     transition: opacity 0.2s;
     cursor: pointer;
@@ -153,6 +156,7 @@ export default {
       transition: width 0.2s, opacity 0.2s;
       opacity: 1;
       width: 13px;
+      background-color: red;
     }
 
     span {

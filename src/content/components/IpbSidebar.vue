@@ -15,7 +15,7 @@
           </a>
         </template>
         <template v-else>
-          <a class="ipb-a-button" :href="jumpToBookmarkHref" :class="{bmInOtherPage}" @click="jumpToBM">
+          <a class="ipb-a-button ipb-a-button--entry" :href="jumpToBookmarkHref" :class="{bmInOtherPage}" @click="jumpToBM">
             <IpbIcon fill="#FFF" type="location" />
             <div class="ipb-bubble">
               <b>Jump to bookmark</b>
@@ -26,7 +26,11 @@
               </span>
             </div>
           </a>
-          <a class="ipb-a-button ipb-edit" @click="removeBookmark">
+          <a class="ipb-a-button ipb-a-button--extra" @click="onBookmarkEntryClick">
+            <IpbIcon fill="#FFF" type="edit" />
+            <div class="ipb-bubble">Change bookmark location</div>
+          </a>
+          <a class="ipb-a-button ipb-a-button--extra" @click="removeBookmark">
             <span>&#10006;</span>
             <!-- <IpbIcon fill="#FFF" type="edit" /> -->
             <div class="ipb-bubble">Remove bookmark</div>
@@ -199,17 +203,18 @@ export default {
     flex-direction: row-reverse;
 
     &:hover {
-      a.ipb-a-button:not(.ipb-edit) { border-radius: 0; }
-      a.ipb-a-button.ipb-edit { display: block; }
+      a.ipb-a-button.ipb-a-button--entry { border-radius: 0; }
+      a.ipb-a-button.ipb-a-button--extra {
+        display: block;
+
+        &:not(:last-of-type) { border-radius: 0; }
+      }
     }
 
     a.ipb-a-button {
-      &:hover {
-        & > .ipb-icon { transform: scale(1.1);}
-        & ~ .ipb-a-button { opacity: 0.5; }
-      }
+      &:hover ~ .ipb-a-button { opacity: 0.5; }
 
-      &.ipb-edit {
+      &.ipb-a-button--extra {
         display: none;
         color: #FFFFFF;
         text-align: center;
@@ -267,7 +272,7 @@ export default {
           left: 22px;
         }
 
-        &.ipb-edit .ipb-bubble { right: auto; left: 4px; }
+        &.ipb-a-button--extra .ipb-bubble { right: auto; left: 4px; }
       }
     }
   }

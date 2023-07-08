@@ -16,12 +16,12 @@ const DEFAULT_SETTINGS = {
 }
 
 const DEFAULT_SETTING_EXTRA_BUTTONS = {
-  backToTop: false,
+  backToTop: true,
   firstCh: false,
   prevCh: false,
   curCh: false,
   nextCh: false,
-  latestCh: false,
+  latestCh: true,
   comment: true
 }
 

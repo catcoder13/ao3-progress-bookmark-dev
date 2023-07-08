@@ -166,10 +166,9 @@ export default {
       }
 
       span {
-        &:first-of-type {
-          padding-right: 8px;
-          word-wrap: break-word;
-        }
+        word-wrap: break-word;
+        
+        &:first-of-type { padding-right: 8px; }
 
         &.ipb-author {
           opacity: 0.7;

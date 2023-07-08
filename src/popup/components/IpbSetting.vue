@@ -10,26 +10,29 @@
       <div class="ipb-setting__option-group">
         <h3>In-page bookmark UI</h3>
         <div class="ipb-setting__option-group__item">
+          <h4>Side button/bookmark alignment</h4>
+          <div class="ipb-tab--custom">
+            <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
+            <span :class="{checked: settings.alignRight}" @click="settings.alignRight = true">Right</span>
+          </div>
+        </div>
+        
+        <div class="ipb-setting__option-group__item">
           <h4>Top chapter progress bar</h4>
           <IpbToggle v-model="settings.progressBar" />
         </div>
+        
         <div class="ipb-setting__option-group__item">
           <h4>Extra navigation buttons</h4>
           <IpbToggle v-model="settings.extraSideBtn" />
         </div>
+        
         <div class="ipb-setting__extra-btn" v-if="settings.extraSideBtn">
           <div v-for="(val, btnKey) in settingExtraBtn" :key="btnKey"
             :class="{checked: val}"
             @click="settingExtraBtn[btnKey] = !val">
               <IpbIcon v-bind="EXTRA_BUTTON_INFOS[btnKey].iconProps" :fill="val ? '#1c73b5' : '#777'"/>
               <span>{{ EXTRA_BUTTON_INFOS[btnKey].label }}</span>
-          </div>
-        </div>
-        <div class="ipb-setting__option-group__item">
-          <h4>Side button/bookmark alignment</h4>
-          <div class="ipb-tab--custom">
-            <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
-            <span :class="{checked: settings.alignRight}" @click="settings.alignRight = true">Right</span>
           </div>
         </div>
       </div>
