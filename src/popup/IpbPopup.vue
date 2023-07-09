@@ -190,13 +190,14 @@ $bg: #FFF;
 
     .ipb-popup__subhead__summary {
       button {
-        border: 1px solid #888888;
-        padding: 3px 8px;
+        border: 1px solid #888;
+        padding: 4px 8px;
         box-sizing: border-box;
         border-radius: 18px;
-        margin: 5px 0;
+        margin-top: 6px;
         cursor: pointer;
-        opacity: 0.5;
+        opacity: .5;
+        line-height: 1;
 
         &:hover { opacity: 1; }
       }

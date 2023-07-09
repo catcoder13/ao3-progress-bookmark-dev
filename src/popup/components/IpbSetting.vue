@@ -36,6 +36,8 @@
           </div>
         </div>
       </div>
+
+      <button class="ipb-setting__reset" @click="onResetSetting">Reset to default settings</button>
      
       <div class="ipb-setting__option-group">
         <h3>Bookmark data</h3>
@@ -43,7 +45,6 @@
         <div class="ipb-setting__option-group__item ipb-import">
           <h4>Import bookmark data</h4>
           <div>
-            <!-- <input type="file" @change="e => curFile = e.target.files[0]" required /> -->
             <input ref="inputFile" type="file" @change="e => curFile = e.target.files[0]" required />
             <button @click="importMsgOn = true">Import</button>
           </div>
@@ -58,8 +59,6 @@
           <button @click="deleteMsgOn = true">Delete</button>
         </div>
       </div>
-      
-      <button class="ipb-setting__reset" @click="onResetSetting">Reset to default settings</button>
     </div>
 
     <div v-if="importMsgOn" class="ipb-setting__overlay-msg">
@@ -282,8 +281,6 @@ export default {
       } // .ipb-setting__option-group__item
 
       .ipb-setting__extra-btn {
-        padding-bottom: 6px;
-
         & > * {
           display: inline-block;
           cursor: pointer;
@@ -366,7 +363,8 @@ export default {
     color: #FFF;
     line-height: 1;
     cursor: pointer;
-    padding: 3px 5px;
+    padding: 5px 8px;
+    margin-bottom: 15px;
 
     &:hover { background-color: #333; }
   }

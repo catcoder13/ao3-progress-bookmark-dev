@@ -10,8 +10,10 @@
   </div>
       
   <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPos">
+  <!-- <div class="ipb-navbar-info" :style="infoPos"> -->
     <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
     <div class="ipb-heading">
+      <!-- <IpbIcon /> -->
       <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI" />
       <b v-if="oneShot">{{name}}</b>
       <b v-else>Chapter {{ parseInt(approxChI) + 1 }}</b>
@@ -19,6 +21,7 @@
     
     <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ipb-title">{{ chapterInfos[approxChI].title }}</span>
 
+    <!-- <template> -->
     <template v-if="hoveredChI != null && !bmInProgress">
       <span class="ipb-desc" v-if="fullViewMode">
         <IpbIcon type="mouse" fill="#999"/>
@@ -28,12 +31,14 @@
         <IpbIcon type="visit" fill="#999"/>
         Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b>
       </span>
-      <span class="ipb-desc" v-else>Back to the top</span>
+      <span class="ipb-desc" v-else>Back to the beginning of this {{oneShot ? 'one-shot' : 'chapter'}}</span>
     </template>
   </div>
 
+  <!-- <div class="ipb-navbar-info ipb-navbar-info--short" :style="infoPos"> -->
   <div v-else-if="approxChI != null" class="ipb-navbar-info ipb-navbar-info--short" :style="infoPos">
-    <b class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
+    <b v-if="oneShot" class="ipb-heading">One-shot</b>
+    <b v-else class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
   </div>
 
   
@@ -116,7 +121,7 @@ export default {
     const infoPos = computed(() => {
       if (bmInProgress.value || approxChI.value == null) return null
       
-      const infoWidthOffset = hoveredChI.value == null ? 70 : 200
+      const infoWidthOffset = hoveredChI.value == null ? 60 : 200
       const xPosCorrect = mousePos.x + infoWidthOffset > navbarElem.width ? navbarElem.width - infoWidthOffset : mousePos.x
       return {top: `${mousePos.y + 22}px`, left: `${xPosCorrect}px`}
     })
@@ -247,6 +252,7 @@ export default {
   .ipb-heading {
     padding: 0;
     font-size: 10px;
+    min-width: 0;
   }
 } 
 
@@ -258,6 +264,7 @@ export default {
   font-size: 14px;
   transition: opacity 0.2s;
   max-width: 200px;
+  box-sizing: border-box;
   pointer-events: none;
   
   & > * { 
@@ -269,12 +276,17 @@ export default {
   .ipb-heading {
     font-size: 12px;
     line-height: 1;
-    padding-right: 100px;
-    padding-bottom: 2px;
+    min-width: 100px;
+    padding: 5px 0;
+    box-sizing: border-box;
+    color: #333;
+    
 
-    & > * { display: inline-block; vertical-align: middle;}
+    b { display: inline; }
 
-    .ipb-icon { width: 20px; height: 20px; }
+    & > * { vertical-align: middle;}
+
+    .ipb-icon { display: inline-block; width: 20px; height: 20px; }
   }
 
   .ipb-note {
@@ -290,6 +302,7 @@ export default {
   .ipb-title {
     font-size: 13px;
     color: #444;
+    padding-bottom: 5px;
   }
 
   .ipb-bm-note {

@@ -8,15 +8,16 @@
 
     <div class="ipb-record">
       <div class="ipb-record-content">
-        <p>
-          <button v-if="work.oneShot" :title="`One-shot: ${work.name}`" @click="() => visitURL(`/works/${work.id}?jumptobm`)">
-            <IpbIcon type="bookmark" fill="#555" />One-shot</button>
-          <button v-else :title="`Chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`" @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm`)">
-            <IpbIcon type="bookmark" fill="#555" />Chapter {{parseInt(work.chI) + 1}}</button>
-        </p>
-        <p>
-          <IpbIcon type="location" fill="#555" /><b>{{ (work.perc * 100).toFixed(2) }}%</b>
-      </p> 
+        <button v-if="work.oneShot" :title="`Visit ${percStr} of this one-shot`"
+          @click="() => visitURL(`/works/${work.id}?jumptobm`)">
+          One-shot<br/>
+          <IpbIcon type="location" fill="#555" /><b>{{ percStr }}</b>
+        </button>
+        <button v-else :title="`Visit ${percStr} of chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`"
+          @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm`)">
+          Chapter {{parseInt(work.chI) + 1}}<br/>
+          <IpbIcon type="location" fill="#555" /><b>{{ percStr }}</b>
+        </button>
       </div>
     </div>
 
@@ -27,6 +28,7 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { removeWork, visitURL } from '../js/works'
 import { settings } from '../js/setting'
 import { selectAuthor, selection } from '../js/search'
@@ -36,8 +38,10 @@ import IpbIcon from '@/common/IpbIcon.vue'
 export default {
   props: ['work'],
   components: {IpbIcon},
-  setup () {
-    return { removeWork, visitURL, settings, selectAuthor, selection } 
+  setup (p) {
+    const percStr = computed(() => (p.work.perc * 100).toFixed(2) + '%')
+
+    return { percStr, removeWork, visitURL, settings, selectAuthor, selection } 
   }
 }
 </script>
@@ -55,7 +59,7 @@ export default {
   
   .ipb-info {
     padding: 8px;
-    width: calc(100% - 135px);
+    width: calc(100% - 125px);
 
     h3 {
       font-family: Georgia, serif;
@@ -95,7 +99,7 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
-    width: 135px;
+    width: 125px;
     height: 100%;
     padding: 8px;
     padding-right: 20px;
@@ -107,35 +111,20 @@ export default {
       top: 50%;
       transform: translateY(-50%);
 
-      p {
-        font-size: 12px;
-        line-height: 1;
-        color: #555;
+      font-size: 12px;
+      line-height: 1;
+      color: #555;
 
-        .ipb-pretitle {
-          white-space: nowrap;
-        }
+      button {
+        padding: 4px 12px;
+        margin: 4px 0;
+        cursor: pointer;
+        border-radius: 12px;
+        border: 1px solid #888888;
 
-        button {
-          padding: 4px 12px;
-          margin: 4px 0;
-          cursor: pointer;
-          border-radius: 12px;
-          border: 1px solid #888888;
-
-          &:hover { filter: brightness(0.9); }
-          &:active { filter: brightness(0.95); }
-        }
+        &:hover { filter: brightness(0.9); }
+        &:active { filter: brightness(0.95); }
       }
-
-      .ipb-icon { vertical-align: bottom; }
-
-      b {
-        color: #444;
-        font-size: 12px;
-        line-height: 1;
-      }
-      
     }
   } // ipb-record
 
@@ -146,7 +135,7 @@ export default {
     top: 0;
     padding: 0;
     height: 100%;
-    width: 10px;
+    width: 12px;
     background-color: #666;
     opacity: 0.2;
     transition: opacity 0.2s;
@@ -155,7 +144,7 @@ export default {
     &:hover {
       transition: width 0.2s, opacity 0.2s;
       opacity: 1;
-      width: 13px;
+      width: 15px;
       background-color: red;
     }
 

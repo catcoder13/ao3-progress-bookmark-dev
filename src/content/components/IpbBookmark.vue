@@ -1,9 +1,17 @@
 <template>
 <div class="ipb-bookmark ipb-bookmark--static" :class="ipbBookmarkClass()" :style="{top: `${pos}px`}">
-  <div class="ipb-bookmark-content" @click="onMoveClick">
+  <div class="ipb-bookmark-content">
   
     <div class="ipb-bookmark__btn">
-      <button @click="removeBookmark" title="Remove this bookmark">Remove</button>
+      <div @click="removeBookmark" title="Remove this bookmark">
+        <IpbIcon fill="red" type="trash" />
+        <span>Remove bookmark</span>
+      </div>
+      <div @click="startBookmarkEdit" title="Change bookmark location">
+        <IpbIcon fill="#333" type="edit" />
+        <span>Move bookmark to a new position</span>
+      </div>
+      <!-- <button @click="removeBookmark" title="Remove this bookmark">Remove</button> -->
     </div>
 
     <div class="ipb-bookmark__icon">
@@ -33,10 +41,7 @@ export default {
       }
     }
 
-    const onMoveClick = e => {
-      startBookmarkEdit(e)
-    }
-    return {mainBM, pos, onMoveClick, removeBookmark, ipbBookmarkClass }
+    return {mainBM, pos, startBookmarkEdit, removeBookmark, ipbBookmarkClass }
   }
 }
 </script>
@@ -52,35 +57,28 @@ export default {
     pointer-events: none;
   }
 
-  &.highlight .ipb-bookmark-content .ipb-bookmark__icon {
-    animation: bookmarkScale 0.3s 4 alternate;
+  &.highlight .ipb-bookmark-content {
+    pointer-events: none;
 
-    .ipb-icon { opacity: 0.8; }
-  }
+    .ipb-bookmark__icon {
+      animation: bookmarkScale 0.3s 4 alternate;
+
+      .ipb-icon { opacity: 1; }
+    }
+  }  
 
   .ipb-bookmark-content {
-    .ipb-bookmark__icon {
-      .ipb-icon {
-        transition: transform 0.2s, opacity 0.2s;
-        opacity: 0.2;
-
-        &:hover {
-          transform: scale(1.2); 
-          opacity: 0.7;
-        }
-      }
-    }
+    .ipb-bookmark__btn { display: none; }
 
     &:hover {
-      .ipb-bookmark__info { display: block; }
-
-      .ipb-bookmark__btn {
-        display: block;
+      .ipb-bookmark__btn  > div:hover {
+        transition: transform 0.2s;
+        transform: scale(1.1);
       }
+
+      .ipb-bookmark__info { display: block; }
     }
   }
-
-  .ipb-bookmark__btn { display: none; }
 
   .ipb-bookmark__info { display: none; }
   

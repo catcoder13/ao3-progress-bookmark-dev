@@ -31,8 +31,7 @@
             <div class="ipb-bubble">Change bookmark location</div>
           </a>
           <a class="ipb-a-button ipb-a-button--extra" @click="removeBookmark">
-            <span>&#10006;</span>
-            <!-- <IpbIcon fill="#FFF" type="edit" /> -->
+            <IpbIcon fill="#FFF" type="trash" />
             <div class="ipb-bubble">Remove bookmark</div>
           </a>
         </template>

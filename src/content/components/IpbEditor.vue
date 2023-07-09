@@ -3,10 +3,11 @@
     <span class="ipb-bookmark__remark" v-if="editBM.invalid">Out of bookmark region</span>
     <div class="ipb-bookmark-content">
       <div class="ipb-bookmark__btn">
-        <button @click="stopBookmarkEdit">Cancel</button>
+        <div class="ipb-cancel" title="Cancel" @click="stopBookmarkEdit">&#10006;</div>
+        <div v-if="!editBM.invalid" class="ipb-confirm" title="Confirm" @click="onUpdateBookmark">&#10003;</div>
       </div>
 
-      <div class="ipb-bookmark__icon" @click="onUpdateBookmark">
+      <div class="ipb-bookmark__icon">
         <IpbIcon type="location"></IpbIcon>
       </div>
 
@@ -102,7 +103,7 @@ export default {
   &.outOfRange {
     .ipb-bookmark__icon {
       cursor: not-allowed;
-      opacity: 0.5;
+      // opacity: 0.5;
     }
   }
 
@@ -123,28 +124,38 @@ export default {
 
   .ipb-bookmark-content {
     pointer-events: all;
-  }
 
-  .ipb-bookmark__icon {
-    cursor: pointer;
+    .ipb-bookmark__btn {
+      & > div {
+        line-height: 25px;
+        font-size: 22px;
+        font-weight: bold;
+        color: grey;
 
-    .ipb-icon { animation: bookmarkHighlight 0.5s infinite alternate; }
-  }
-
-  .ipb-bookmark__btn &:hover  ~ .ipb-bookmark__icon .ipb-icon {
-    opacity: 0.3;
-    animation: none;
-  }
-
-  .ipb-bookmark__info {
-    text-align: right;
-    
-    span {
-      display: block;
-      white-space: nowrap;
-
-      &:first-child:not(:only-child) { padding-bottom: 2px; }
+        &:hover {
+          transition: font-size 0.2s;
+          font-size: 26px; 
+          color: #333;
+        }
+      }
+      
     }
-  }
+
+    .ipb-bookmark__icon { opacity: 0.2; }
+    // .ipb-bookmark__icon .ipb-icon { animation: bookmarkHighlight 0.5s infinite alternate; }
+
+    .ipb-bookmark__info {
+      text-align: right;
+      
+      span {
+        display: block;
+        white-space: nowrap;
+
+        &:first-child:not(:only-child) { padding-bottom: 2px; }
+      }
+    }
+  } // ipb-bookmark-content
+
+  
 } // ipb-bookmark
 </style>
