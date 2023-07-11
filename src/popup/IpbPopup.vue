@@ -126,7 +126,7 @@ $bg: #FFF;
     font-size: 18px;
     line-height: 1;
     font-family: Georgia, serif;
-    padding: 15px 0;
+    padding: 10px 0;
     color: #FFF;
     text-align: center;
     // background: linear-gradient(to bottom, #4c0000 0%, transparent);

@@ -52,7 +52,7 @@ const stopBookmarkEdit = () => {
 
 const startBookmarkEdit = (e, chapters) => {
   if (mainBM.chI == null && !withinBookmarkLimit.value) {
-    console.warn(`[AO3 IPB] Reached bookmark limit! Maximum bookmark: ${BOOKMARK_LIMIT}`)
+    // console.warn(`[AO3 IPB] Reached bookmark limit! Maximum bookmark: ${BOOKMARK_LIMIT}`)
     return
   }
 

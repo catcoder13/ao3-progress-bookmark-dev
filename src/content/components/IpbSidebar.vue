@@ -7,8 +7,8 @@
             <IpbIcon fill="#FFF" type="add" />
               <div class="ipb-bubble">
                 <template  v-if="!withinBookmarkLimit">
-                  <span>You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
-                  Try to delete some of the existing bookmark to free out more space for new bookmark.</span>
+                  <b>You had reached bookmark limit ({{ BOOKMARK_LIMIT }}).</b>
+                  <span>Try to remove some existing bookmarks to free out more space for new bookmark.</span>
                 </template>
                 <template v-else>Add a new bookmark</template>
               </div>
@@ -172,11 +172,29 @@ export default {
       }
     }
 
+    &.exceed {
+      background-color: #bfbfbf;
+      cursor: not-allowed;
+
+      &:active::before { opacity: 0; }
+
+      .ipb-bubble {
+        white-space: normal;
+        width: 250px;
+
+        & > * { display: inline-block; }
+        
+        b { color: red; padding-bottom: 5px; }
+      }
+    }
+    
+
     & > .ipb-icon {
       transition: transform 0.2s;
       width: 100%;
       height: 100%;
     }
+    
 
     .ipb-bubble {
       display: none;
@@ -186,13 +204,14 @@ export default {
       background-color: #ddd;
       bottom: 0;
       transform: translateY(calc(100% + 5px));
-      right: 22px;
+      right: 24px;
       pointer-events: none;
       font-size: 11px;
       color: #333;
       line-height: 1;
       text-align: left;
       white-space: nowrap;
+      box-shadow: 1px 1px 2px #999;
     }
   }
 
@@ -257,7 +276,7 @@ export default {
 
       .ipb-bubble {
         right: auto;
-        left: 22px;
+        left: 24px;
       }
     }
 
@@ -267,7 +286,7 @@ export default {
       & > a.ipb-a-button {
         .ipb-bubble {
           right: auto;
-          left: 22px;
+          left: 24px;
         }
 
         &.ipb-a-button--extra .ipb-bubble { right: auto; left: 4px; }

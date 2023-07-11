@@ -41,7 +41,7 @@ if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
   console.warn('url not match, workID not found')
 }
 
-console.log(fullViewMode, jumpToBMOnLoad, workID, name, author, authorURL)
+// console.log(fullViewMode, jumpToBMOnLoad, workID, name, author, authorURL)
 
 const chapterListElem = document.getElementById('selected_id')
 let chapterInfos = null 

@@ -169,7 +169,7 @@ export default {
     position: absolute;
     z-index: 1;
     right: 10px;
-    top: 10px;
+    top: 5px;
     width: 27px;
     height: 27px;
     border-radius: 50%;
