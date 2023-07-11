@@ -11,7 +11,6 @@
         <IpbIcon type="location"></IpbIcon>
       </div>
 
-      
       <div class="ipb-bookmark__info" v-if="!editBM.invalid">
         <template v-if="mainBM.chI != null">
           <span :style="{opacity: 0.6}">Old bookmark: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
@@ -103,7 +102,6 @@ export default {
   &.outOfRange {
     .ipb-bookmark__icon {
       cursor: not-allowed;
-      // opacity: 0.5;
     }
   }
 
@@ -141,8 +139,7 @@ export default {
       
     }
 
-    .ipb-bookmark__icon { opacity: 0.2; }
-    // .ipb-bookmark__icon .ipb-icon { animation: bookmarkHighlight 0.5s infinite alternate; }
+    .ipb-bookmark__icon { opacity: 0.5; }
 
     .ipb-bookmark__info {
       text-align: right;

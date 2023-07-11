@@ -1,7 +1,8 @@
 <template>
   <div class="ipb-popup">
-    <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
-    <h1 class="ipb-popup__title">AO3 In-page Bookmark</h1>
+    <!-- <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button> -->
+    <h1 class="ipb-popup__title">AO3 Progress Bookmark</h1>
+    <!-- <h1 class="ipb-popup__title">&nbsp;</h1> -->
     <IpbSearch />
     
     <div class="ipb-popup__filter">
@@ -125,10 +126,11 @@ $bg: #FFF;
     font-size: 18px;
     line-height: 1;
     font-family: Georgia, serif;
-    padding: 10px 0 20px;
+    padding: 15px 0;
     color: #FFF;
     text-align: center;
-    background: linear-gradient(to bottom, #4c0000 0%, transparent);
+    // background: linear-gradient(to bottom, #4c0000 0%, transparent);
+    background: linear-gradient(to bottom, transparent 0%, #4c0000 100%);
   }
 
   .ipb-sortby {

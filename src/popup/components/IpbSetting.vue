@@ -8,7 +8,7 @@
     <div class="ipb-style-scrollbar">
       <h2>Settings</h2>
       <div class="ipb-setting__option-group">
-        <h3>In-page bookmark UI</h3>
+        <h3>User Interface</h3>
         <div class="ipb-setting__option-group__item">
           <h4>Side button/bookmark alignment</h4>
           <div class="ipb-tab--custom">
@@ -18,7 +18,7 @@
         </div>
         
         <div class="ipb-setting__option-group__item">
-          <h4>Top chapter progress bar</h4>
+          <h4>Chapter progress bar</h4>
           <IpbToggle v-model="settings.progressBar" />
         </div>
         
@@ -27,10 +27,10 @@
           <IpbToggle v-model="settings.extraSideBtn" />
         </div>
         
-        <div class="ipb-setting__extra-btn" v-if="settings.extraSideBtn">
+        <div class="ipb-setting__extra-btn" :class="{enabled: settings.extraSideBtn}">
           <div v-for="(val, btnKey) in settingExtraBtn" :key="btnKey"
             :class="{checked: val}"
-            @click="settingExtraBtn[btnKey] = !val">
+            @click="() => onExtraBtnClick(btnKey, !val)">
               <IpbIcon v-bind="EXTRA_BUTTON_INFOS[btnKey].iconProps" :fill="val ? '#1c73b5' : '#777'"/>
               <span>{{ EXTRA_BUTTON_INFOS[btnKey].label }}</span>
           </div>
@@ -128,10 +128,16 @@ export default {
       toggle.value = false
     }
 
+    const onExtraBtnClick = (btnKey, newVal) => {
+      if (!settings.extraSideBtn) return
+
+      settingExtraBtn[btnKey] = newVal
+    }
+
     return {
       inputFile,
       deleteMsgOn, onDeleteAllBookmarkData,
-      curFile, importMsgOn, onImportBookmarkData, importComplete,
+      curFile, importMsgOn, onImportBookmarkData, importComplete, onExtraBtnClick,
       toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS,
       downloadData, onResetSetting
     }
@@ -156,11 +162,7 @@ export default {
     
     .ipb-style-scrollbar { transform: translateX(0); }
 
-    .ipb-setting__entry {
-      // line { stroke: #333; }
-
-      &:hover { background-color: rgba(#FFF, 0.8); }
-    }
+    .ipb-setting__entry :hover { background-color: rgba(#FFF, 0.8); }
   }
 
   .ipb-setting__entry {
@@ -189,8 +191,6 @@ export default {
       width: 25px;
       height: 25px;
     }
-
-    // line { transition: stroke 0.2s; }
 
     &:hover { background-color: rgba(#FFF, 0.1); }
   }
@@ -281,20 +281,30 @@ export default {
       } // .ipb-setting__option-group__item
 
       .ipb-setting__extra-btn {
+        opacity: 0.5;
+        cursor: not-allowed;
+        
+        &.enabled {
+          opacity: 1;
+          cursor: default;
+
+          & > * {
+            cursor: pointer;
+            &:hover { opacity: 1; }
+          }
+        }
         & > * {
           display: inline-block;
-          cursor: pointer;
+          cursor: not-allowed;
           padding: 3px 6px;
           line-height: 1;
           font-size: 11px;
-          opacity: 0.7;
+          opacity: 0.6;
           color: #777;
           border: 1px solid #777;
           border-radius: 12px;
           margin-bottom: 5px;
           margin-right: 5px;
-
-          &:hover { opacity: 1; }
 
           &.checked { 
             opacity: 1;
@@ -374,7 +384,7 @@ export default {
   display: flex;
 
   span {
-    background-color: $btn_blue;
+    background-color: $ao3_red;
     color: #FFF;
     padding: 5px 10px;
     line-height: 1;

@@ -55,7 +55,7 @@ const initStoreData = () => {
       workIDs.value = workIDArr
     }
     
-    console.log(obj)
+    // console.log(obj)
   })
 }
 initStoreData()

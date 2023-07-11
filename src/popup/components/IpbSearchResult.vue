@@ -12,7 +12,7 @@
             <IpbIcon v-else type="author" fill="#84b4e7" />
             <span>
               {{ item.text }}
-              {{ item.i }}
+              <!-- {{ item.i }} -->
             </span>
             <span class="ipb-author" v-if="item.type === 'work'">by {{ item.works[item.val].author }}</span>
           </button>

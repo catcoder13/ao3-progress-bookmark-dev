@@ -50,7 +50,7 @@ const removeAllWorks = cb => {
       ...workIDs.map(workID => STORE_WORK_KEY_PREFIX + workID),
       STORE_ALL_WORK_KEYS
     ]).then(res => {
-      console.log('removed complete in store', res)
+      // console.log('removed complete in store', res)
       workIDs.forEach(workID => delete works[workID])
 
       if (cb) cb()

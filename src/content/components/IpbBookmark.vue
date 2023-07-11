@@ -11,11 +11,10 @@
         <IpbIcon fill="#333" type="edit" />
         <span>Move bookmark to a new position</span>
       </div>
-      <!-- <button @click="removeBookmark" title="Remove this bookmark">Remove</button> -->
     </div>
 
     <div class="ipb-bookmark__icon">
-      <IpbIcon type="location"></IpbIcon>
+      <IpbIcon type="location" fill=""></IpbIcon>
     </div>
 
     <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>  
@@ -55,6 +54,8 @@ export default {
 
   &.bmInProgress.ipb-bookmark > * {
     pointer-events: none;
+
+    .ipb-icon path { fill: grey; }
   }
 
   &.highlight .ipb-bookmark-content {
@@ -68,6 +69,7 @@ export default {
   }  
 
   .ipb-bookmark-content {
+    .ipb-bookmark__icon .ipb-icon { fill: $ao3_red; }
     .ipb-bookmark__btn { display: none; }
 
     &:hover {

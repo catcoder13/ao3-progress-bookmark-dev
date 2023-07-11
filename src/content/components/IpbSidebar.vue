@@ -7,8 +7,8 @@
             <IpbIcon fill="#FFF" type="add" />
               <div class="ipb-bubble">
                 <template  v-if="!withinBookmarkLimit">
-                  You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
-                  Try to delete some of the existing bookmark to free out more space for new bookmark.
+                  <span>You had reached bookmark limit {{ BOOKMARK_LIMIT }}.<br />
+                  Try to delete some of the existing bookmark to free out more space for new bookmark.</span>
                 </template>
                 <template v-else>Add a new bookmark</template>
               </div>
@@ -76,7 +76,6 @@ export default {
 
     const bmInOtherPage = computed(() => !fullViewMode && mainBM.chI != curChI.value)
 
-    // let countDownInt = null
     const jumpToBM = () => {
       jumpToBookmark(chapters, curChI)
     }
@@ -211,7 +210,7 @@ export default {
     }
 
     a.ipb-a-button {
-      &:hover ~ .ipb-a-button { opacity: 0.5; }
+      &:hover ~ .ipb-a-button { opacity: 0.75; }
 
       &.ipb-a-button--extra {
         display: none;

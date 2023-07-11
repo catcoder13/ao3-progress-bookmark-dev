@@ -8,15 +8,15 @@
 
     <div class="ipb-record">
       <div class="ipb-record-content">
-        <button v-if="work.oneShot" :title="`Visit ${percStr} of this one-shot`"
+        <button v-if="work.oneShot" :title="`Visit one-shot (${percStr})`"
           @click="() => visitURL(`/works/${work.id}?jumptobm`)">
-          One-shot<br/>
-          <IpbIcon type="location" fill="#555" /><b>{{ percStr }}</b>
+          <b>One-shot</b><br/>
+          <IpbIcon type="location" fill="#555" /><span>{{ percStr }}</span>
         </button>
-        <button v-else :title="`Visit ${percStr} of chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''}`"
+        <button v-else :title="`Visit chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''} (${percStr})`"
           @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm`)">
-          Chapter {{parseInt(work.chI) + 1}}<br/>
-          <IpbIcon type="location" fill="#555" /><b>{{ percStr }}</b>
+          <b>Chapter {{parseInt(work.chI) + 1}}</b><br/>
+          <IpbIcon type="location" fill="#555" /><span>{{ percStr }}</span>
         </button>
       </div>
     </div>
@@ -59,7 +59,7 @@ export default {
   
   .ipb-info {
     padding: 8px;
-    width: calc(100% - 125px);
+    width: calc(100% - 135px);
 
     h3 {
       font-family: Georgia, serif;
@@ -99,7 +99,7 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
-    width: 125px;
+    width: 135px;
     height: 100%;
     padding: 8px;
     padding-right: 20px;
@@ -116,11 +116,27 @@ export default {
       color: #555;
 
       button {
-        padding: 4px 12px;
+        padding: 4px 8px;
         margin: 4px 0;
         cursor: pointer;
         border-radius: 12px;
         border: 1px solid #888888;
+        width: 110px;
+        box-sizing: border-box;
+
+        b {
+          display: inline-block;
+          width: 100%;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: 13px;
+          line-height: 1;
+          overflow: hidden;
+        }
+
+        span {
+          font-size: 12px;
+        }
 
         &:hover { filter: brightness(0.9); }
         &:active { filter: brightness(0.95); }

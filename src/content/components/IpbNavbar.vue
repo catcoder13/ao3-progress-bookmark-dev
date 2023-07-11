@@ -10,10 +10,8 @@
   </div>
       
   <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPos">
-  <!-- <div class="ipb-navbar-info" :style="infoPos"> -->
     <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
     <div class="ipb-heading">
-      <!-- <IpbIcon /> -->
       <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI" />
       <b v-if="oneShot">{{name}}</b>
       <b v-else>Chapter {{ parseInt(approxChI) + 1 }}</b>
@@ -21,7 +19,6 @@
     
     <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ipb-title">{{ chapterInfos[approxChI].title }}</span>
 
-    <!-- <template> -->
     <template v-if="hoveredChI != null && !bmInProgress">
       <span class="ipb-desc" v-if="fullViewMode">
         <IpbIcon type="mouse" fill="#999"/>
@@ -31,11 +28,13 @@
         <IpbIcon type="visit" fill="#999"/>
         Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b>
       </span>
-      <span class="ipb-desc" v-else>Back to the beginning of this {{oneShot ? 'one-shot' : 'chapter'}}</span>
+      <span class="ipb-desc" v-else>
+        <IpbIcon type="mouse" fill="#999"/>
+        Back to the beginning of this {{oneShot ? 'one-shot' : 'chapter'}}
+      </span>
     </template>
   </div>
 
-  <!-- <div class="ipb-navbar-info ipb-navbar-info--short" :style="infoPos"> -->
   <div v-else-if="approxChI != null" class="ipb-navbar-info ipb-navbar-info--short" :style="infoPos">
     <b v-if="oneShot" class="ipb-heading">One-shot</b>
     <b v-else class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
@@ -55,6 +54,7 @@ import { scrollY, activateScroll, deactivateScroll } from '../js/scroll'
 
 import IpbIcon from '@/common/IpbIcon.vue'
 
+const TOOLTIP_RANGE_Y = 40
 export default {
   name: 'IpbNavbar',
   components: { IpbIcon },
@@ -106,12 +106,12 @@ export default {
       if (hoveredChI.value != null) return hoveredChI.value
       
       if (stucked.value) {
-        if (mousePos.y > 70 || mousePos.y < 0) return null
+        if (mousePos.y > TOOLTIP_RANGE_Y || mousePos.y < 0) return null
       } else {
         if (mousePos.x < navbarElem.left || mousePos.x > navbarElem.left + navbarElem.width) return null
         
         const mousePosY = scrollY.value + mousePos.y
-        if (mousePosY > navbarElem.top + 70 || mousePosY < navbarElem.top) return null
+        if (mousePosY > navbarElem.top + TOOLTIP_RANGE_Y || mousePosY < navbarElem.top) return null
       }
 
       const mousePosX = Math.max(0, mousePos.x - navbarElem.left)
@@ -188,7 +188,6 @@ export default {
       opacity: 1;
 
       &:not(:only-child).ipb-current {
-      // &:not(.ipb-one-chapter-only).ipb-current {
         height: 8px;
 
         &.ipb-focus { height: 17px; }

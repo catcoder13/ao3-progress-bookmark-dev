@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AO3 In-page Bookmark",
+  "name": "AO3 Progress Bookmark",
   "version": "0.1.0",
-  "description": "Enhance in-page navigating experience on AO3's work page with in-page bookmark, chapter progress bar, and more.",
+  "description": "Bookmarking AO3's works precisely at the page scroll position.",
   "icons":  {
     "128": "imgs/ipb.png",
     "32": "imgs/ipb32.png"
@@ -20,6 +20,10 @@
       "matches": [
         "https://archiveofourown.org/works/*",
         "https://archiveofourown.org/chapters/*"
+      ],
+      "exclude_matches": [
+        "https://archiveofourown.org/works",
+        "https://archiveofourown.org/works/search*"
       ],
       "css": ["css/content.css"],
       "js": ["js/chunk-vendors.js", "js/content.js"]
