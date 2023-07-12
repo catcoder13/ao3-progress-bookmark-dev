@@ -82,7 +82,8 @@ export default {
 
     const jumpToBookmarkHref = computed(() => {
       if (!fullViewMode && mainBM.chI != null &&  mainBM.chI != curChI.value) {
-        return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}#chapter-${parseInt(mainBM.chI) + 1}?jumptobm`
+        // return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}#chapter-${parseInt(mainBM.chI) + 1}?jumptobm`
+        return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}?jumptobm`
       }
 
       return null

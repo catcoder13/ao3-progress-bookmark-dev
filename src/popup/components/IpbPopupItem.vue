@@ -14,7 +14,8 @@
           <IpbIcon type="location" fill="#555" /><span>{{ percStr }}</span>
         </button>
         <button v-else :title="`Visit chapter ${parseInt(work.chI) + 1}${work.chTitle ? `: ${work.chTitle}` : ''} (${percStr})`"
-          @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm`)">
+          @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}?jumptobm`)">
+          <!-- @click="() => visitURL(`/works/${work.id}/chapters/${work.chID}#chapter-${parseInt(work.chI) + 1}?jumptobm`)"> -->
           <b>Chapter {{parseInt(work.chI) + 1}}</b><br/>
           <IpbIcon type="location" fill="#555" /><span>{{ percStr }}</span>
         </button>

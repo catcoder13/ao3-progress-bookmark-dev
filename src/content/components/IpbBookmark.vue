@@ -55,7 +55,7 @@ export default {
   &.bmInProgress.ipb-bookmark > * {
     pointer-events: none;
 
-    .ipb-icon path { fill: grey; }
+    .ipb-icon path { fill: #333; }
   }
 
   &.highlight .ipb-bookmark-content {

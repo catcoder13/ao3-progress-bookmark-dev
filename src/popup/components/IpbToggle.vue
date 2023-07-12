@@ -1,5 +1,5 @@
 <template>
-  <label class="ipb-toggle">
+  <label class="ipb-toggle" :class="{checked: modelValue}">
     <input type="checkbox" :checked="modelValue" @input="onChange"/>
     <span></span>
   </label>

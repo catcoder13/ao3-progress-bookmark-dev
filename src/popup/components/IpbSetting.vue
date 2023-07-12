@@ -6,25 +6,25 @@
     </div>
     
     <div class="ipb-style-scrollbar">
-      <h2>Settings</h2>
+      <h1>Settings</h1>
       <div class="ipb-setting__option-group">
-        <h3>User Interface</h3>
+        <h2>User Interface</h2>
         <div class="ipb-setting__option-group__item">
-          <h4>Side button/bookmark alignment</h4>
           <div class="ipb-tab--custom">
             <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
             <span :class="{checked: settings.alignRight}" @click="settings.alignRight = true">Right</span>
           </div>
+          <h3>Side button/bookmark alignment</h3>
         </div>
         
         <div class="ipb-setting__option-group__item">
-          <h4>Chapter progress bar</h4>
           <IpbToggle v-model="settings.progressBar" />
+          <h3>Chapter progress bar</h3>
         </div>
         
         <div class="ipb-setting__option-group__item">
-          <h4>Extra navigation buttons</h4>
           <IpbToggle v-model="settings.extraSideBtn" />
+          <h3>Extra navigation buttons</h3>
         </div>
         
         <div class="ipb-setting__extra-btn" :class="{enabled: settings.extraSideBtn}">
@@ -40,29 +40,31 @@
       <button class="ipb-setting__reset" @click="onResetSetting">Reset to default settings</button>
      
       <div class="ipb-setting__option-group">
-        <h3>Bookmark data</h3>
-
-        <div class="ipb-setting__option-group__item ipb-import">
-          <h4>Import bookmark data</h4>
-          <div>
-            <input ref="inputFile" type="file" @change="e => curFile = e.target.files[0]" required />
-            <button @click="importMsgOn = true">Import</button>
-          </div>
+        <h2>Bookmark data</h2>
+        <div class="ipb-setting__option-group__item">
+          <input ref="inputFile" type="file" accept=".json" @change="e => curFile = e.target.files[0]" required />
+          <h3>Import bookmark data</h3>
         </div>
 
         <div class="ipb-setting__option-group__item">
-          <h4>Download bookmark data</h4>
           <button @click="downloadData">Download</button>
+          <h3>Download bookmark data</h3>
         </div>
+
         <div class="ipb-setting__option-group__item ipb-delete">
-          <h4>Delete all bookmarks</h4>
           <button @click="deleteMsgOn = true">Delete</button>
+          <h3>Delete all bookmarks</h3>
         </div>
+      </div>
+
+      <div class="ipb-setting__option-group">
+        <h2>Q & A</h2>
+        <IpbQA v-for="([q, ans, extra], i) in Q_A" :key="i" :q="q" :ans="ans" :extra="extra" />
       </div>
     </div>
 
-    <div v-if="importMsgOn" class="ipb-setting__overlay-msg">
-      <IpbFileSummary :file="curFile" @complete="importComplete" @cancel="importMsgOn = false"/>
+    <div v-if="curFile" class="ipb-setting__overlay-msg">
+      <IpbFileSummary :file="curFile" @complete="importComplete" @cancel="onClearImport"/>
     </div>
 
     <div v-if="deleteMsgOn" class="ipb-setting__overlay-msg">
@@ -84,16 +86,44 @@
 import {ref} from 'vue'
 import { settings, settingExtraBtn, onResetSetting } from '../js/setting'
 import { downloadData } from '../js/data'
-import { EXTRA_BUTTON_INFOS } from '@/common/variables'
+import { EXTRA_BUTTON_INFOS, BOOKMARK_LIMIT } from '@/common/variables'
 import { removeAllWorks } from '../js/works'
 
 import IpbToggle from './IpbToggle.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
 import IpbFileSummary from './IpbFileSummary.vue'
+import IpbQA from './IpbQA.vue'
 
-
+const Q_A = [
+  [
+    "Where are the bookmark data stored?",
+    "Bookmark data is stored locally within the memory space allocated to your browser profile."
+  ],
+  [
+    "What happen when I switch to a different browser profile?",
+    "If you switch to a different browser profile (logging into the browser with a different browser account), you won't be able to access the bookmark records that are created by the old browser profile."
+  ],
+  [
+    "How do I migrate my bookmark data to a different browser profile?",
+    "To migrate your bookmark data to a new browser profile, follow these steps:",
+    [
+      "Download the bookmark data (it will be a .json file)",
+      "Switch to the desired browser profile",
+      "Import the .json file",
+      "Bookmark datas will now be accessible on the new profile"
+    ]
+  ],
+  [
+    "What happen to existing bookmarks when importing bookmark data from a .json file?",
+    "All old bookmarks will be removed before importing new datas."
+  ],
+  [
+    `What happen when I reach the maximum bookmark limit (${BOOKMARK_LIMIT} bookmark records)?`,
+    "You will not be able to add any new bookmark. To add new bookmark, you are required to delete existing bookmarks to free out more space."
+  ]
+]
 export default {
-  components: { IpbToggle, IpbIcon, IpbFileSummary },
+  components: { IpbToggle, IpbIcon, IpbFileSummary, IpbQA },
   setup() {
     const toggle = ref(false)
 
@@ -114,19 +144,19 @@ export default {
       deleteMsgOn.value = false
     }
 
-    const importMsgOn = ref(false)
     const curFile = ref(null)
-
-    const onImportBookmarkData = () => {
-      importMsgOn.value = false
+    
+    const onClearImport = () => {
+      inputFile.value.value = null
+      curFile.value = null
     }
 
     const importComplete = () => {
-      curFile.value = null
-      inputFile.value.value = null
-      importMsgOn.value = false
+      onClearImport()
       toggle.value = false
     }
+
+    
 
     const onExtraBtnClick = (btnKey, newVal) => {
       if (!settings.extraSideBtn) return
@@ -137,9 +167,9 @@ export default {
     return {
       inputFile,
       deleteMsgOn, onDeleteAllBookmarkData,
-      curFile, importMsgOn, onImportBookmarkData, importComplete, onExtraBtnClick,
+      curFile, importComplete, onClearImport, onExtraBtnClick,
       toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS,
-      downloadData, onResetSetting
+      downloadData, onResetSetting, Q_A
     }
   }
 }
@@ -162,7 +192,7 @@ export default {
     
     .ipb-style-scrollbar { transform: translateX(0); }
 
-    .ipb-setting__entry :hover { background-color: rgba(#FFF, 0.8); }
+    .ipb-setting__entry:hover { background-color: rgba(#FFF, 0.8); }
   }
 
   .ipb-setting__entry {
@@ -181,8 +211,7 @@ export default {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-
-      line-height: 1;
+      line-height: 21px;
       font-size: 20px;
       color: #666;
     }
@@ -195,9 +224,9 @@ export default {
     &:hover { background-color: rgba(#FFF, 0.1); }
   }
 
-  h2 {
+  h1 {
     font-family: Georgia, serif;
-    font-size: 22px;
+    font-size: 24px;
     line-height: 1;
     margin-bottom: 15px;
   }
@@ -207,33 +236,48 @@ export default {
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 280px;
+    max-width: 370px;
     height: 100%;
     background-color: #eee;
     transform: translateX(100%);
     transition: transform 0.3s;
-    padding: 10px;
+    padding: 15px;
     box-sizing: border-box;
     overflow-y: scroll;
 
     .ipb-setting__option-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
 
-      h3 {
+      h2 {
         font-weight: bold;
         margin-bottom: 10px;
+        border-bottom: 1px solid #333;
+      }
+
+      p {
+        margin-bottom: 10px;
+        color: #666;
       }
 
       .ipb-setting__option-group__item {
         display: flex;
+        flex-direction: row-reverse;
         align-items: center;
         justify-content: space-between;
-        padding-bottom: 6px;
+        margin-bottom: 10px;
+
+        .ipb-toggle ~ h3 { opacity: 0.3; }
+        .ipb-toggle.checked ~ h3 { opacity: 1; }
+
+        h3 {
+          font-weight: bold;
+          font-size: 13px;
+        }
 
         button {
           border: 1px solid #777;
           cursor: pointer;
-          padding: 3px 5px;
+          padding: 5px 8px;
           line-height: 1;
           color: #FFF;
           background-color: #666;
@@ -251,32 +295,10 @@ export default {
           }
         }
 
-        &.ipb-import {
-          display: block;
+        input[type=file] {
           font-size: 12px;
-
-          h4 { margin-bottom: 5px; }
-
-          & > div {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-
-            input[type=file] {
-              font-size: 12px;
-              width: 170px;
-              cursor: pointer;
-              
-              &:invalid ~ button {
-                opacity: 0.5;
-                pointer-events: none;
-                cursor: default;
-                color: #333;
-                background-color: transparent;
-              }
-            }
-          }
-          
+          width: 162px;
+          cursor: pointer;
         }
       } // .ipb-setting__option-group__item
 
@@ -311,6 +333,7 @@ export default {
             border: 1px solid $btn_blue;
             color: $btn_blue;
             font-weight: bold;
+            font-size: 10px;
           }
 
           
@@ -373,8 +396,9 @@ export default {
     color: #FFF;
     line-height: 1;
     cursor: pointer;
-    padding: 5px 8px;
-    margin-bottom: 15px;
+    padding: 6px 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
 
     &:hover { background-color: #333; }
   }
@@ -386,7 +410,7 @@ export default {
   span {
     background-color: $ao3_red;
     color: #FFF;
-    padding: 5px 10px;
+    padding: 6px 12px;
     line-height: 1;
     cursor: pointer;
     opacity: 0.3;

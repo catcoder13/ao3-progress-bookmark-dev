@@ -8,8 +8,9 @@
             @mousemove="() => onNewItemHover(item)"
             @click="$emit('select', $event, item)"
             class="ipb-search-blur-ref" :class="{current: hoverredItem.i === item.i, [item.type]: true}" >
-            <IpbIcon v-if="item.type === 'work'" fill="#888" />
-            <IpbIcon v-else type="author" fill="#84b4e7" />
+            <!-- <IpbIcon v-if="item.type === 'work'" fill="#888" /> -->
+            <IpbIcon v-if="item.type === 'author'" type="author" fill="#84b4e7" />
+            <!-- <IpbIcon v-else type="author" fill="#84b4e7" /> -->
             <span>
               {{ item.text }}
               <!-- {{ item.i }} -->
@@ -134,22 +135,17 @@ export default {
     button {
       position: relative;
       text-align: left;
-      padding: 5px 10px 5px 20px;
+      padding: 5px 7px;
       background-color: #FFF;
       cursor: pointer;
       color: #555;
 
       & > * {
         line-height: 1;
-        vertical-align: middle;
+        vertical-align: bottom;
       }
 
-      .ipb-icon {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        left: 5px;
-      }
+      .ipb-icon { padding-right: 2px; }
 
       // &:nth-child(2n+1) {
       //   background-color: #eee;
