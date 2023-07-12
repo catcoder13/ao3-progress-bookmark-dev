@@ -149,16 +149,15 @@ export default {
 
 .ipb-sidebar {
   display: flex;
-  gap: 5px;
+  gap: 3px;
   flex-direction: column;
   align-items: flex-end;
 
   a.ipb-a-button {
     position: relative;
     background-color: $ao3_red;
-    width: 24px;
-    height: 24px;
-    padding: 3px;
+    width: 23px;
+    height: 23px;
     box-sizing: border-box;
     opacity: 0.5;
     border-top-left-radius: 3px;
@@ -192,8 +191,12 @@ export default {
 
     & > .ipb-icon {
       transition: transform 0.2s;
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 6px);
+      height: calc(100% - 6px);
     }
     
 

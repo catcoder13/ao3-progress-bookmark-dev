@@ -3,7 +3,7 @@
     <input type="text" :value="selection && selection.text" :style="{opacity: partialText ? 0 : (open ? 0.5 : 1)}"/>
     <input class="ipb-search_main" ref="input" type="text" :value="partialText"
       @input="onInput"
-      :placeholder="selection ? '' : 'Search by author name or work title'"
+      :placeholder="selection ? '' : 'Search bookmark items by author name or work title'"
       @focus="onFocus"
       @blur="onBlur"
       @keydown="onKeyDown"

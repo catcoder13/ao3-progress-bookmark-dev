@@ -23,7 +23,12 @@
       ],
       "exclude_matches": [
         "https://archiveofourown.org/works",
-        "https://archiveofourown.org/works/search*"
+        "https://archiveofourown.org/works/search*",
+        "https://archiveofourown.org/works/*/comments",
+        "https://archiveofourown.org/works/*/edit*",
+        "https://archiveofourown.org/works/*/chapters/new",
+        "https://archiveofourown.org/works/*/chapters/manage",
+        "https://archiveofourown.org/works/*/chapters/comments"
       ],
       "css": ["css/content.css"],
       "js": ["js/chunk-vendors.js", "js/content.js"]

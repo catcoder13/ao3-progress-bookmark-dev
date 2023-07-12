@@ -14,7 +14,7 @@
             <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
             <span :class="{checked: settings.alignRight}" @click="settings.alignRight = true">Right</span>
           </div>
-          <h3>Side button/bookmark alignment</h3>
+          <h3>Buttons/bookmark alignment</h3>
         </div>
         
         <div class="ipb-setting__option-group__item">
@@ -97,7 +97,7 @@ import IpbQA from './IpbQA.vue'
 const Q_A = [
   [
     "Where are the bookmark data stored?",
-    "Bookmark data is stored locally within the memory space allocated to your browser profile."
+    "Bookmark data is stored locally in your computer, within the memory space allocated to your browser profile."
   ],
   [
     "What happen when I switch to a different browser profile?",
@@ -272,6 +272,7 @@ export default {
         h3 {
           font-weight: bold;
           font-size: 13px;
+          line-height: 1;
         }
 
         button {

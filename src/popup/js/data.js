@@ -1,6 +1,4 @@
 import {
-  // STORE_SETTING_KEY,
-  // STORE_SETTING_EXTRA_BTN_KEY,
   STORE_WORK_KEY_PREFIX,
   STORE_ALL_WORK_KEYS
  } from '@/common/variables'
@@ -17,11 +15,8 @@ import {
  
 const downloadData = () => {
   Promise.all([
-    // chrome.storage.local.get(STORE_SETTING_KEY).then(obj => obj[STORE_SETTING_KEY] || {}),
-    // chrome.storage.local.get(STORE_SETTING_EXTRA_BTN_KEY).then(obj => obj[STORE_SETTING_EXTRA_BTN_KEY] || {}),
     chrome.storage.local.get(STORE_ALL_WORK_KEYS).then(obj => obj[STORE_ALL_WORK_KEYS] || [])
   ]).then(([
-    // settingObj, settingExtraBtnObj,
     workIDs
   ]) => {
     Promise.all(
@@ -36,8 +31,6 @@ const downloadData = () => {
         }, {})
         
       const downloadObj = {
-        // [STORE_SETTING_KEY]: settingObj,
-        // [STORE_SETTING_EXTRA_BTN_KEY]: settingExtraBtnObj,
         [STORE_ALL_WORK_KEYS]: workIDs,
         ...workObjResemble
       }
