@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="ipb-remark">
-        <b>Note: All existing bookmark(s) will be deleted!</b>!
+        <b>Note: All existing bookmarks will be removed before importing the above bookmark records!</b>!
       </div>
     </div>
     

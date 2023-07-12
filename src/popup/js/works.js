@@ -55,10 +55,7 @@ const removeAllWorks = cb => {
 
       if (cb) cb()
     })
-
-    // workIDs.forEach(workID => delete works[workID])
     
-    // chrome.storage.local.set({ [STORE_ALL_WORK_KEYS]: [] })
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))
 }
 

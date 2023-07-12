@@ -10,7 +10,7 @@ const hoverredItem = reactive({
   id: null
 })
 
-const activeSearchResults = ref([])
+// const activeSearchResults = ref([])
 
 const resetHoverredItem = () => {
   hoverredItem.viaNav = false
@@ -66,6 +66,6 @@ export {
   clearSelection,
   partialText,
   selectAuthor,
-  searchResults,
-  activeSearchResults
+  searchResults
+  // activeSearchResults
 }

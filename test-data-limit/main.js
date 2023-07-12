@@ -1,7 +1,7 @@
 const fs = require('fs')
 
-const NUM_OF_AUTHORS = 100
-const NUM_OF_WORKS = 1000
+const NUM_OF_AUTHORS = 1000
+const NUM_OF_WORKS = 2000
 
 const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 const MAX_AUTHOR_NAME_LENGTH = 40
@@ -63,10 +63,10 @@ for (var i = 0; i < NUM_OF_WORKS; i++) {
   workObjs['AO3IPB' + workID] = work
 }
 
-fs.writeFileSync('./data-struct/datas/works.json', JSON.stringify(workObjs))
-fs.writeFileSync('./data-struct/datas/authors.json', JSON.stringify(AUTHORS))
-fs.writeFileSync('./data-struct/datas/workIDs.json', JSON.stringify(workIDs))
-fs.writeFileSync('./data-struct/datas/bm.json', JSON.stringify({
+fs.writeFileSync('./test-data-limit/datas/works.json', JSON.stringify(workObjs))
+fs.writeFileSync('./test-data-limit/datas/authors.json', JSON.stringify(AUTHORS))
+fs.writeFileSync('./test-data-limit/datas/workIDs.json', JSON.stringify(workIDs))
+fs.writeFileSync('./test-data-limit/datas/bm.json', JSON.stringify({
   AO3_IPB_ALL_WORK_KEYS: workIDs,
   ...workObjs
 }))

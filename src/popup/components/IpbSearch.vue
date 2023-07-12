@@ -37,6 +37,8 @@ export default {
           open.value = true
           if (selection.value) {
             partialText.value = ''
+          } else {
+            resetHoverredItem()
           }
         }
 
@@ -87,12 +89,14 @@ export default {
                     }
                     hoverredItem.id = searchResults.value[newI].id
                     hoverredItem.i = newI
+                    e.preventDefault()
                     break
                 case DOWN:
                     hoverredItem.viaNav = true
                     newI = (hoverredItem.i < searchResults.value.length - 1) ? hoverredItem.i + 1 : searchResults.value.length - 1
                     hoverredItem.id = searchResults.value[newI].id
                     hoverredItem.i = newI
+                    e.preventDefault()
                     break
             }
         }

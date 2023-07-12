@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AO3 Progress Bookmark",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Bookmarking AO3's works precisely at the page scroll position.",
   "icons":  {
     "128": "imgs/ipb.png",

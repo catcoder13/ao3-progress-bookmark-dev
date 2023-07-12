@@ -52,8 +52,8 @@
         </div>
 
         <div class="ipb-setting__option-group__item ipb-delete">
-          <button @click="deleteMsgOn = true">Delete</button>
-          <h3>Delete all bookmarks</h3>
+          <button @click="deleteMsgOn = true">Remove</button>
+          <h3>Remove all bookmarks</h3>
         </div>
       </div>
 
@@ -70,12 +70,12 @@
     <div v-if="deleteMsgOn" class="ipb-setting__overlay-msg">
       <div class="ipb-text">
         <span>
-          <b>Are you sure you want to delete all bookmark data?</b>
+          <b>Are you sure you want to remove all bookmark data?</b>
           <br />
           Before proceeding, it is advised to download your bookmark data using the "Download" button under the "Download bookmark data" setting section for potential recovery.</span>
       </div>
       <div class="ipb-button">
-        <button class="ipb-delete" @click="onDeleteAllBookmarkData">Confirm delete</button>
+        <button class="ipb-delete" @click="onDeleteAllBookmarkData">Confirm remove</button>
         <button @click="deleteMsgOn = false">Cancel</button>
       </div>
     </div>
@@ -110,16 +110,16 @@ const Q_A = [
       "Download the bookmark data (it will be a .json file)",
       "Switch to the desired browser profile",
       "Import the .json file",
-      "Bookmark datas will now be accessible on the new profile"
+      "Bookmark records are now accessible for the new profile"
     ]
   ],
   [
     "What happen to existing bookmarks when importing bookmark data from a .json file?",
-    "All old bookmarks will be removed before importing new datas."
+    "All existing bookmark records will be removed before importing new bookmark records."
   ],
   [
     `What happen when I reach the maximum bookmark limit (${BOOKMARK_LIMIT} bookmark records)?`,
-    "You will not be able to add any new bookmark. To add new bookmark, you are required to delete existing bookmarks to free out more space."
+    "You will not be able to add any new bookmark. To add new bookmark, you will have to remove existing bookmarks to free out more space."
   ]
 ]
 export default {
@@ -236,7 +236,7 @@ export default {
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 370px;
+    max-width: 350px;
     height: 100%;
     background-color: #eee;
     transform: translateX(100%);
@@ -297,7 +297,7 @@ export default {
 
         input[type=file] {
           font-size: 12px;
-          width: 162px;
+          width: 81px;
           cursor: pointer;
         }
       } // .ipb-setting__option-group__item

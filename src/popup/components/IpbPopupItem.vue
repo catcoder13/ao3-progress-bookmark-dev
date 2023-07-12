@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <div title="Delete this bookmark" class="ipb-close-btn" @click="() => removeWork(work.id)">
+    <div title="Remove this bookmark" class="ipb-close-btn" @click="() => removeWork(work.id)">
       <span >&#10006;</span>
     </div>
   </div>

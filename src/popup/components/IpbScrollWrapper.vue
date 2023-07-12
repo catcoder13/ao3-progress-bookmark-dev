@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { onMounted, ref, onUpdated, reactive, computed, nextTick, watch } from 'vue'
+import { onMounted, ref, reactive, computed, nextTick, watch } from 'vue'
 
 export default {
   props: {
@@ -75,10 +75,9 @@ export default {
           scrollContainer.scrollTo(0, scrollContainer.scrollTop - diff)
         }
         
-        
         emit('top', anchor.min, anchor.max)
-
-      } else if (scrollTop + height >= parseInt(scrollHeight) && anchor.max < p.options.length - 1) { // reach scroll bottom
+        
+      } else if (Math.ceil(scrollTop) + height >= parseInt(scrollHeight) && anchor.max < p.options.length - 1) { // reach scroll bottom
         const newMax = Math.min(p.options.length - 1, anchor.max + p.appendOffset)
         
         anchor.max = newMax
@@ -89,15 +88,8 @@ export default {
     }
 
     onMounted(() => {
-      // use conventional querySelector instead of direct access from ref to ensure items' order is the same as dom's render
-      emit('optionChange', [...wrapper.value.querySelectorAll('.ipb-scroll-wrapper__item')])
       emit('mounted', wrapper.value)
     })
-
-    onUpdated(() => {
-      emit('optionChange', [...wrapper.value.querySelectorAll('.ipb-scroll-wrapper__item')])
-    })
-
 
     return {wrapper, filteredOptions, onScroll}
   }

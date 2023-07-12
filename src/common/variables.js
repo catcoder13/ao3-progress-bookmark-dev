@@ -7,7 +7,7 @@ const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 
 const AO3_DOMAIN = "https://archiveofourown.org"
 
-const BOOKMARK_LIMIT = 1000
+const BOOKMARK_LIMIT = 2000
 
 const DEFAULT_SETTINGS = {
   progressBar: false,

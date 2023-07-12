@@ -1,19 +1,17 @@
 <template>
   <IpbScrollWrapper class="ipb-search-result" :options="options" :anchorMin="anchorMin"
     @mounted="onWrapperMounted"
-    @optionChange="newOpts => activeSearchResults = newOpts"
+
     @top="onReachEdge" @bottom="onReachEdge">
       <template v-slot:item="{item}">
         <button
             @mousemove="() => onNewItemHover(item)"
             @click="$emit('select', $event, item)"
             class="ipb-search-blur-ref" :class="{current: hoverredItem.i === item.i, [item.type]: true}" >
-            <!-- <IpbIcon v-if="item.type === 'work'" fill="#888" /> -->
             <IpbIcon v-if="item.type === 'author'" type="author" fill="#84b4e7" />
-            <!-- <IpbIcon v-else type="author" fill="#84b4e7" /> -->
             <span>
               {{ item.text }}
-              <!-- {{ item.i }} -->
+              {{ item.i }}
             </span>
             <span class="ipb-author" v-if="item.type === 'work'">by {{ item.works[item.val].author }}</span>
           </button>
@@ -26,7 +24,7 @@
 
 <script>
 import { ref, watch, reactive } from 'vue'
-import { selection, hoverredItem, activeSearchResults } from '../js/search'
+import { selection, hoverredItem } from '../js/search'
 
 import IpbScrollWrapper from './IpbScrollWrapper.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
@@ -34,37 +32,37 @@ import IpbIcon from '@/common/IpbIcon.vue'
 export default {
   props: ['options'],
   components: { IpbIcon, IpbScrollWrapper },
-  setup () {
+  setup (p) {
     const scrollWrapper = ref(null)
     const anchorMin = ref((selection.value && selection.value.id - 4) || 0)
-    const anchorRef = reactive({min: 0, max: 20})
+    const anchorRef = reactive({min: anchorMin.value, max: anchorMin.value + 20})
 
     const correctScrollPos = targetElem => {
       if (!targetElem || !scrollWrapper.value) return
       const {top, bottom} = targetElem.getBoundingClientRect()
       const {top: pTop, height: pHeight} = scrollWrapper.value.getBoundingClientRect()
-      
+
       const btnTop = scrollWrapper.value.scrollTop + top
       const btnBottom = scrollWrapper.value.scrollTop + bottom
       const containerTop = scrollWrapper.value.scrollTop + pTop
       const containerBottom = containerTop + pHeight
+
       if (btnBottom + 2 >=containerBottom) {
         const diff = btnBottom - containerBottom
         scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollTop + diff) // trigger scroll wrapper scroll event
-        // console.log('exceed bottom')
+        // console.log('exceed bottom', diff)
       } else if (btnTop < containerTop) {
         const diff = containerTop - btnTop
         scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollTop - diff) // trigger scroll wrapper scroll event
-        // console.log('exceed top')
+        // console.log('exceed top, diff', diff)
       }
     }
 
     watch(() => hoverredItem.i,
     async newI => {
       if (newI >= 0) {
-        // console.log('newI', newI, hoverredItem.viaNav)
         if (hoverredItem.viaNav) {
-          const targetElem = activeSearchResults.value[newI - anchorRef.min]
+          const targetElem = scrollWrapper.value.querySelector(`#ipb-item-${p.options[newI].id}`)
           correctScrollPos(targetElem)
 
           if (newI === anchorRef.min) {
@@ -84,14 +82,10 @@ export default {
     const onWrapperMounted = el => {
       scrollWrapper.value = el
       if (selection.value) {
-        onNewItemHover(selection.value)
-        for (var i=0; i< activeSearchResults.value.length;i++) {
-          const elem = activeSearchResults.value[i]
-          if (elem.getAttribute('id') === `ipb-item-${selection.value.id}`) {
-            hoverredItem.viaNav = false
-            hoverredItem.id = selection.value.id
-            hoverredItem.i = selection.value.id
-            elem.scrollIntoView()
+        for (var i = anchorRef.min; i <= anchorRef.max; i++) {
+          if (p.options[i].id === selection.value.id) {
+            onNewItemHover(p.options[i])
+            scrollWrapper.value.querySelector(`#ipb-item-${selection.value.id}`).scrollIntoView()
             break
           }
         }
@@ -116,7 +110,7 @@ export default {
  
     return {
       anchorMin, onReachEdge,
-      onWrapperMounted, onNewItemHover, hoverredItem, activeSearchResults }
+      onWrapperMounted, onNewItemHover, hoverredItem }
   }
 }
 </script>
@@ -146,10 +140,6 @@ export default {
       }
 
       .ipb-icon { padding-right: 2px; }
-
-      // &:nth-child(2n+1) {
-      //   background-color: #eee;
-      // }
 
       &.current,
       &.author.current {

@@ -8,7 +8,7 @@
               <div class="ipb-bubble">
                 <template  v-if="!withinBookmarkLimit">
                   <b>You had reached bookmark limit ({{ BOOKMARK_LIMIT }}).</b>
-                  <span>Try to remove some existing bookmarks to free out more space for new bookmark.</span>
+                  <span>Try to remove some existing bookmarks to create more space for new bookmarks.</span>
                 </template>
                 <template v-else>Add a new bookmark</template>
               </div>
@@ -103,7 +103,7 @@ export default {
       if (chICode === 1) targetChHash = Math.min(curChI.value + 1, chapterInfos.length - 1)
       if (chICode === 2) targetChHash = chapterInfos.length - 1
       
-      if (fullViewMode || chICode === 0) return `#chapter-${targetChHash + 1}`
+      if (fullViewMode || targetChHash === curChI.value) return `#chapter-${targetChHash + 1}`
       
       return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[targetChHash].chID}#chapter-${targetChHash + 1}`
       
