@@ -8,7 +8,7 @@
     <div class="ipb-style-scrollbar">
       <h1>Settings</h1>
       <div class="ipb-setting__option-group">
-        <h2>User Interface</h2>
+        <h2>AO3 work page layout</h2>
         <div class="ipb-setting__option-group__item">
           <div class="ipb-tab--custom">
             <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
@@ -42,17 +42,18 @@
       <div class="ipb-setting__option-group">
         <h2>Bookmark data</h2>
         <div class="ipb-setting__option-group__item">
-          <input ref="inputFile" type="file" accept=".json" @change="e => curFile = e.target.files[0]" required />
+          <input id="importBMInput" ref="inputFile" type="file" accept=".json" @change="e => curFile = e.target.files[0]" required />
+          <label for="importBMInput">&#x1F5C1; Upload</label>
           <h3>Import bookmark data</h3>
         </div>
 
         <div class="ipb-setting__option-group__item">
-          <button @click="downloadData">Download</button>
+          <button @click="downloadData">&#x1F5AB; Download</button>
           <h3>Download bookmark data</h3>
         </div>
 
         <div class="ipb-setting__option-group__item ipb-delete">
-          <button @click="deleteMsgOn = true">Remove</button>
+          <button @click="deleteMsgOn = true">&#x1F5D1; Remove</button>
           <h3>Remove all bookmarks</h3>
         </div>
       </div>
@@ -236,7 +237,7 @@ export default {
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 350px;
+    max-width: 340px;
     height: 100%;
     background-color: #eee;
     transform: translateX(100%);
@@ -275,10 +276,12 @@ export default {
           line-height: 1;
         }
 
+        input[type=file] ~ label,
         button {
           border: 1px solid #777;
           cursor: pointer;
           padding: 5px 8px;
+          font-size: 13px;
           line-height: 1;
           color: #FFF;
           background-color: #666;
@@ -297,9 +300,10 @@ export default {
         }
 
         input[type=file] {
-          font-size: 12px;
-          width: 81px;
-          cursor: pointer;
+          display: none;
+          // font-size: 12px;
+          // width: 81px;
+          // cursor: pointer;
         }
       } // .ipb-setting__option-group__item
 
@@ -322,7 +326,7 @@ export default {
           padding: 3px 6px;
           line-height: 1;
           font-size: 11px;
-          opacity: 0.6;
+          opacity: 0.5;
           color: #777;
           border: 1px solid #777;
           border-radius: 12px;

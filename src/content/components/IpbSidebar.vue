@@ -237,7 +237,7 @@ export default {
 
       &.ipb-a-button--extra {
         display: none;
-        color: #FFFFFF;
+        color: #FFF;
         text-align: center;
 
         .ipb-bubble { right: 4px; }

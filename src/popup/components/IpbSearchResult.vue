@@ -34,7 +34,7 @@ export default {
   components: { IpbIcon, IpbScrollWrapper },
   setup (p) {
     const scrollWrapper = ref(null)
-    const anchorMin = ref((selection.value && selection.value.id - 4) || 0)
+    const anchorMin = ref(Math.max(0, (selection.value && selection.value.id - 4) || 0))
     const anchorRef = reactive({min: anchorMin.value, max: anchorMin.value + 20})
 
     const correctScrollPos = targetElem => {
@@ -90,8 +90,6 @@ export default {
           }
         }
       }
-
-      
     }
 
     const onReachEdge = (min, max) => {
@@ -154,7 +152,7 @@ export default {
       span {
         word-wrap: break-word;
         
-        &:first-of-type { padding-right: 8px; }
+        &:first-of-type { padding-right: 2px; }
 
         &.ipb-author {
           opacity: 0.7;

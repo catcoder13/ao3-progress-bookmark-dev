@@ -55,7 +55,7 @@ export default {
 #workskin {
   &.bmInProgress #chapters > .chapter,
   &.bmInProgress.oneshot #chapters {
-    background-color: rgba(#aaaaaa, 0.3);
+    background-color: rgba(#aaa, 0.3);
   }
 }
 
@@ -152,8 +152,6 @@ export default {
     .ipb-bookmark__btn {
       right: auto;
       left: 5px;
-      // padding-right: 0;
-      // padding-left: 25px;
       flex-direction: row-reverse;
     }
 

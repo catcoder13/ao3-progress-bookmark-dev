@@ -6,8 +6,8 @@
     <IpbSearch />
     
     <div class="ipb-popup__filter">
-      <IpbTab class="ipb-sortby" title="Sort by:" :options="SORT_BY" v-model="sortBy"></IpbTab>
-      <span class="ipb-icon-wrapper" :title="`Sort ${sortBy.label.toLowerCase()} in ${descend ? 'descending' : 'descending'} order`">
+      <IpbSortByTab  title="Sort by:" :options="SORT_BY" v-model="sortBy" />
+      <span class="ipb-icon-wrapper" :title="`Sort ${sortBy.label.toLowerCase()} in ${descend ? 'descending' : 'ascending'} order`">
         <IpbIcon type="sort" fill="#333" :open="!descend" @click="descend = !descend" />
       </span>
     </div>
@@ -46,7 +46,7 @@ import { settings } from './js/setting'
 import { partialText, selection, clearSelection } from './js/search'
 import { BOOKMARK_LIMIT } from '@/common/variables'
 
-import IpbTab from './components/IpbTab.vue'
+import IpbSortByTab from './components/IpbSortByTab.vue'
 import IpbSetting from './components/IpbSetting.vue'
 import IpbPopupItem from './components/IpbPopupItem.vue'
 import IpbIcon from '@/common/IpbIcon.vue'
@@ -54,15 +54,13 @@ import IpbIcon from '@/common/IpbIcon.vue'
 import IpbSearch from './components/IpbSearch.vue'
 import IpbScrollWrapper from './components/IpbScrollWrapper.vue'
 
-const VIEW_MODES = [{label: 'All', val: 'all'}, {label: 'Author', val: 'author'}]
-const SORT_BY = [{label: 'Recent bookmark', val: 't'}, {label: 'Progress', val: 'perc'}, {label: 'Title', val: 'name'}]
+const SORT_BY = [{label: 'Recent bookmark', val: 't', symbol: '&#x1F550;'}, {label: 'Progress', val: 'perc', symbol: '%'}, {label: 'Title', val: 'name'}]
 
 export default {
   name: 'App',
-  components: { IpbTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch, IpbScrollWrapper },
+  components: { IpbSortByTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch, IpbScrollWrapper },
   setup () {
     const sortBy = ref(SORT_BY[0])
-    const viewMode = ref(VIEW_MODES[0])
     const descend = ref(true)
 
     const sortedWorks = computed(() => {
@@ -101,7 +99,7 @@ export default {
     return {
       works, selection, sortedWorks,
       clearSelection, 
-      sortBy, SORT_BY, viewMode, VIEW_MODES, visitURL, settings, descend, clearLocalStorage,
+      sortBy, SORT_BY, visitURL, settings, descend, clearLocalStorage,
       BOOKMARK_LIMIT
     }
   }
@@ -129,32 +127,7 @@ $bg: #FFF;
     padding: 10px 0;
     color: #FFF;
     text-align: center;
-    // background: linear-gradient(to bottom, #4c0000 0%, transparent);
     background: linear-gradient(to bottom, transparent 0%, #4c0000 100%);
-  }
-
-  .ipb-sortby {
-    span {
-      font-size: 12px;
-      line-height: 11px;
-      padding: 4px 10px;
-      margin-right: 5px;
-      border-radius: 12px;
-      border: 1px solid rgba(#333, 0.7);
-      background-color: #FFF;
-      transition: border 0.2s, background-color 0.2s, color 0.2s;
-
-      &:hover {
-        border: 1px solid rgba(#333, 1);
-        background-color: rgba(#333, 0.6);
-        color: #FFF;
-      }
-
-      &.current {
-        background-color: #333;
-        color: #FFF;
-      }
-    }
   }
 
   .ipb-popup__filter {

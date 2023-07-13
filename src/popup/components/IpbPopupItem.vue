@@ -2,8 +2,8 @@
   <div class="ipb-popup-item">
     <div class="ipb-info">
       <h3>{{ work.name }} </h3>
-        <span v-if="!selection || selection.type !== 'author'" class="ipb-author">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
-        <span class="ipb-popup__item__datetime"><IpbIcon type="clock" fill="#555"/>{{ (new Date(work.t)).toLocaleString() }}</span>
+        <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Click to search bookmarked works by ${work.author}`">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
+        <span class="ipb-popup__item__datetime" :title="`Bookmark created/updated at ${time}`">&#x1F550;{{time}}</span>
     </div>
 
     <div class="ipb-record">
@@ -40,8 +40,8 @@ export default {
   components: {IpbIcon},
   setup (p) {
     const percStr = computed(() => (p.work.perc * 100).toFixed(2) + '%')
-
-    return { percStr, removeWork, visitURL, settings, selectAuthor, selection } 
+    const time = (new Date(p.work.t)).toLocaleString()
+    return { percStr, time, removeWork, visitURL, settings, selectAuthor, selection } 
   }
 }
 </script>
@@ -73,15 +73,16 @@ export default {
     .ipb-author {
       font-size: 11px;
       word-wrap: break-word;
+      padding-left: 2px;
     }
 
     .ipb-popup__item__datetime {
       display: block;
       font-size: 11px;
       line-height: 1;
-      padding: 2px;
+      padding: 2px 0;
       color: #555;
-      margin-top: 4px;
+      margin-top: 10px;
       opacity: 0.8;
 
       & > * { vertical-align: text-bottom; }
@@ -120,7 +121,7 @@ export default {
         margin: 4px 0;
         cursor: pointer;
         border-radius: 12px;
-        border: 1px solid #888888;
+        border: 1px solid #888;
         width: 110px;
         box-sizing: border-box;
 
@@ -171,7 +172,7 @@ export default {
       top: 50%;
       left: 50%;
       transform: translate(-50%,-50%);
-      color: #FFFFFF;
+      color: #FFF;
     }
   }
 } // ipb-popup-item
