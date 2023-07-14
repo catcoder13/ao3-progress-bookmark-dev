@@ -35,7 +35,7 @@ export default {
   setup (p) {
     const scrollWrapper = ref(null)
     const anchorMin = ref(Math.max(0, (selection.value && selection.value.id - 4) || 0))
-    const anchorRef = reactive({min: anchorMin.value, max: anchorMin.value + 20})
+    const anchorRef = reactive({min: anchorMin.value, max: Math.min(p.options.length - 1, anchorMin.value + 20)})
 
     const correctScrollPos = targetElem => {
       if (!targetElem || !scrollWrapper.value) return

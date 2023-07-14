@@ -14,7 +14,7 @@
             <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
             <span :class="{checked: settings.alignRight}" @click="settings.alignRight = true">Right</span>
           </div>
-          <h3>Buttons/bookmark alignment</h3>
+          <h3>Buttons alignment</h3>
         </div>
         
         <div class="ipb-setting__option-group__item">
@@ -265,14 +265,14 @@ export default {
         flex-direction: row-reverse;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
 
         .ipb-toggle ~ h3 { opacity: 0.3; }
         .ipb-toggle.checked ~ h3 { opacity: 1; }
 
         h3 {
-          font-weight: bold;
-          font-size: 13px;
+          // font-weight: bold;
+          font-size: 12px;
           line-height: 1;
         }
 
@@ -299,12 +299,7 @@ export default {
           }
         }
 
-        input[type=file] {
-          display: none;
-          // font-size: 12px;
-          // width: 81px;
-          // cursor: pointer;
-        }
+        input[type=file] { display: none; }
       } // .ipb-setting__option-group__item
 
       .ipb-setting__extra-btn {
@@ -325,7 +320,7 @@ export default {
           cursor: not-allowed;
           padding: 3px 6px;
           line-height: 1;
-          font-size: 11px;
+          font-size: 10px;
           opacity: 0.5;
           color: #777;
           border: 1px solid #777;
@@ -338,14 +333,16 @@ export default {
             border: 1px solid $btn_blue;
             color: $btn_blue;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 9px;
           }
 
-          
-          
           & > * { display: inline-block; vertical-align: middle; }
 
-          .ipb-icon { padding-right: 2px; }
+          .ipb-icon {
+            width: 12px;
+            height: 12px;
+            padding-right: 2px;
+          }
         }
       }
 

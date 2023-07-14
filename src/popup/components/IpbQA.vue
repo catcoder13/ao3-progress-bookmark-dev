@@ -49,7 +49,7 @@ export default {
     opacity: 0.75;
     padding-right: 15px;
     font-weight: bold;
-    font-size: 13px;
+    font-size: 11px;
 
     &:hover { opacity: 1; }
 
