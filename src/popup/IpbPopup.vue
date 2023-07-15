@@ -6,8 +6,8 @@
     <IpbSearch />
     
     <div class="ipb-popup__filter">
-      <IpbSortByTab  title="Sort by:" :options="SORT_BY" v-model="sortBy" />
-      <span class="ipb-icon-wrapper" :title="`Sort ${sortBy.label.toLowerCase()} in ${descend ? 'descending' : 'ascending'} order`">
+      <IpbSortByTab  title="Sort by:" :options="SORT_BY" v-model="settingsPopup.sortBy" />
+      <span class="ipb-icon-wrapper" :title="`Sort ${settingsPopup.sortBy.label.toLowerCase()} in ${descend ? 'descending' : 'ascending'} order`">
         <IpbIcon type="sort" fill="#333" :open="!descend" @click="descend = !descend" />
       </span>
     </div>
@@ -42,9 +42,9 @@ import '@/common/__base.scss'
 
 import {computed, ref, watch} from 'vue'
 import {works, visitURL} from './js/works'
-import { settings } from './js/setting'
+import { settings, settingsPopup } from './js/setting'
 import { partialText, selection, clearSelection } from './js/search'
-import { BOOKMARK_LIMIT } from '@/common/variables'
+import { BOOKMARK_LIMIT, SORT_BY } from '@/common/variables'
 
 import IpbSortByTab from './components/IpbSortByTab.vue'
 import IpbSetting from './components/IpbSetting.vue'
@@ -54,13 +54,10 @@ import IpbIcon from '@/common/IpbIcon.vue'
 import IpbSearch from './components/IpbSearch.vue'
 import IpbScrollWrapper from './components/IpbScrollWrapper.vue'
 
-const SORT_BY = [{label: 'Recent bookmark', val: 't', symbol: '&#x1F550;'}, {label: 'Progress', val: 'perc', symbol: '%'}, {label: 'Title', val: 'name'}]
-
 export default {
   name: 'App',
   components: { IpbSortByTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch, IpbScrollWrapper },
   setup () {
-    const sortBy = ref(SORT_BY[0])
     const descend = ref(true)
 
     const sortedWorks = computed(() => {
@@ -70,14 +67,14 @@ export default {
 
       // sort works
       let workArrRef = null
-      if (sortBy.value.val == 'name') {
+      if (settingsPopup.sortBy.val == 'name') {
         workArrRef = workArr.sort((a,b) => {
-          const tA = a[sortBy.value.val].toUpperCase()
-          const tB = b[sortBy.value.val].toUpperCase()
+          const tA = a[settingsPopup.sortBy.val].toUpperCase()
+          const tB = b[settingsPopup.sortBy.val].toUpperCase()
           return tB.localeCompare(tA) // descend by default
         })
       } else {
-        workArrRef = workArr.sort((a, b) => b[sortBy.value.val] - a[sortBy.value.val]) // descend by default
+        workArrRef = workArr.sort((a, b) => b[settingsPopup.sortBy.val] - a[settingsPopup.sortBy.val]) // descend by default
       }
 
       return descend.value ? workArrRef : workArrRef.reverse()
@@ -99,7 +96,7 @@ export default {
     return {
       works, selection, sortedWorks,
       clearSelection, 
-      sortBy, SORT_BY, visitURL, settings, descend, clearLocalStorage,
+      settingsPopup, SORT_BY, visitURL, settings, descend, clearLocalStorage,
       BOOKMARK_LIMIT
     }
   }

@@ -52,7 +52,6 @@ export default {
       const initMax = initMin + p.maxResultAllowed
       anchor.min = initMin
       anchor.max = initMax
-      // console.log('update anchor', anchor)
     })
 
     const onScroll = async e => {
@@ -68,7 +67,7 @@ export default {
         anchor.max = Math.min(anchor.min + p.maxResultAllowed, p.options.length - 1)
 
         await nextTick()
-        // console.log('e', e.target, 'wrapper', wrapper.value)
+        
         const prevFirstItem = scrollContainer.querySelector(prevID)
         if (prevFirstItem) {
           const diff = scrollContainer.getBoundingClientRect().top - prevFirstItem.getBoundingClientRect().top

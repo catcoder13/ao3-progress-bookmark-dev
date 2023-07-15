@@ -2,6 +2,8 @@ import { onScroll } from "@/content/js/scroll"
 
 const STORE_SETTING_KEY = 'AO3_IPB_SETTINGS'
 const STORE_SETTING_EXTRA_BTN_KEY = 'AO3_IPB_SETTING_EXTRA_BTN_KEY'
+const STORE_SETTING_POPUP_KEY = 'AO3_IPB_SETTING_POPUP'
+
 const STORE_WORK_KEY_PREFIX = `AO3IPB`
 const STORE_ALL_WORK_KEYS = `AO3_IPB_ALL_WORK_KEYS`
 
@@ -25,6 +27,13 @@ const DEFAULT_SETTING_EXTRA_BUTTONS = {
   comment: true
 }
 
+const SORT_BY = [{label: 'Recent bookmark', val: 't', symbol: '&#x1F550;'}, {label: 'Progress', val: 'perc', symbol: '%'}, {label: 'Title', val: 'name'}]
+
+const DEFAULT_SETTING_POPUP = {
+  compact: false,
+  sortBy: SORT_BY[0]
+}
+
 const EXTRA_BUTTON_INFOS = {
   backToTop: {label: 'Top', eventKey: 'backToTop', iconProps: { type: 'top'}, chICode: -3, onClick: onScroll},
   firstCh: {label: 'First chapter', eventKey: 'jumpToFirstChapter', iconProps: {type: 'next-last', open: false}, checkIfExternal: true, chICode: -2},
@@ -38,11 +47,12 @@ const EXTRA_BUTTON_INFOS = {
   }}
 }
 
+
 export {
   STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS,
-  DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS,
-  STORE_SETTING_KEY, STORE_SETTING_EXTRA_BTN_KEY,
-  EXTRA_BUTTON_INFOS,
+  DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS, DEFAULT_SETTING_POPUP,
+  STORE_SETTING_KEY, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_POPUP_KEY,
+  EXTRA_BUTTON_INFOS, SORT_BY,
   AO3_DOMAIN,
   BOOKMARK_LIMIT
 }

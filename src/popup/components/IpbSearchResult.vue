@@ -54,7 +54,7 @@ export default {
       } else if (btnTop < containerTop) {
         const diff = containerTop - btnTop
         scrollWrapper.value.scrollTo(0, scrollWrapper.value.scrollTop - diff) // trigger scroll wrapper scroll event
-        // console.log('exceed top, diff', diff)
+        // console.log('exceed top', diff)
       }
     }
 

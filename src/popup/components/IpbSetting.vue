@@ -271,7 +271,6 @@ export default {
         .ipb-toggle.checked ~ h3 { opacity: 1; }
 
         h3 {
-          // font-weight: bold;
           font-size: 12px;
           line-height: 1;
         }

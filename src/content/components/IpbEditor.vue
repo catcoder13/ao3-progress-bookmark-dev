@@ -1,5 +1,5 @@
 <template>
-  <div class="ipb-bookmark ipb-bookmark--editor" :class="{outOfRange: editBM.invalid}" :style="{top: `${editBM.y}px`}">
+  <div class="ipb-bookmark ipb-bookmark--editor" :style="{top: `${editBM.y}px`}">
     <span class="ipb-bookmark__remark" v-if="editBM.invalid">Out of bookmark region</span>
     <div class="ipb-bookmark-content">
       <div class="ipb-bookmark__btn">
@@ -98,12 +98,6 @@ export default {
   position: fixed;
   z-index: 100;
   pointer-events: none;
-
-  &.outOfRange {
-    .ipb-bookmark__icon {
-      cursor: not-allowed;
-    }
-  }
 
   .ipb-bookmark__remark {
     position: absolute;

@@ -87,8 +87,6 @@ export default {
   flex-direction: column;
   justify-content: space-between;
 
-  // & > * { margin-bottom: 10px; }
-
   h3 {
     font-size: 18px;
   }

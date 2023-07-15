@@ -173,7 +173,6 @@ export default {
     position: absolute;
     z-index: 1;
     bottom: 0;
-    // left: 50%;
     transform: translateY(100%);
     width: 100%;
     max-height: 150px;
