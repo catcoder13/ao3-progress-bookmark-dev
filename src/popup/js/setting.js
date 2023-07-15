@@ -15,7 +15,8 @@ const onResetSetting = () => {
   // below will trigger chrome.storage.local.set of settings
   Object.keys(DEFAULT_SETTINGS).forEach(setKey => settings[setKey] = DEFAULT_SETTINGS[setKey])
   Object.keys(DEFAULT_SETTING_EXTRA_BUTTONS).forEach(setKey => settingExtraBtn[setKey] = DEFAULT_SETTING_EXTRA_BUTTONS[setKey])
-  Object.keys(DEFAULT_SETTING_POPUP).forEach(setKey => settingsPopup[setKey] = DEFAULT_SETTING_POPUP[setKey])
+  // reset only apply to content, not popup layout
+  // Object.keys(DEFAULT_SETTING_POPUP).forEach(setKey => settingsPopup[setKey] = DEFAULT_SETTING_POPUP[setKey])
 }
 
 Promise.all([

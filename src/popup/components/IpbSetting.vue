@@ -250,6 +250,7 @@ export default {
       margin-bottom: 20px;
 
       h2 {
+        font-size: 14px;
         font-weight: bold;
         margin-bottom: 10px;
         border-bottom: 1px solid #333;

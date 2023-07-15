@@ -43,7 +43,7 @@ export default {
 
   h2 {
     display: inline-block;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1;
     margin: 0;
     padding-right: 10px;
@@ -62,7 +62,7 @@ export default {
     background-color: #FFF;
     transition: border 0.2s, background-color 0.2s, color 0.2s;
     opacity: 0.8;
-    
+
     .ipb-icon {
       width: 11px;
       height: 11px;

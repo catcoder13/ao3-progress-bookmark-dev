@@ -13,7 +13,7 @@
       <div class="ipb-record-content">
         <button :title="btnTitle" @click="onBtnClick">
           <b v-if="!settingsPopup.compact">{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b>
-          <span class="ipb-chapter-num" v-else-if="!work.oneShot">{{ parseInt(work.chI) + 1 }}</span>
+          <span class="ipb-chapter-num" v-else>{{ work.oneShot ? '' : parseInt(work.chI) + 1 }}</span>
           <p><span>{{ percStr }}</span><IpbIcon type="location" fill="#555" /></p>
         </button>
       </div>

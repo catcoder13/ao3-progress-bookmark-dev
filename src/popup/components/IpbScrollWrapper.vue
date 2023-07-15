@@ -26,7 +26,7 @@ export default {
       default: false
     },
     anchorMin: { type: Number, default: 0 },
-    maxResultAllowed: { type: Number, default: 20 },
+    maxResultAllowed: { type: Number, default: 15 },
     appendOffset: { type: Number, default: 4 }
   },
   setup (p, {emit}) {

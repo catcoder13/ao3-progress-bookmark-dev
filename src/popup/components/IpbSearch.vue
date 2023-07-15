@@ -10,7 +10,6 @@
     />
     <span class="ipb-close" v-if="selection" @click="clearSelection" title="Clear search result">&#10006;</span>
     <IpbSearchResult v-if="open" @select="onSelect" :options="searchResults" />
-    
   </div>
 </template>
 
@@ -33,7 +32,7 @@ export default {
         const input = ref(null)
         const open = ref(false)
         
-        const onFocus = async () => {
+        const onFocus = () => {
           open.value = true
           if (selection.value) {
             partialText.value = ''
@@ -100,10 +99,17 @@ export default {
                     break
             }
         }
+
+        const onArrowClick = e => {
+          if (open.value) onBlur(e)
+          else onFocus()
+          
+          e.stopPropagation()
+        }
         return {
             input, open,
             selection, partialText, hoverredItem, searchResults,
-            onFocus, onSelect, onInput, onBlur, clearSelection, onKeyDown
+            onFocus, onSelect, onInput, onBlur, clearSelection, onKeyDown, onArrowClick
         }
     }
     
@@ -116,6 +122,8 @@ export default {
 
   &.open {
     &::before {
+      pointer-events: all;
+      cursor: pointer;
       transform: rotate(-135deg);
       top: 8px;
     }
@@ -155,7 +163,7 @@ export default {
     &:hover { transform: translateY(-50%) scale(1.2); color: #333; }
   }
 
-  &:before {
+  &::before {
     content: '';
     position: absolute;
     top: 4px;
