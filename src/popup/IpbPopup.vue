@@ -7,9 +7,15 @@
     
     <div class="ipb-popup__filter">
       <IpbSortByTab  title="Sort by:" :options="SORT_BY" v-model="settingsPopup.sortBy" />
-      <span class="ipb-icon-wrapper" :title="`Sort ${settingsPopup.sortBy.label.toLowerCase()} in ${descend ? 'descending' : 'ascending'} order`">
-        <IpbIcon type="sort" fill="#333" :open="!descend" @click="descend = !descend" />
-      </span>
+      <div class="ipb-popup__filter__sideBtn">
+        <span class="ipb-icon-wrapper" :title="settingsPopup.compact ? 'Compact layout' : 'Expand layout'">
+          <IpbIcon type="compact" fill="#333" :open="!settingsPopup.compact" @click="settingsPopup.compact = !settingsPopup.compact" />
+        </span>
+        <span class="ipb-icon-wrapper" :title="`Sort ${settingsPopup.sortBy.label.toLowerCase()} in ${settingsPopup.descend ? 'descending' : 'ascending'} order`">
+          <IpbIcon type="sort" fill="#333" :open="!settingsPopup.descend" @click="settingsPopup.descend = !settingsPopup.descend" />
+        </span>
+      </div>
+      
     </div>
 
     <div class="ipb-popup__subhead">
@@ -58,7 +64,7 @@ export default {
   name: 'App',
   components: { IpbSortByTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch, IpbScrollWrapper },
   setup () {
-    const descend = ref(true)
+    // const descend = ref(true)
 
     const sortedWorks = computed(() => {
       const workArr = Object.keys(selection.value ? selection.value.works : works)
@@ -77,7 +83,7 @@ export default {
         workArrRef = workArr.sort((a, b) => b[settingsPopup.sortBy.val] - a[settingsPopup.sortBy.val]) // descend by default
       }
 
-      return descend.value ? workArrRef : workArrRef.reverse()
+      return settingsPopup.descend ? workArrRef : workArrRef.reverse()
     })
 
     watch(() => sortedWorks.value,
@@ -96,7 +102,7 @@ export default {
     return {
       works, selection, sortedWorks,
       clearSelection, 
-      settingsPopup, SORT_BY, visitURL, settings, descend, clearLocalStorage,
+      settingsPopup, SORT_BY, visitURL, settings, clearLocalStorage,
       BOOKMARK_LIMIT
     }
   }
@@ -131,7 +137,7 @@ $bg: #FFF;
     position: relative;
     background-color: $bm_filter_bar_color;
 
-    & > div {
+    .ipb-tab {
       display: block;
       padding: 5px 10px;
     }
@@ -142,16 +148,21 @@ $bg: #FFF;
         span { font-size: 10px; }
       }
     }
-
-    .ipb-icon-wrapper {
+    
+    .ipb-popup__filter__sideBtn {
+      display: flex;
+      gap: 3px;
       position: absolute;
       right: 5px;
       top: 5px;
-      cursor: pointer;
-      opacity: 0.8;
-      transition: opacity 0.2s;
 
-      &:hover { opacity: 1; }
+      .ipb-icon-wrapper {
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+
+        &:hover { opacity: 1; }
+      }
     }
   }
 

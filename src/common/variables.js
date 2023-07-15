@@ -31,7 +31,8 @@ const SORT_BY = [{label: 'Recent bookmark', val: 't', symbol: '&#x1F550;'}, {lab
 
 const DEFAULT_SETTING_POPUP = {
   compact: false,
-  sortBy: SORT_BY[0]
+  sortBy: SORT_BY[0],
+  descend: true
 }
 
 const EXTRA_BUTTON_INFOS = {
