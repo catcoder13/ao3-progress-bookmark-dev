@@ -6,13 +6,10 @@
     <IpbSearch />
     
     <div class="ipb-popup__filter">
-      <IpbSortByTab  title="Sort by:" :options="SORT_BY" v-model="settingsPopup.sortBy" />
+      <IpbSortByTab  title="Sort works by:" :options="SORT_BY" v-model="settingsPopup.sortBy" />
       <div class="ipb-popup__filter__sideBtn">
         <span class="ipb-icon-wrapper" :title="settingsPopup.compact ? 'Compact layout' : 'Expand layout'">
           <IpbIcon type="compact" fill="#333" :open="!settingsPopup.compact" @click="settingsPopup.compact = !settingsPopup.compact" />
-        </span>
-        <span class="ipb-icon-wrapper" :title="`Sort ${settingsPopup.sortBy.label.toLowerCase()} in ${settingsPopup.descend ? 'descending' : 'ascending'} order`">
-          <IpbIcon type="sort" fill="#333" :open="!settingsPopup.descend" @click="settingsPopup.descend = !settingsPopup.descend" />
         </span>
       </div>
       
@@ -64,8 +61,6 @@ export default {
   name: 'App',
   components: { IpbSortByTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch, IpbScrollWrapper },
   setup () {
-    // const descend = ref(true)
-
     const sortedWorks = computed(() => {
       const workArr = Object.keys(selection.value ? selection.value.works : works)
         .filter(workID => !!works[workID]) // selection.value.works is not reactive, thus need manual filtering to filter out deleted work
@@ -83,7 +78,7 @@ export default {
         workArrRef = workArr.sort((a, b) => b[settingsPopup.sortBy.val] - a[settingsPopup.sortBy.val]) // descend by default
       }
 
-      return settingsPopup.descend ? workArrRef : workArrRef.reverse()
+      return settingsPopup.descends[settingsPopup.sortBy.i] ? workArrRef : workArrRef.reverse()
     })
 
     watch(() => sortedWorks.value,

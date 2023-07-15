@@ -27,12 +27,18 @@ const DEFAULT_SETTING_EXTRA_BUTTONS = {
   comment: true
 }
 
-const SORT_BY = [{label: 'Recent bookmark', val: 't', symbol: '&#x1F550;'}, {label: 'Progress', val: 'perc', symbol: '%'}, {label: 'Title', val: 'name'}]
+const SORT_BY = [
+  {i:0, label: 'Recent bookmark', val: 't', symbol: '&#x1F550;'},
+  {i:1, label: 'Progress', val: 'perc', symbol: '%'},
+  {i:2, label: 'Title', val: 'name'}
+]
+
+const DESCENDS = [true, true, false]
 
 const DEFAULT_SETTING_POPUP = {
   compact: false,
   sortBy: SORT_BY[0],
-  descend: true
+  descends: DESCENDS
 }
 
 const EXTRA_BUTTON_INFOS = {
@@ -53,7 +59,7 @@ export {
   STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS,
   DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS, DEFAULT_SETTING_POPUP,
   STORE_SETTING_KEY, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_POPUP_KEY,
-  EXTRA_BUTTON_INFOS, SORT_BY,
+  EXTRA_BUTTON_INFOS, SORT_BY, DESCENDS,
   AO3_DOMAIN,
   BOOKMARK_LIMIT
 }

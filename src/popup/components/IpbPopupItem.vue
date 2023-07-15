@@ -3,16 +3,15 @@
     <div class="ipb-info">
       <h3>
         <span>{{ work.name }}</span>
-        <span v-if="settingsPopup.compact" class="ipb-datetime" :title="`Bookmark created/updated at ${time}`">&#x1F550;</span>
+        <span v-if="settingsPopup.compact" class="ipb-datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;</span>
       </h3>
       <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Click to search bookmarked works by ${work.author}`">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
-      <span v-if="!settingsPopup.compact" class="ipb-popup__item__datetime" :title="`Bookmark created/updated at ${time}`">&#x1F550;{{time}}</span>
+      <span v-if="!settingsPopup.compact" class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;{{time}}</span>
     </div>
 
     <div class="ipb-record">
       <div class="ipb-record-content">
         <button :title="btnTitle" @click="onBtnClick">
-          <!-- <b>{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b> -->
           <b v-if="!settingsPopup.compact">{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b>
           <span class="ipb-chapter-num" v-else-if="!work.oneShot">{{ parseInt(work.chI) + 1 }}</span>
           <p><span>{{ percStr }}</span><IpbIcon type="location" fill="#555" /></p>
@@ -49,10 +48,10 @@ export default {
     }
     const btnTitle = computed(() => {
       if (p.work.oneShot) {
-        return `Visit one-shot (${percStr.value})`
+        return `Visit One-shot (${percStr.value})`
       }
 
-      return `Visit chapter ${parseInt(p.work.chI) + 1}${p.work.chTitle ? `: ${p.work.chTitle}` : ''} (${percStr.value})`
+      return `Visit Chapter ${parseInt(p.work.chI) + 1}${p.work.chTitle ? `: ${p.work.chTitle}` : ''} (${percStr.value})`
     })
     return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPopup, selectAuthor, selection } 
   }
@@ -99,7 +98,7 @@ export default {
   &:hover .ipb-close-btn { display: block; }
   
   .ipb-info {
-    padding: 8px;
+    padding: 8px 20px 8px 8px;
     width: calc(100% - 135px);
 
     h3 {
@@ -115,6 +114,7 @@ export default {
         &.ipb-datetime {
           padding-left: 2px;
           font-size: 12px;
+          opacity: 0.6;
         }
       }
     }
