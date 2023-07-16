@@ -46,7 +46,7 @@ export default {
     font-size: 12px;
     line-height: 1;
     margin: 0;
-    padding-right: 10px;
+    padding-right: 5px;
   }
 
   & > div {
@@ -70,7 +70,7 @@ export default {
 
     span.ipb-sort {
       pointer-events: none;
-      opacity: 0.5;
+      opacity: 0.2;
     }
 
     &:hover {

@@ -100,16 +100,10 @@ export default {
             }
         }
 
-        const onArrowClick = e => {
-          if (open.value) onBlur(e)
-          else onFocus()
-          
-          e.stopPropagation()
-        }
         return {
             input, open,
             selection, partialText, hoverredItem, searchResults,
-            onFocus, onSelect, onInput, onBlur, clearSelection, onKeyDown, onArrowClick
+            onFocus, onSelect, onInput, onBlur, clearSelection, onKeyDown
         }
     }
     

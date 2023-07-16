@@ -61,7 +61,7 @@ export default {
 <style lang="scss">
 .ipb-popup-item.ipb-popup-item--compact {
   .ipb-info {
-    h3 { font-size: 14px; }
+    h3 { font-size: 13px; }
     .ipb-author a { font-size: 10px; }
   }
 
@@ -83,7 +83,11 @@ export default {
       min-width: 23px;
     }
 
-    p { text-align: right; }
+    p {
+      text-align: right;
+
+      span { font-size: 11px;}
+    }
   }
 }
 
