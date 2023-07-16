@@ -1,5 +1,5 @@
 import {reactive} from 'vue'
-import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS, AO3_DOMAIN, STORE_SETTING_POPUP_KEY } from '@/common/variables'
+import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS, AO3_DOMAIN } from '@/common/variables'
 
 const works = reactive({})
 
@@ -18,12 +18,8 @@ const fetchSyncData = () => {
         })
         workObjs.forEach((workObj, i) => {
           const work = workObj[STORE_WORK_KEY_PREFIX + workIDs[i]]
-          if (work) {
-            work.id = workIDs[i]
-            works[workIDs[i]] = work
-          } else {
-            console.warn('[AO3 IPB]', workIDs[i], 'exist in array but bm item does not exist')
-          }
+          if (work) works[workIDs[i]] = {...work, id: workIDs[i]}
+          else console.warn('[AO3 IPB]', workIDs[i], 'exist in array but bm item does not exist')
     
         })
       }).catch(err => console.warn(`[AO3 IPB] Error occur on fetching works`, err))
@@ -33,18 +29,14 @@ fetchSyncData()
 
 chrome.storage.onChanged.addListener(obj => {
   const existingWorkKeys = Object.keys(works)
+
   // handle changed work and removed work
   existingWorkKeys
     .filter(key => obj[STORE_WORK_KEY_PREFIX + key])
     .forEach(key => {
-      if (obj[STORE_WORK_KEY_PREFIX + key].newValue) { // this is changed work
-        const newWork = obj[STORE_WORK_KEY_PREFIX + key].newValue
-        works[key] = {...newWork, id: key}
-        // console.log('work change', key)
-      } else { // this is a removed work
-        delete works[key]
-        // console.log('remove work', key)
-      }
+      const newWork = obj[STORE_WORK_KEY_PREFIX + key].newValue
+      if (newWork) works[key] = {...newWork, id: key} // this is changed work
+      else delete works[key] // this is a removed work
     })
 
   // handle new work
@@ -56,9 +48,7 @@ chrome.storage.onChanged.addListener(obj => {
       .forEach(key => {
         chrome.storage.local.get(STORE_WORK_KEY_PREFIX + key).then(workObj => {
           const work = workObj[STORE_WORK_KEY_PREFIX + key]
-          work.id = key
-          works[key] = work
-          // console.log('new bookmark added into popup', key)
+          works[key] = {...work, id: key}
         })
       })
   }

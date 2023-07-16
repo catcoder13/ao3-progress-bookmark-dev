@@ -18,6 +18,8 @@
 <script>
 import { onMounted, ref, reactive, computed, nextTick, watch } from 'vue'
 
+const REACH_EDGE_THRESHOLD = 0
+
 export default {
   props: {
     options: Array,
@@ -44,6 +46,7 @@ export default {
       // console.log('list change, reset anchor')
       anchor.min = 0
       anchor.max = p.maxResultAllowed
+      console.log('reset scroll anchor')
     })
 
     watch(() => p.anchorMin, 
@@ -59,7 +62,7 @@ export default {
       const {height} = scrollContainer.getBoundingClientRect()
       const {scrollTop, scrollHeight} = scrollContainer
       
-      if (scrollTop <= 0 && anchor.min > 0) { // reach scroll top
+      if (scrollTop <= REACH_EDGE_THRESHOLD && anchor.min > 0) { // reach scroll top
         const prevID = `#ipb-item-${filteredOptions.value[0].id}`
         const newMin = Math.max(0, anchor.min - p.appendOffset)
         
@@ -76,7 +79,7 @@ export default {
         
         emit('top', anchor.min, anchor.max)
         
-      } else if (Math.ceil(scrollTop) + height >= parseInt(scrollHeight) && anchor.max < p.options.length - 1) { // reach scroll bottom
+      } else if (Math.ceil(scrollTop) + height >= parseInt(scrollHeight) - REACH_EDGE_THRESHOLD && anchor.max < p.options.length - 1) { // reach scroll bottom
         const newMax = Math.min(p.options.length - 1, anchor.max + p.appendOffset)
         
         anchor.max = newMax

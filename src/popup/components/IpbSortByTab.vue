@@ -5,8 +5,8 @@
       <IpbIcon v-if="opt.icon" :type="opt.icon" fill=""/>
       <span class="ipb-symbol" v-if="opt.symbol" v-html="opt.symbol"></span>
       <span>{{getOptLabel(opt)}}</span>
-      <span class="ipb-sort" :title="`${opt.label} is sorted in ${settingsPopup.descends[i] ? 'descending' : 'ascending'} order`" @click="e => updateDescends(e, i)">
-        <IpbIcon type="sort" fill="#333" :open="!settingsPopup.descends[i]"/>
+      <span class="ipb-sort" :title="`${opt.label} is sorted in ${settingsPU.descends[i] ? 'descending' : 'ascending'} order`" @click="e => updateDescends(e, i)">
+        <IpbIcon type="sort" fill="#333" :open="!settingsPU.descends[i]"/>
       </span>
     </div>
   </div>
@@ -14,7 +14,7 @@
 
 <script>
 import IpbIcon from '@/common/IpbIcon.vue'
-import { settingsPopup } from '../js/setting'
+import { settingsPU } from '../js/setting'
 
 export default {
     components: { IpbIcon },
@@ -25,14 +25,14 @@ export default {
         const getOptLabel = opt => typeof opt === "string" ? opt : opt.label
 
         const updateDescends = (e, i) => {
-          const descendRef = settingsPopup.descends
+          const descendRef = settingsPU.descends
           descendRef[i] = !descendRef[i]
 
-          settingsPopup.descends = descendRef
+          settingsPU.descends = descendRef
 
           e.preventDefault()
         }
-        return { onSelect, getOptLabel, updateDescends, settingsPopup }
+        return { onSelect, getOptLabel, updateDescends, settingsPU }
     }
 }
 </script>

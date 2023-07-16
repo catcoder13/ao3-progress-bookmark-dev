@@ -1,18 +1,17 @@
 <template>
   <div class="ipb-popup">
-    <!-- <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button> -->
+    <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
     <h1 class="ipb-popup__title">AO3 Progress Bookmark</h1>
     <!-- <h1 class="ipb-popup__title">&nbsp;</h1> -->
     <IpbSearch />
     
     <div class="ipb-popup__filter">
-      <IpbSortByTab  title="Sort works by:" :options="SORT_BY" v-model="settingsPopup.sortBy" />
+      <IpbSortByTab  title="Sort works by:" :options="SORT_BY" v-model="settingsPU.sortBy" />
       <div class="ipb-popup__filter__sideBtn">
-        <span class="ipb-icon-wrapper" :title="settingsPopup.compact ? 'Compact layout' : 'Expand layout'">
-          <IpbIcon type="compact" fill="#333" :open="!settingsPopup.compact" @click="settingsPopup.compact = !settingsPopup.compact" />
+        <span class="ipb-icon-wrapper" :title="settingsPUUI.compact ? 'Compact layout' : 'Expand layout'">
+          <IpbIcon type="compact" fill="#333" :open="!settingsPUUI.compact" @click="settingsPUUI.compact = !settingsPUUI.compact" />
         </span>
       </div>
-      
     </div>
 
     <div class="ipb-popup__subhead">
@@ -43,9 +42,9 @@
 <script>
 import '@/common/__base.scss'
 
-import {computed, ref, watch} from 'vue'
+import {computed, watch} from 'vue'
 import {works, visitURL} from './js/works'
-import { settings, settingsPopup } from './js/setting'
+import { settings, settingsPU, settingsPUUI } from './js/setting'
 import { partialText, selection, clearSelection } from './js/search'
 import { BOOKMARK_LIMIT, SORT_BY } from '@/common/variables'
 
@@ -68,17 +67,17 @@ export default {
 
       // sort works
       let workArrRef = null
-      if (settingsPopup.sortBy.val == 'name') {
+      if (settingsPU.sortBy.val == 'name') {
         workArrRef = workArr.sort((a,b) => {
-          const tA = a[settingsPopup.sortBy.val].toUpperCase()
-          const tB = b[settingsPopup.sortBy.val].toUpperCase()
+          const tA = a[settingsPU.sortBy.val].toUpperCase()
+          const tB = b[settingsPU.sortBy.val].toUpperCase()
           return tB.localeCompare(tA) // descend by default
         })
       } else {
-        workArrRef = workArr.sort((a, b) => b[settingsPopup.sortBy.val] - a[settingsPopup.sortBy.val]) // descend by default
+        workArrRef = workArr.sort((a, b) => b[settingsPU.sortBy.val] - a[settingsPU.sortBy.val]) // descend by default
       }
 
-      return settingsPopup.descends[settingsPopup.sortBy.i] ? workArrRef : workArrRef.reverse()
+      return settingsPU.descends[settingsPU.sortBy.i] ? workArrRef : workArrRef.reverse()
     })
 
     watch(() => sortedWorks.value,
@@ -97,7 +96,7 @@ export default {
     return {
       works, selection, sortedWorks,
       clearSelection, 
-      settingsPopup, SORT_BY, visitURL, settings, clearLocalStorage,
+      settingsPU, settingsPUUI, SORT_BY, visitURL, settings, clearLocalStorage,
       BOOKMARK_LIMIT
     }
   }

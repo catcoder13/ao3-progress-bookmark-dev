@@ -1,18 +1,18 @@
 <template>
-  <div class="ipb-popup-item" :class="{'ipb-popup-item--compact': settingsPopup.compact}">
+  <div class="ipb-popup-item" :class="{'ipb-popup-item--compact': settingsPUUI.compact}">
     <div class="ipb-info">
       <h3>
         <span>{{ work.name }}</span>
-        <span v-if="settingsPopup.compact" class="ipb-datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;</span>
+        <span v-if="settingsPUUI.compact" class="ipb-datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;</span>
       </h3>
       <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Click to search bookmarked works by ${work.author}`">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
-      <span v-if="!settingsPopup.compact" class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;{{time}}</span>
+      <span v-if="!settingsPUUI.compact" class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;{{time}}</span>
     </div>
 
     <div class="ipb-record">
       <div class="ipb-record-content">
         <button :title="btnTitle" @click="onBtnClick">
-          <b v-if="!settingsPopup.compact">{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b>
+          <b v-if="!settingsPUUI.compact">{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b>
           <span class="ipb-chapter-num" v-else>{{ work.oneShot ? '' : parseInt(work.chI) + 1 }}</span>
           <p><span>{{ percStr }}</span><IpbIcon type="location" fill="#555" /></p>
         </button>
@@ -28,7 +28,7 @@
 <script>
 import { computed } from 'vue'
 import { removeWork, visitURL } from '../js/works'
-import { settings, settingsPopup } from '../js/setting'
+import { settings, settingsPUUI } from '../js/setting'
 import { selectAuthor, selection } from '../js/search'
 import IpbIcon from '@/common/IpbIcon.vue'
 
@@ -53,7 +53,7 @@ export default {
 
       return `Visit Chapter ${parseInt(p.work.chI) + 1}${p.work.chTitle ? `: ${p.work.chTitle}` : ''} (${percStr.value})`
     })
-    return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPopup, selectAuthor, selection } 
+    return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPUUI, selectAuthor, selection } 
   }
 }
 </script>
