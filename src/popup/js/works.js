@@ -1,5 +1,5 @@
 import {reactive} from 'vue'
-import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS, AO3_DOMAIN } from '@/common/variables'
+import { STORE_WORK_KEY_PREFIX, STORE_ALL_WORK_KEYS, AO3_DOMAIN, STORE_SETTING_POPUP_KEY } from '@/common/variables'
 
 const works = reactive({})
 
@@ -30,6 +30,41 @@ const fetchSyncData = () => {
   }).catch(err => console.warn('[AO3 IPB] Error occur on fetching all work IDs', err))
 }
 fetchSyncData()
+
+chrome.storage.onChanged.addListener(obj => {
+  const existingWorkKeys = Object.keys(works)
+  // handle changed work and removed work
+  existingWorkKeys
+    .filter(key => obj[STORE_WORK_KEY_PREFIX + key])
+    .forEach(key => {
+      if (obj[STORE_WORK_KEY_PREFIX + key].newValue) { // this is changed work
+        const newWork = obj[STORE_WORK_KEY_PREFIX + key].newValue
+        works[key] = {...newWork, id: key}
+        // console.log('work change', key)
+      } else { // this is a removed work
+        delete works[key]
+        // console.log('remove work', key)
+      }
+    })
+
+  // handle new work
+  if (obj[STORE_ALL_WORK_KEYS]) {
+    const workIDArr = obj[STORE_ALL_WORK_KEYS].newValue || []
+    
+    workIDArr
+      .filter(key => !existingWorkKeys.includes(key))
+      .forEach(key => {
+        chrome.storage.local.get(STORE_WORK_KEY_PREFIX + key).then(workObj => {
+          const work = workObj[STORE_WORK_KEY_PREFIX + key]
+          work.id = key
+          works[key] = work
+          // console.log('new bookmark added into popup', key)
+        })
+      })
+  }
+  
+  // console.log(obj)
+})
 
 const removeWork = workID => {
   delete works[workID]

@@ -3,8 +3,8 @@
     <h2 class="ipb-title" v-if="title">{{ title }}</h2>
     <div :class="{current: opt.val == modelValue.val}" v-for="(opt,i) in options" :key="i" @click="() => onSelect(opt)">
       <IpbIcon v-if="opt.icon" :type="opt.icon" fill=""/>
-      <span v-if="opt.symbol" v-html="opt.symbol"></span>
-      {{ getOptLabel(opt) }}
+      <span class="ipb-symbol" v-if="opt.symbol" v-html="opt.symbol"></span>
+      <span>{{getOptLabel(opt)}}</span>
       <span class="ipb-sort" :title="`${opt.label} is sorted in ${settingsPopup.descends[i] ? 'descending' : 'ascending'} order`" @click="e => updateDescends(e, i)">
         <IpbIcon type="sort" fill="#333" :open="!settingsPopup.descends[i]"/>
       </span>
@@ -54,8 +54,8 @@ export default {
     cursor: pointer;
     transition: background-color 0.2s;
     font-size: 12px;
-    line-height: 11px;
-    padding: 4px 10px;
+    line-height: 10px;
+    padding: 3px 10px;
     margin-right: 5px;
     border-radius: 12px;
     border: 1px solid rgba(#333, 0.7);
@@ -63,9 +63,18 @@ export default {
     transition: border 0.2s, background-color 0.2s, color 0.2s;
     opacity: 0.8;
 
+    & > * {
+      display: inline;
+      vertical-align: middle;
+
+      &:not(:last-child) { padding-right: 2px; }
+    }
+
     .ipb-icon {
       width: 11px;
       height: 11px;
+
+      path { fill: #333; }
     }
 
     span.ipb-sort {
@@ -86,12 +95,14 @@ export default {
       background-color: #333;
       color: #FFF;
       opacity: 1;
+      
+      .ipb-icon path { fill: #FFF; }
 
       .ipb-sort {
         pointer-events: all;
         opacity: 1;
 
-        .ipb-icon path { fill: #FFF; }
+        // .ipb-icon path { fill: #FFF; }
 
         &:hover .ipb-icon {
           transform: scale(1.2);
@@ -101,7 +112,7 @@ export default {
       } 
     }
 
-    .ipb-icon path { fill: #333; }
+    // .ipb-icon path { fill: #333; }
   }
 }
 </style>

@@ -54,6 +54,16 @@ Promise.all([
   }, {deep: true})
 })
 
+chrome.storage.onChanged.addListener(obj => {
+  // handled popup setting changes
+  if (obj[STORE_SETTING_POPUP_KEY] && obj[STORE_SETTING_POPUP_KEY].newValue) {
+    const newPopupSettings = obj[STORE_SETTING_POPUP_KEY].newValue
+    Object.keys(newPopupSettings).forEach(key => {
+      settingsPopup[key] = newPopupSettings[key]
+    })
+  }
+})
+
 
 
 export { settings, settingExtraBtn, settingsPopup, onResetSetting }
