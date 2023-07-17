@@ -5,15 +5,15 @@
         <span>{{ work.name }}</span>
         <span v-if="settingsPUUI.compact" class="ipb-datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;</span>
       </h3>
-      <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Click to search bookmarked works by ${work.author}`">by <a href="#" @click="() => selectAuthor(work.author)" :tabindex="getTabIndex([0])">{{ work.author }}</a></span>
+      <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Search bookmarked works by ${work.author}`">by <a href="#" @click="() => selectAuthor(work.author)" :tabindex="getTabIndex([0])">{{ work.author }}</a></span>
       <span v-if="!settingsPUUI.compact" class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;{{time}}</span>
     </div>
 
     <div class="ipb-record">
       <div class="ipb-record-content">
-        <button :title="btnTitle" @click="onBtnClick" :tabindex="getTabIndex([0])">
+        <button :class="{oneshot: work.oneShot}" :title="btnTitle" @click="onBtnClick" :tabindex="getTabIndex([0])">
           <b v-if="!settingsPUUI.compact">{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b>
-          <span class="ipb-chapter-num" v-else>{{ work.oneShot ? '' : parseInt(work.chI) + 1 }}</span>
+          <span v-else class="ipb-chapter-num">{{ work.oneShot ? '' : parseInt(work.chI) + 1 }}</span>
           <p><span>{{ percStr }}</span><IpbIcon type="location" fill="#555" /></p>
         </button>
       </div>
@@ -69,6 +69,11 @@ export default {
   .ipb-record .ipb-record-content button {
     padding: 4px 8px;
 
+    &.oneshot .ipb-chapter-num {
+      padding: 0;
+      background-color: #ccc;
+    }
+
     .ipb-chapter-num {
       position: absolute;
       top: 0;
@@ -76,7 +81,7 @@ export default {
       height: 100%;
       padding: 2px 4px 2px 5px;
       box-sizing: border-box;
-      background-color: grey;
+      background-color: #888;
       color: #FFF;
       font-size: 11px;
       font-weight: bold;
@@ -181,12 +186,14 @@ export default {
         box-sizing: border-box;
         overflow: hidden;
 
+        &.oneshot b { background-color: #ccc; color: #444; }
+
         b {
           position: absolute;
           left: 0;
           top: 0;
           width: 100%;
-          background-color: grey;
+          background-color: #888;
           padding: 4px 2px;
           box-sizing: border-box;
           white-space: nowrap;
@@ -197,9 +204,7 @@ export default {
           color: #FFF;
         }
 
-        span {
-          font-size: 12px;
-        }
+        span { font-size: 12px; }
 
         &:hover { filter: brightness(0.9); }
         &:active { filter: brightness(0.95); }

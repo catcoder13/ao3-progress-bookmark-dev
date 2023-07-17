@@ -104,6 +104,7 @@ export default {
 
       .ipb-sort {
         pointer-events: all;
+        cursor: pointer;
         opacity: 1;
 
         &:hover,

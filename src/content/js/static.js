@@ -11,7 +11,15 @@ if (!innerDivWorkWrapper) console.warn('[AO3 IPB] URL matches a work page, howev
 const chapterDoms = mainContent ? mainContent.querySelectorAll('#chapters > .chapter') : []
 
 // initialise mainContent class name
-const oneShot = chapterDoms.length === 0
+const chStat = document.querySelector('dd.chapters')
+let oneShot = chapterDoms.length === 0
+if (chStat && chStat.innerHTML === '1/1') {
+  oneShot = true
+  console.log('oneshot', oneShot, 'determined by stat dom')
+} else {
+  console.log('oneshot', oneShot, 'determined by chapter elem count in maincontent')
+}
+
 if (mainContent) mainContent.classList.toggle('oneshot', oneShot)
 
 // retrieve work id and chapter id(if any)

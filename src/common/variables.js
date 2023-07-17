@@ -29,7 +29,7 @@ const DEFAULT_SETTING_EXTRA_BUTTONS = {
 }
 
 const SORT_BY = [
-  {i:0, label: 'Recent', val: 't', symbol: '&#x1F550;'},
+  {i:0, label: 'Recent bookmark', val: 't', symbol: '&#x1F550;'},
   {i:1, label: 'Progress', val: 'perc', icon: 'location'},
   {i:2, label: 'Title', val: 'name'}
 ]

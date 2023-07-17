@@ -111,7 +111,7 @@ const Q_A = [
     [
       "Download the bookmark data (it will be a .json file)",
       "Switch to the desired browser profile",
-      "Import the .json file",
+      "Import the downloaded .json file",
       "Bookmark records are now accessible for the new profile"
     ]
   ],

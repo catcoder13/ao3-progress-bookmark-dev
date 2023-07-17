@@ -2,7 +2,7 @@
   <IpbSetting></IpbSetting>
 
   <div class="ipb-popup">
-    <button @click="clearLocalStorage" tabindex="-1" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
+    <button @click="clearLocalStorage" tabindex="-1" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer', backgroundColor: '#FFF'}">Clear sync storage</button>
     <h1 class="ipb-popup__title">AO3 Progress Bookmark</h1>
     <!-- <h1 class="ipb-popup__title">&nbsp;</h1> -->
     <IpbSearch />
@@ -29,7 +29,7 @@
       </div>
     </div>
     
-    <IpbScrollWrapper class="ipb-popup__wrapper" :options="sortedWorks" :animate="true" :maxResultAllowed="10">
+    <IpbScrollWrapper class="ipb-popup__wrapper" :options="sortedWorks" :maxResultAllowed="10">
       <template v-slot:item="{item}">
         <IpbPopupItem :work="item" />
         {{ item.i }}
@@ -107,17 +107,6 @@ export default {
 
 <style lang="scss">
 $bg: #FFF;
-
-.ao3-progress-bookmark--popup {
-  // button,
-  // a {
-  //   &:focus-visible { box-shadow: 0 0 2px 2px #51a7e8; }
-  // }
-
-  // input {
-  //   &:focus-visible { box-shadow: inset 0 0 2px 2px #51a7e8; }
-  // }
-}
 
 .ipb-popup {
   width: 450px;
