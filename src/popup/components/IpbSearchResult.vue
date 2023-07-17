@@ -13,7 +13,7 @@
               {{ item.text }}
               <!-- {{ item.i }} -->
             </span>
-            <span class="ipb-author" v-if="item.type === 'work'">by {{ item.works[item.val].author }}</span>
+            <span class="ipb-author" v-if="item.type === 'work'">by {{ item.author }}</span>
           </button>
       </template>
       <template v-if="!options.length">

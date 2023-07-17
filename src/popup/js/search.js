@@ -19,16 +19,12 @@ const resetHoverredItem = () => {
 const searchItems = computed(() => {
   const authorRef = {}
   const workArr = Object.keys(works).map(workID => {
-    if (!authorRef[works[workID].author]) authorRef[works[workID].author] = {}
-    authorRef[works[workID].author][workID] = works[workID]
-    return {type: 'work', val: workID, text: works[workID].name, works: {[workID]: works[workID]}}
+    if (!authorRef[works[workID].author]) authorRef[works[workID].author] = works[workID].authorURL
+    return {type: 'work', val: workID, text: works[workID].name, author: works[workID].author}
   })
 
   const authorArr = Object.keys(authorRef).map(author => {
-    return {
-      type: 'author', val: author, text: author, works: authorRef[author],
-      authorURL: authorRef[author][Object.keys(authorRef[author])[0]].authorURL
-    }
+    return { type: 'author', val: author, text: author, authorURL: authorRef[author] }
   })
 
    return [...workArr, ...authorArr]

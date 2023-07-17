@@ -42,7 +42,7 @@ const DEFAULT_SETTING_PU = {
 }
 
 const DEFAULT_SETTING_PU_UI = {
-  compact: false
+  compact: 0
 }
 
 const EXTRA_BUTTON_INFOS = {

@@ -10,9 +10,9 @@
     <div class="ipb-popup__filter">
       <IpbSortByTab  title="Sort works by:" :options="SORT_BY" v-model="settingsPU.sortBy" />
       <div class="ipb-popup__filter__sideBtn">
-        <button class="ipb-icon-wrapper" :title="settingsPUUI.compact ? 'Compact layout' : 'Expand layout'"
-          @click="settingsPUUI.compact = !settingsPUUI.compact" :tabindex="getTabIndex([0])">
-          <IpbIcon type="compact" fill="#333" :open="!settingsPUUI.compact" />
+        <button class="ipb-icon-wrapper" :title="compactTitle(settingsPUUI.compact)"
+          @click="onCompactClick" :tabindex="getTabIndex([0])">
+          <IpbIcon type="compact" fill="#333" :index="settingsPUUI.compact" />
         </button>
       </div>
     </div>
@@ -63,9 +63,19 @@ export default {
   components: { IpbSortByTab, IpbSetting, IpbPopupItem, IpbIcon, IpbSearch, IpbScrollWrapper },
   setup () {
     const sortedWorks = computed(() => {
-      const workArr = Object.keys(selection.value ? selection.value.works : works)
-        .filter(workID => !!works[workID]) // selection.value.works is not reactive, thus need manual filtering to filter out deleted work
-        .map(workID => works[workID])
+      let workArr = []
+      if (selection.value) {
+        if (selection.value.type === 'work') workArr = [works[selection.value.val]]
+        else if (selection.value.type === 'author') {
+          workArr = Object.keys(works)
+            .filter(workID => works[workID].author === selection.value.val)
+            .map(workID => works[workID])
+        }
+      } else {
+        workArr = Object.keys(works)
+          // .filter(workID => !!works[workID]) // selection.value.works is not reactive, thus need manual filtering to filter out deleted work
+          .map(workID => works[workID])
+      }
 
       // sort works
       let workArrRef = null
@@ -94,10 +104,20 @@ export default {
       chrome.storage.local.clear()
     }
 
+    const compactTitle = index => {
+      if (index === 0) return 'Expand layout'
+      if (index === 1) return 'Compact layout'
+      return 'Extra compact layout'
+    }
+
+    const onCompactClick = () => {
+      settingsPUUI.compact = (settingsPUUI.compact + 1) % 3
+    }
+
 
     return {
       works, selection, sortedWorks,
-      clearSelection, getTabIndex,
+      clearSelection, getTabIndex, compactTitle, onCompactClick,
       settingsPU, settingsPUUI, SORT_BY, visitURL, settings, clearLocalStorage,
       BOOKMARK_LIMIT
     }
@@ -212,16 +232,16 @@ $bg: #FFF;
       white-space: nowrap;
     }
 
-    a.ipb-author {
-      font-size: 16px;
-      font-weight: bold;
-      display: inline-block;
-      line-height: 1;
-      padding-bottom: 2px;
-      margin-bottom: 5px;
-      color: $link_blue;
-      border-color: $link_blue;
-    }
+    // a.ipb-author {
+    //   font-size: 16px;
+    //   font-weight: bold;
+    //   display: inline-block;
+    //   line-height: 1;
+    //   padding-bottom: 2px;
+    //   margin-bottom: 5px;
+    //   color: $link_blue;
+    //   border-color: $link_blue;
+    // }
 
     .ipb-popup__author-works {
       padding-bottom: 10px;

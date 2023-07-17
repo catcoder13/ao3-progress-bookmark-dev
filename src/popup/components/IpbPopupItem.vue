@@ -1,12 +1,18 @@
 <template>
-  <div class="ipb-popup-item" :class="{'ipb-popup-item--compact': settingsPUUI.compact}">
+  <div class="ipb-popup-item" :class="ipbPopupItemClass()">
     <div class="ipb-info">
-      <h3>
-        <span>{{ work.name }}</span>
-        <span v-if="settingsPUUI.compact" class="ipb-datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;</span>
-      </h3>
-      <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Search bookmarked works by ${work.author}`">by <a href="#" @click="() => selectAuthor(work.author)" :tabindex="getTabIndex([0])">{{ work.author }}</a></span>
-      <span v-if="!settingsPUUI.compact" class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;{{time}}</span>
+      <h3>{{ work.name }}</h3>
+      <template v-if="!selection || selection.type !== 'author'">
+        <a href="#" v-if="!selection || selection.type !== 'author'" class="ipb-author"
+        @click="() => selectAuthor(work.author)" :tabindex="getTabIndex([0])" :title="`Search ${work.author}'s bookmarked works`">
+          <IpbIcon type="author" fill="#166fce" />
+          <span v-if="settingsPUUI.compact !== 2">{{ work.author }}</span>
+        </a>
+      </template>
+      <span class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">
+        <template v-if="settingsPUUI.compact === 0">&#x1F550; {{time}}</template>
+        <template v-else>&#x1F550;</template>
+      </span>
     </div>
 
     <div class="ipb-record">
@@ -54,17 +60,46 @@ export default {
 
       return `Visit Chapter ${parseInt(p.work.chI) + 1}${p.work.chTitle ? `: ${p.work.chTitle}` : ''} (${percStr.value})`
     })
-    return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPUUI, selectAuthor, selection, getTabIndex } 
+
+    const ipbPopupItemClass = () => {
+      return {
+        'ipb-popup-item--compact': settingsPUUI.compact,
+        [`ipb-compact-${settingsPUUI.compact}`]: settingsPUUI.compact
+      }
+    }
+    return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPUUI, ipbPopupItemClass, selectAuthor, selection, getTabIndex } 
   }
 }
 </script>
 
 <style lang="scss">
 .ipb-popup-item.ipb-popup-item--compact {
-  .ipb-info {
-    h3 { font-size: 13px; }
-    .ipb-author a { font-size: 10px; }
+
+  .ipb-popup__item__datetime { padding-left: 2px; }
+
+  &.ipb-compact-1 {
+    a.ipb-author,
+    .ipb-popup__item__datetime {
+      display: inline;
+      vertical-align: middle;
+    }
+
+    .ipb-info {
+      h3 { font-size: 14px; }
+      a.ipb-author { font-size: 11px; }
+    }
   }
+
+  &.ipb-compact-2 {
+    a.ipb-author {
+      padding-left: 2px;
+
+      .ipb-icon { width: 13px; height: 13px;}
+    }
+    .ipb-info > * { display: inline; font-size: 13px; }
+  }
+
+  
 
   .ipb-record .ipb-record-content button {
     padding: 4px 8px;
@@ -106,7 +141,7 @@ export default {
   & > * { box-sizing: border-box; }
   
   .ipb-info {
-    padding: 8px 20px 8px 8px;
+    padding: 8px 18px 8px 8px;
     width: calc(100% - 135px);
 
     h3 {
@@ -127,31 +162,21 @@ export default {
       }
     }
 
-    p { margin: 10px 0 5px; }
-
-    .ipb-author {
-      font-size: 11px;
+    a.ipb-author {
+      font-size: 12px;
       word-wrap: break-word;
-      padding-left: 2px;
+      
+      & > * { vertical-align: text-bottom; }
     }
 
     .ipb-popup__item__datetime {
       display: block;
       font-size: 11px;
       line-height: 1;
-      padding: 2px 0;
       color: #555;
       margin-top: 10px;
       opacity: 0.8;
-
-      & > * { vertical-align: text-bottom; }
-
-      .ipb-icon {
-        padding-right: 5px;
-        vertical-align: bottom;
-        width: 13px;
-        height: 13px;
-      }
+      user-select: none;
     }
   } // ipb-info
 
