@@ -5,13 +5,13 @@
         <span>{{ work.name }}</span>
         <span v-if="settingsPUUI.compact" class="ipb-datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;</span>
       </h3>
-      <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Click to search bookmarked works by ${work.author}`">by <a @click="() => selectAuthor(work.author)">{{ work.author }}</a></span>
+      <span v-if="!selection || selection.type !== 'author'" class="ipb-author" :title="`Click to search bookmarked works by ${work.author}`">by <a href="#" @click="() => selectAuthor(work.author)" :tabindex="getTabIndex([0])">{{ work.author }}</a></span>
       <span v-if="!settingsPUUI.compact" class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">&#x1F550;{{time}}</span>
     </div>
 
     <div class="ipb-record">
       <div class="ipb-record-content">
-        <button :title="btnTitle" @click="onBtnClick">
+        <button :title="btnTitle" @click="onBtnClick" :tabindex="getTabIndex([0])">
           <b v-if="!settingsPUUI.compact">{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b>
           <span class="ipb-chapter-num" v-else>{{ work.oneShot ? '' : parseInt(work.chI) + 1 }}</span>
           <p><span>{{ percStr }}</span><IpbIcon type="location" fill="#555" /></p>
@@ -19,14 +19,15 @@
       </div>
     </div>
 
-    <div title="Remove this bookmark" class="ipb-close-btn" @click="() => removeWork(work.id)">
+    <button title="Remove this bookmark" class="ipb-close-btn" @click="() => removeWork(work.id)" :tabindex="getTabIndex([0])">
       <span >&#10006;</span>
-    </div>
+    </button>
   </div>
 </template>
 
 <script>
 import { computed } from 'vue'
+import { getTabIndex } from '../js/visibility'
 import { removeWork, visitURL } from '../js/works'
 import { settings, settingsPUUI } from '../js/setting'
 import { selectAuthor, selection } from '../js/search'
@@ -53,7 +54,7 @@ export default {
 
       return `Visit Chapter ${parseInt(p.work.chI) + 1}${p.work.chTitle ? `: ${p.work.chTitle}` : ''} (${percStr.value})`
     })
-    return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPUUI, selectAuthor, selection } 
+    return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPUUI, selectAuthor, selection, getTabIndex } 
   }
 }
 </script>
@@ -98,8 +99,6 @@ export default {
   box-shadow: 0 0 3px #999;
 
   & > * { box-sizing: border-box; }
-  
-  &:hover .ipb-close-btn { display: block; }
   
   .ipb-info {
     padding: 8px 20px 8px 8px;
@@ -175,6 +174,7 @@ export default {
         padding: 22px 8px 4px;
         margin: 4px 0;
         cursor: pointer;
+        background-color: #FFF;
         border-radius: 12px;
         border: 1px solid #888;
         width: 110px;
@@ -208,7 +208,6 @@ export default {
   } // ipb-record
 
   .ipb-close-btn {
-    display: none;
     position: absolute;
     right: 0;
     top: 0;
@@ -220,7 +219,8 @@ export default {
     transition: opacity 0.2s;
     cursor: pointer;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       transition: width 0.2s, opacity 0.2s;
       opacity: 1;
       width: 15px;

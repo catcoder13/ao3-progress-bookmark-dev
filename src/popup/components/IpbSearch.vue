@@ -1,20 +1,21 @@
 <template>
   <div class="ipb-search" :class="{open}">
-    <input type="text" :value="selection && selection.text" :style="{opacity: partialText ? 0 : (open ? 0.5 : 1)}"/>
-    <input class="ipb-search_main" ref="input" type="text" :value="partialText"
+    <input type="text" tabindex="-1" :value="selection && selection.text" :style="{opacity: partialText ? 0 : (open ? 0.5 : 1)}"/>
+    <input class="ipb-search_main" ref="input" type="text" :value="partialText" :tabindex="getTabIndex([0])"
       @input="onInput"
       :placeholder="selection ? '' : 'Search bookmark items by author name or work title'"
-      @focus="onFocus"
+      @click="onFocus"
       @blur="onBlur"
       @keydown="onKeyDown"
     />
-    <span class="ipb-close" v-if="selection" @click="clearSelection" title="Clear search result">&#10006;</span>
+    <button class="ipb-close" v-if="selection" @click="clearSelection" title="Clear search result" :tabindex="getTabIndex([0])">&#10006;</button>
     <IpbSearchResult v-if="open" @select="onSelect" :options="searchResults" />
   </div>
 </template>
 
 <script>
 import {ref} from 'vue'
+import { getTabIndex } from '../js/visibility'
 import {
   selection, hoverredItem, resetHoverredItem, clearSelection,
   partialText, searchResults
@@ -32,7 +33,7 @@ export default {
         const input = ref(null)
         const open = ref(false)
         
-        const onFocus = () => {
+        const onFocus = e => {
           open.value = true
           if (selection.value) {
             partialText.value = ''
@@ -42,6 +43,8 @@ export default {
         }
 
         const onInput = e => {
+          console.log('on input')
+          if (!open.value) onFocus()
           resetHoverredItem()
           partialText.value = e.target.value
         }
@@ -65,6 +68,10 @@ export default {
             let newI = hoverredItem.i
             switch (e.keyCode) {
                 case TAB:
+                    partialText.value = ""
+                    resetHoverredItem()
+                    e.target.blur()
+                  break
                 case ESC:
                     if (partialText.value) {
                         partialText.value = ""
@@ -77,6 +84,8 @@ export default {
                 case ENTER:
                     if (searchResults.value[hoverredItem.i]) {
                       onSelect(null, searchResults.value[hoverredItem.i])
+                    } else if (!open.value) {
+                      onFocus()
                     }
                     break
                 case UP:
@@ -102,7 +111,7 @@ export default {
 
         return {
             input, open,
-            selection, partialText, hoverredItem, searchResults,
+            selection, partialText, hoverredItem, searchResults, getTabIndex,
             onFocus, onSelect, onInput, onBlur, clearSelection, onKeyDown
         }
     }
@@ -141,6 +150,7 @@ export default {
     pointer-events: none;
     background-color: transparent;
     opacity: 0.5;
+
   }
 
   .ipb-close {

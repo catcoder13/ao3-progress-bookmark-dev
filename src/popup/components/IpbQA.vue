@@ -1,6 +1,6 @@
 <template>
   <div ref="scrollTarget" class="ipb-q-and-a">
-    <h3 @click="onToggle" :class="{open}">{{ q }}</h3>
+    <button @click="onToggle" :class="{open}" :tabindex="getTabIndex([1])">{{ q }}</button>
     <div v-if="open">
       <p> {{ ans }}</p>
       <ul v-if="extra">
@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import { nextTick, ref } from 'vue';
+import { nextTick, ref } from 'vue'
+import { getTabIndex } from '../js/visibility'
 
 export default {
   props: {
@@ -32,7 +33,7 @@ export default {
         scrollTarget.value.scrollIntoView({block: 'start', behavior: 'smooth'})
       }
     }
-    return {open, onToggle, scrollTarget}
+    return {open, onToggle, scrollTarget, getTabIndex}
   }
 }
 </script>
@@ -43,15 +44,17 @@ export default {
   color: #333;
   scroll-margin-top: 5px;
 
-  h3 {
+  button {
     position: relative;
     cursor: pointer;
     opacity: 0.75;
     padding-right: 15px;
     font-weight: bold;
     font-size: 11px;
+    text-align: left;
 
-    &:hover { opacity: 1; }
+    &:hover,
+    &:focus-visible { opacity: 1; }
 
     &.open {
       opacity: 1;

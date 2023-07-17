@@ -1,9 +1,9 @@
 <template>
   <div class="ipb-setting" :class="{open: toggle}" @click="onClickedAreaCheck">
-    <div class="ipb-setting__entry" @click="onToggle">
+    <button class="ipb-setting__entry" @click="onToggle" :tabindex="getTabIndex([0,1])">
       <IpbIcon v-if="!toggle" type="menu" fill="#FFF" :open="false"/>
       <span v-else>&#10006;</span>
-    </div>
+    </button>
     
     <div class="ipb-style-scrollbar">
       <h1>Settings</h1>
@@ -11,49 +11,49 @@
         <h2>AO3 work page layout</h2>
         <div class="ipb-setting__option-group__item">
           <div class="ipb-tab--custom">
-            <span :class="{checked: !settings.alignRight}" @click="settings.alignRight = false">Left</span>
-            <span :class="{checked: settings.alignRight}" @click="settings.alignRight = true">Right</span>
+            <button :class="{checked: !settings.alignRight}" @click="settings.alignRight = false" :tabindex="getTabIndex([1])">Left</button>
+            <button :class="{checked: settings.alignRight}" @click="settings.alignRight = true" :tabindex="getTabIndex([1])">Right</button>
           </div>
           <h3>Buttons alignment</h3>
         </div>
         
         <div class="ipb-setting__option-group__item">
-          <IpbToggle v-model="settings.progressBar" />
+          <IpbToggle v-model="settings.progressBar" :tabindex="getTabIndex([1])" />
           <h3>Chapter progress bar</h3>
         </div>
         
         <div class="ipb-setting__option-group__item">
-          <IpbToggle v-model="settings.extraSideBtn" />
+          <IpbToggle v-model="settings.extraSideBtn" :tabindex="getTabIndex([1])"/>
           <h3>Extra navigation buttons</h3>
         </div>
         
         <div class="ipb-setting__extra-btn" :class="{enabled: settings.extraSideBtn}">
-          <div v-for="(val, btnKey) in settingExtraBtn" :key="btnKey"
+          <button v-for="(val, btnKey) in settingExtraBtn" :key="btnKey" :tabindex="getTabIndex([1], settings.extraSideBtn)"
             :class="{checked: val}"
             @click="() => onExtraBtnClick(btnKey, !val)">
               <IpbIcon v-bind="EXTRA_BUTTON_INFOS[btnKey].iconProps" :fill="val ? '#1c73b5' : '#777'"/>
               <span>{{ EXTRA_BUTTON_INFOS[btnKey].label }}</span>
-          </div>
+          </button>
         </div>
-      </div>
 
-      <button class="ipb-setting__reset" @click="onResetSetting">Reset to default settings</button>
+        <button class="ipb-setting__reset" @click="onResetSetting" :tabindex="getTabIndex([1])">Reset to default settings</button>
+      </div>
      
       <div class="ipb-setting__option-group">
         <h2>Bookmark data</h2>
         <div class="ipb-setting__option-group__item">
-          <input id="importBMInput" ref="inputFile" type="file" accept=".json" @change="e => curFile = e.target.files[0]" required />
+          <input id="importBMInput" ref="inputFile" type="file" accept=".json" @change="e => curFile = e.target.files[0]" required :tabindex="getTabIndex([1])"/>
           <label for="importBMInput">&#x1F5C1; Upload</label>
           <h3>Import bookmark data</h3>
         </div>
 
         <div class="ipb-setting__option-group__item">
-          <button @click="downloadData">&#x1F5AB; Download</button>
+          <button @click="downloadData" :tabindex="getTabIndex([1])">&#x1F5AB; Download</button>
           <h3>Download bookmark data</h3>
         </div>
 
         <div class="ipb-setting__option-group__item ipb-delete">
-          <button @click="deleteMsgOn = true">&#x1F5D1; Remove</button>
+          <button @click="deleteMsgOn = true" :tabindex="getTabIndex([1])">&#x1F5D1; Remove</button>
           <h3>Remove all bookmarks</h3>
         </div>
       </div>
@@ -76,15 +76,16 @@
           Before proceeding, it is advised to download your bookmark data using the "Download" button under the "Download bookmark data" setting section for potential recovery.</span>
       </div>
       <div class="ipb-button">
-        <button class="ipb-delete" @click="onDeleteAllBookmarkData">Confirm remove</button>
-        <button @click="deleteMsgOn = false">Cancel</button>
+        <button class="ipb-delete" @click="onDeleteAllBookmarkData" :tabindex="getTabIndex([2])">Confirm remove</button>
+        <button @click="deleteMsgOn = false" :tabindex="getTabIndex([2])">Cancel</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import {ref} from 'vue'
+import {ref, watch} from 'vue'
+import { getTabIndex, visibility } from '../js/visibility'
 import { settings, settingExtraBtn, onResetSetting } from '../js/setting'
 import { downloadData } from '../js/data'
 import { EXTRA_BUTTON_INFOS, BOOKMARK_LIMIT } from '@/common/variables'
@@ -128,6 +129,7 @@ export default {
   setup() {
     const toggle = ref(false)
 
+    
     const onToggle = e => {
       toggle.value = !toggle.value
       e.stopPropagation()
@@ -165,12 +167,25 @@ export default {
       settingExtraBtn[btnKey] = newVal
     }
 
+    watch(() => toggle.value,
+    newToggleVal => {
+      visibility.value = newToggleVal ? 1 : 0
+    })
+
+    watch([
+      () => deleteMsgOn.value,
+      () => curFile.value,
+    ],
+    ([newDeleteMsgOn, newCurFile]) => {
+      visibility.value = (newDeleteMsgOn || newCurFile) ? 2 : 1 
+    })
+
     return {
       inputFile,
       deleteMsgOn, onDeleteAllBookmarkData,
       curFile, importComplete, onClearImport, onExtraBtnClick,
       toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS,
-      downloadData, onResetSetting, Q_A
+      downloadData, onResetSetting, Q_A, getTabIndex
     }
   }
 }
@@ -184,16 +199,21 @@ export default {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  user-select: none;
+  z-index: 1;
 
   &.open {
     background-color: rgba(#000, 0.65);
     pointer-events: all;
     transition: background-color 0.2s 0.2s;
     
-    .ipb-style-scrollbar { transform: translateX(0); }
+    .ipb-style-scrollbar {
+      visibility:visible;
+      transform: translateX(0);
+      transition: transform 0.3s;
+    }
 
-    .ipb-setting__entry:hover { background-color: rgba(#FFF, 0.8); }
+    .ipb-setting__entry:hover,
+    .ipb-setting__entry:focus-visible { background-color: rgba(#FFF, 0.8); }
   }
 
   .ipb-setting__entry {
@@ -206,6 +226,9 @@ export default {
     border-radius: 50%;
     cursor: pointer;
     pointer-events: all;
+    background-color: transparent;
+
+    &::before { display: none; }
 
     & > * {
       position: absolute;
@@ -222,7 +245,8 @@ export default {
       height: 25px;
     }
 
-    &:hover { background-color: rgba(#FFF, 0.1); }
+    &:hover,
+    &:focus-visible { background-color: rgba(#FFF, 0.1); }
   }
 
   h1 {
@@ -233,6 +257,7 @@ export default {
   }
 
   & > .ipb-style-scrollbar {
+    visibility: hidden;
     position: absolute;
     top: 0;
     right: 0;
@@ -241,13 +266,13 @@ export default {
     height: 100%;
     background-color: #eee;
     transform: translateX(100%);
-    transition: transform 0.3s;
+    transition: transform 0.3s, visibility 0s 0.3s;
     padding: 15px;
     box-sizing: border-box;
     overflow-y: scroll;
 
     .ipb-setting__option-group {
-      margin-bottom: 20px;
+      margin-bottom: 40px;
 
       h2 {
         font-size: 14px;
@@ -276,8 +301,7 @@ export default {
           line-height: 1;
         }
 
-        input[type=file] ~ label,
-        button {
+        & > button:not(.ipb-toggle) {
           border: 1px solid #777;
           cursor: pointer;
           padding: 5px 8px;
@@ -286,20 +310,72 @@ export default {
           color: #FFF;
           background-color: #666;
 
-          &:hover {
+          &:hover,
+          &:focus-visible {
+            background-color: #333;
+            color: #FFF;
+          }
+        }
+
+        input[type=file] {
+          opacity: 0;
+          width: 0;
+          height: 0;
+          position: absolute;
+
+          & ~ label {
+            border: 1px solid #777;
+            cursor: pointer;
+            padding: 5px 8px;
+            font-size: 13px;
+            line-height: 1;
+            color: #FFF;
+            background-color: #666;
+          }
+          
+          &:focus-visible ~ label { box-shadow: 0 0 2px 2px #51a7e8; }
+
+          &:focus-visible ~ label,
+          & ~ label:hover {
             background-color: #333;
             color: #FFF;
           }
         }
 
         &.ipb-delete {
-          button:hover {
+          button:hover,
+          button:focus-visible {
             border-color: $red;
             background-color: $red;
           }
         }
 
-        input[type=file] { display: none; }
+        .ipb-tab--custom {
+          display: flex;
+
+          button {
+            background-color: $ao3_red;
+            color: #FFF;
+            padding: 6px 12px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+
+            &:not(:last-child) { margin-right: 5px; }
+
+            &.checked {
+              pointer-events: none;
+              opacity: 1;
+            }
+
+            &:hover,
+            &:focus-visible {
+              opacity: 1;
+            }
+
+          }
+        }
       } // .ipb-setting__option-group__item
 
       .ipb-setting__extra-btn {
@@ -312,14 +388,15 @@ export default {
 
           & > * {
             cursor: pointer;
-            &:hover { opacity: 1; }
+            &:hover,
+            &:focus-visible { opacity: 1; }
           }
         }
         & > * {
           display: inline-block;
           cursor: not-allowed;
           padding: 3px 6px;
-          line-height: 1;
+          line-height: 10px;
           font-size: 10px;
           opacity: 0.5;
           color: #777;
@@ -346,7 +423,19 @@ export default {
         }
       }
 
-    }
+      .ipb-setting__reset {
+        background-color: #666;
+        color: #FFF;
+        line-height: 1;
+        cursor: pointer;
+        padding: 6px 10px;
+        font-size: 14px;
+        margin-top: 10px;
+
+        &:hover,
+        &:focus-visible { background-color: #333; }
+      }
+    } // ipb-setting__option-group
   }
 
   .ipb-setting__overlay-msg {
@@ -379,12 +468,15 @@ export default {
       button {
         padding: 5px 10px;
         cursor: pointer;
+        background-color: #FFF;
 
         &:first-child { margin-right: 10px; }
 
-        &:hover { filter: brightness(0.8); }
+        &:hover,
+        &:focus-visible { filter: brightness(0.8); }
 
-        &.ipb-delete:hover {
+        &.ipb-delete:hover,
+        &.ipb-delete:focus-visible {
           background-color: $red;
           color: #FFF;
         }
@@ -392,43 +484,5 @@ export default {
     }
     
   }
-
-  .ipb-setting__reset {
-    background-color: #666;
-    color: #FFF;
-    line-height: 1;
-    cursor: pointer;
-    padding: 6px 10px;
-    margin-bottom: 20px;
-    font-size: 14px;
-
-    &:hover { background-color: #333; }
-  }
 } // .ipb-setting
-
-.ipb-tab--custom {
-  display: flex;
-
-  span {
-    background-color: $ao3_red;
-    color: #FFF;
-    padding: 6px 12px;
-    line-height: 1;
-    cursor: pointer;
-    opacity: 0.3;
-    transition: opacity 0.2s;
-
-    &:not(:last-child) { margin-right: 5px; }
-
-    &.checked {
-      pointer-events: none;
-      opacity: 1;
-    }
-
-    &:hover {
-      opacity: 1;
-    }
-
-  }
-}
 </style>

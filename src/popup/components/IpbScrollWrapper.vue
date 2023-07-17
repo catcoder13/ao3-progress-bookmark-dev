@@ -18,7 +18,7 @@
 <script>
 import { onMounted, ref, reactive, computed, nextTick, watch } from 'vue'
 
-const REACH_EDGE_THRESHOLD = 0
+const REACH_EDGE_THRESHOLD = 20
 
 export default {
   props: {
@@ -43,10 +43,9 @@ export default {
 
     watch(() => p.options,
     () => {
-      // console.log('list change, reset anchor')
       anchor.min = 0
       anchor.max = p.maxResultAllowed
-      console.log('reset scroll anchor')
+      // console.log('reset scroll anchor')
     })
 
     watch(() => p.anchorMin, 

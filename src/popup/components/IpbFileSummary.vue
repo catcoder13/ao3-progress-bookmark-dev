@@ -9,7 +9,7 @@
     </div>
     <div v-else class="ipb-file-summary__content">
       <h4>Total work(s) from file: {{ summaries.workCount }}</h4>
-      <div class="ipb-author-work">
+      <div class="ipb-author-work" tabindex="0">
         <h4>Authors</h4>
         <div class="" v-for="(authorWorkCount, authorName) in summaries.authors" :key=authorName>
           <IpbIcon type="author" fill="#999" />
@@ -102,6 +102,11 @@ export default {
       max-height: 110px;
       overflow-y: overlay;
       background-color: #333;
+      
+      &:focus-visible {
+        box-shadow: 0 0 2px 2px #51a7e8;
+        outline: none;
+      }
 
       & > div:not(:last-child) { padding-bottom: 2px; }
     }

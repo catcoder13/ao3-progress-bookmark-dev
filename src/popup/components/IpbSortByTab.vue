@@ -1,19 +1,22 @@
 <template>
   <div class="ipb-tab">
     <h2 class="ipb-title" v-if="title">{{ title }}</h2>
-    <div :class="{current: opt.val == modelValue.val}" v-for="(opt,i) in options" :key="i" @click="() => onSelect(opt)">
+    <button :class="{current: opt.val == modelValue.val}" v-for="(opt,i) in options" :key="i" @click="() => onSelect(opt)" :tabindex="getTabIndex([0])">
       <IpbIcon v-if="opt.icon" :type="opt.icon" fill=""/>
       <span class="ipb-symbol" v-if="opt.symbol" v-html="opt.symbol"></span>
       <span>{{getOptLabel(opt)}}</span>
-      <span class="ipb-sort" :title="`${opt.label} is sorted in ${settingsPU.descends[i] ? 'descending' : 'ascending'} order`" @click="e => updateDescends(e, i)">
+      <button class="ipb-sort" :title="`${opt.label} is sorted in ${settingsPU.descends[i] ? 'descending' : 'ascending'} order`"
+        @click="e => updateDescends(e, i)" :tabindex="getTabIndex([0], opt.val === modelValue.val)">
         <IpbIcon type="sort" fill="#333" :open="!settingsPU.descends[i]"/>
-      </span>
-    </div>
+      </button>
+    </button>
   </div>
 </template>
 
 <script>
 import IpbIcon from '@/common/IpbIcon.vue'
+
+import { getTabIndex } from '../js/visibility'
 import { settingsPU } from '../js/setting'
 
 export default {
@@ -32,7 +35,7 @@ export default {
 
           e.preventDefault()
         }
-        return { onSelect, getOptLabel, updateDescends, settingsPU }
+        return { onSelect, getOptLabel, updateDescends, settingsPU, getTabIndex }
     }
 }
 </script>
@@ -49,7 +52,7 @@ export default {
     padding-right: 5px;
   }
 
-  & > div {
+  & > button {
     display: inline-block;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -77,12 +80,13 @@ export default {
       path { fill: #333; }
     }
 
-    span.ipb-sort {
+    button.ipb-sort {
       pointer-events: none;
       opacity: 0.2;
     }
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       border: 1px solid rgba(#333, 1);
       background-color: rgba(#333, 0.6);
       color: #FFF;
@@ -102,17 +106,16 @@ export default {
         pointer-events: all;
         opacity: 1;
 
-        // .ipb-icon path { fill: #FFF; }
-
-        &:hover .ipb-icon {
-          transform: scale(1.2);
-          
-          path { fill: red; }
+        &:hover,
+        &:focus-visible {
+          .ipb-icon {
+            transform: scale(1.2);
+            
+            path { fill: red; }
+          }
         }
       } 
     }
-
-    // .ipb-icon path { fill: #333; }
   }
 }
 </style>

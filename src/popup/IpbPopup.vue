@@ -1,6 +1,8 @@
 <template>
+  <IpbSetting></IpbSetting>
+
   <div class="ipb-popup">
-    <button @click="clearLocalStorage" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
+    <button @click="clearLocalStorage" tabindex="-1" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer'}">Clear sync storage</button>
     <h1 class="ipb-popup__title">AO3 Progress Bookmark</h1>
     <!-- <h1 class="ipb-popup__title">&nbsp;</h1> -->
     <IpbSearch />
@@ -8,21 +10,22 @@
     <div class="ipb-popup__filter">
       <IpbSortByTab  title="Sort works by:" :options="SORT_BY" v-model="settingsPU.sortBy" />
       <div class="ipb-popup__filter__sideBtn">
-        <span class="ipb-icon-wrapper" :title="settingsPUUI.compact ? 'Compact layout' : 'Expand layout'">
-          <IpbIcon type="compact" fill="#333" :open="!settingsPUUI.compact" @click="settingsPUUI.compact = !settingsPUUI.compact" />
-        </span>
+        <button class="ipb-icon-wrapper" :title="settingsPUUI.compact ? 'Compact layout' : 'Expand layout'"
+          @click="settingsPUUI.compact = !settingsPUUI.compact" :tabindex="getTabIndex([0])">
+          <IpbIcon type="compact" fill="#333" :open="!settingsPUUI.compact" />
+        </button>
       </div>
     </div>
 
     <div class="ipb-popup__subhead">
       <div class="ipb-popup__subhead__summary">
-        <button v-if="selection" @click="clearSelection">&#10006; Clear search result</button>
+        <button v-if="selection" @click="clearSelection" :tabindex="getTabIndex([0])">&#10006; Clear search result</button>
         <span>{{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)</span>
       </div>
       
       <div class="ipb-popup__subhead__author" v-if="selection && selection.type === 'author'">
         <IpbIcon type="author" fill="#166fce" />
-        <a :title="`Visit ${selection.val}'s AO3 page`" @click="() => visitURL(selection.authorURL)">{{ selection.val }}</a>
+        <a href="#" :title="`Visit ${selection.val}'s AO3 page`" @click="() => visitURL(selection.authorURL)" :tabindex="getTabIndex([0])">{{ selection.val }}</a>
       </div>
     </div>
     
@@ -35,14 +38,13 @@
       <span v-if="!Object.keys(sortedWorks).length" class="ipb-no-bm-msg">No bookmark added.</span>
     </IpbScrollWrapper>
   </div>
-
-  <IpbSetting></IpbSetting>
 </template>
 
 <script>
 import '@/common/__base.scss'
 
 import {computed, watch} from 'vue'
+import { getTabIndex } from './js/visibility'
 import {works, visitURL} from './js/works'
 import { settings, settingsPU, settingsPUUI } from './js/setting'
 import { partialText, selection, clearSelection } from './js/search'
@@ -95,7 +97,7 @@ export default {
 
     return {
       works, selection, sortedWorks,
-      clearSelection, 
+      clearSelection, getTabIndex,
       settingsPU, settingsPUUI, SORT_BY, visitURL, settings, clearLocalStorage,
       BOOKMARK_LIMIT
     }
@@ -106,6 +108,17 @@ export default {
 <style lang="scss">
 $bg: #FFF;
 
+.ao3-progress-bookmark--popup {
+  // button,
+  // a {
+  //   &:focus-visible { box-shadow: 0 0 2px 2px #51a7e8; }
+  // }
+
+  // input {
+  //   &:focus-visible { box-shadow: inset 0 0 2px 2px #51a7e8; }
+  // }
+}
+
 .ipb-popup {
   width: 450px;
   max-height: 350px;
@@ -114,7 +127,6 @@ $bg: #FFF;
   flex-direction: column;
   text-align: left;
   background-color: $ao3_red;
-  user-select: none;
 
   .ipb-popup__title {
     display: block;
@@ -154,6 +166,9 @@ $bg: #FFF;
         cursor: pointer;
         opacity: 0.8;
         transition: opacity 0.2s;
+        background-color: transparent;
+
+        &::before { display: none;}
 
         &:hover { opacity: 1; }
       }

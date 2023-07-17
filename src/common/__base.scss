@@ -20,13 +20,22 @@ body {
     font-weight: normal;
   }
 
+  button,
+  a {
+    &:focus-visible { box-shadow: 0 0 2px 2px #51a7e8; }
+  }
+
+  input {
+    &:focus-visible { box-shadow: inset 0 0 2px 1px #51a7e8; }
+  }
+
   input {
     outline: none;
     font-size: 12px;
     line-height: 1;
     border: none;
 
-    &:focus{
+    &:focus {
       outline: none;
       border: none;
     }
@@ -38,25 +47,9 @@ body {
     border: none;
     border-radius: 0;
     outline: none;
+    background-color: transparent;
 
     &:focus { outline: none; }
-
-    &:active::before,
-    &:active .ipb-btn-child::before {
-      opacity: 1;
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(#FFF, 0.1);
-      opacity: 0;
-      pointer-events: none;
-    }
   }
 
   .ipb-btn-child {
@@ -82,7 +75,8 @@ body {
     cursor: pointer;
 
     &:hover { border-bottom: 1px solid $link_blue; }
-
+    
+    &:focus { outline: none; }
     &.ipb-a-button {
       position: relative;
       outline: none;
@@ -91,6 +85,7 @@ body {
       &:hover,
       &:focus,
       &:visited {
+        outline: none;
         border-bottom: none;
         color: #333;
       }

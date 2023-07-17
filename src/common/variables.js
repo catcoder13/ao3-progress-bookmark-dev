@@ -14,7 +14,7 @@ const BOOKMARK_LIMIT = 2000
 
 const DEFAULT_SETTINGS = {
   progressBar: false,
-  extraSideBtn: true,
+  extraSideBtn: false,
   alignRight: true
 }
 
