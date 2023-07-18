@@ -98,30 +98,38 @@ import IpbQA from './IpbQA.vue'
 
 const Q_A = [
   [
-    "Where are the bookmark data stored?",
-    "Bookmark data is stored locally in your computer, within the memory space allocated to your browser profile."
+    "Where are the bookmark records stored?",
+    "Bookmark recrods are stored locally in your computer, within the memory space allocated to your browser profile."
+  ],
+  [
+    "Are the bookmark records tied to my AO3 account?",
+    "No. The bookmark records are tied to your browser profile."
   ],
   [
     "What happen when I switch to a different browser profile?",
     "If you switch to a different browser profile (logging into the browser with a different browser account), you won't be able to access the bookmark records that are created by the old browser profile."
   ],
   [
-    "How do I migrate my bookmark data to a different browser profile?",
-    "To migrate your bookmark data to a new browser profile, follow these steps:",
+    "How do I migrate my bookmark records to a different browser profile?",
+    "To migrate your bookmark records to a new browser profile, follow these steps:",
     [
-      "Download the bookmark data (it will be a .json file)",
+      "Download the bookmark records (it will be a .json file)",
       "Switch to the desired browser profile",
       "Import the downloaded .json file",
       "Bookmark records are now accessible for the new profile"
     ]
   ],
   [
-    "What happen to existing bookmarks when importing bookmark data from a .json file?",
+    "What happen to existing bookmarks when importing bookmark records from a .json file?",
     "All existing bookmark records will be removed before importing new bookmark records."
   ],
   [
-    `What happen when I reach the maximum bookmark limit (${BOOKMARK_LIMIT} bookmark records)?`,
-    "You will not be able to add any new bookmark. To add new bookmark, you will have to remove existing bookmarks to free out more space."
+    `What is the reason for imposing a maximum limit of ${BOOKMARK_LIMIT} bookmarks?`,
+    "The bookmark limit is tested to ensure compliance with extension storage criteria and to prevent excessive computing/memory resource usage."
+  ],
+  [
+    `What happen when the maximum bookmark limit (${BOOKMARK_LIMIT} bookmark records) is reached?`,
+    "you won't be able to add any new bookmarks. If you want to add more bookmarks, you'll need to remove some of the existing ones to free up space."
   ]
 ]
 export default {

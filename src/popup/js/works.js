@@ -74,7 +74,7 @@ const removeAllWorks = cb => {
     chrome.storage.local.remove([
       ...workIDs.map(workID => STORE_WORK_KEY_PREFIX + workID),
       STORE_ALL_WORK_KEYS
-    ]).then(res => {
+    ]).then(() => {
       // console.log('removed complete in store', res)
       workIDs.forEach(workID => delete works[workID])
 

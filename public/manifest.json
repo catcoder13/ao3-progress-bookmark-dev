@@ -7,13 +7,16 @@
     "128": "imgs/ipb.png",
     "32": "imgs/ipb32.png"
   },
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "128": "imgs/ipb.png",
       "32": "imgs/ipb32.png"
     }
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -27,8 +30,7 @@
         "https://archiveofourown.org/works/*/comments",
         "https://archiveofourown.org/works/*/edit*",
         "https://archiveofourown.org/works/*/chapters/new",
-        "https://archiveofourown.org/works/*/chapters/manage",
-        "https://archiveofourown.org/works/*/chapters/comments"
+        "https://archiveofourown.org/works/*/chapters/manage"
       ],
       "css": ["css/content.css"],
       "js": ["js/chunk-vendors.js", "js/content.js"]

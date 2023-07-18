@@ -33,7 +33,7 @@ export default {
         const input = ref(null)
         const open = ref(false)
         
-        const onFocus = e => {
+        const onFocus = () => {
           open.value = true
           if (selection.value) {
             partialText.value = ''

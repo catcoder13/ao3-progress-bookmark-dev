@@ -16,7 +16,7 @@ if (!mainContent) console.warn('[AO3 IPB] URL matches a work page, however #work
 
 /**
  * dom: chapterDoms
- *  - multi chapter work's chapter's titles, each chapter's section
+ *  - multiple chapter dom reference (if exists)
  * 
  * isEntireWork
  *  - although a page with param "view_full_work=true" is an Entire Work page in url format,
@@ -60,13 +60,8 @@ if (jumpToBMOnLoad && history.scrollRestoration) history.scrollRestoration = 'ma
 /**
  * workID
  *  - retrieve workID from url(one-shot) or mainContent(multi-chapter)
- * 
- * isEntireWork
- *  - determine if a page is displayed as an Entire work by checking the url
- *  - note: url under pattern match1 is guaranteed NOT an Entire Work page
  */
 let workID = null
-// let isEntireWork = false
 const match1 = (window.location.href).match(/chapters\/(\d+)/)
 const match2 = (window.location.href).match(/\/works\/(\d+)/)
 
@@ -74,10 +69,6 @@ if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
   workID = mainContent && mainContent.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)/)[1]
 } else if (match2) { // pattern: https://archiveofourown.org/works/xxxxxxxxx/...
   workID = match2[1]
-
-  // const url = new URL(window.location.href)
-  // const entireWorkParam = url.searchParams.get('view_full_work')
-  // isEntireWork = (entireWorkParam && entireWorkParam.toLowerCase() === 'true') ? 1 : 0
 } else {
   console.warn('url not match, workID not found')
 }

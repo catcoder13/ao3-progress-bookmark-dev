@@ -20,7 +20,7 @@
     <div class="ao3pb-popup__subhead">
       <div class="ao3pb-popup__subhead__summary">
         <button v-if="selection" @click="clearSelection" :tabindex="getTabIndex([0])">&#10006; Clear search result</button>
-        <span>You had bookmarked {{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} works</span>
+        <span v-if="Object.keys(works).length">You had bookmarked {{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} works</span>
       </div>
       
       <div class="ao3pb-popup__subhead__author" v-if="selection && selection.type === 'author'">

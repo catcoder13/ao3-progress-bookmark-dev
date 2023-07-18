@@ -41,12 +41,12 @@ const initStoreData = () => {
     }
 
     if (obj[STORE_SETTING_KEY]) {
-      const settingObj = obj[STORE_SETTING_KEY].newValue || {}
+      const settingObj = obj[STORE_SETTING_KEY].newValue || {...DEFAULT_SETTINGS}
       updateSetting(settingObj)
     }
 
     if (obj[STORE_SETTING_EXTRA_BTN_KEY]) {
-      const settingExtraBtnObj = obj[STORE_SETTING_EXTRA_BTN_KEY].newValue || {}
+      const settingExtraBtnObj = obj[STORE_SETTING_EXTRA_BTN_KEY].newValue || {...DEFAULT_SETTING_EXTRA_BUTTONS}
       updateSettingExtraBtn(settingExtraBtnObj)
     }
 

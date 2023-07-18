@@ -65,16 +65,16 @@ Promise.all([
 
 chrome.storage.onChanged.addListener(obj => {
   // handle popup setting changes
-  if (obj[STORE_SETTING_PU_KEY] && obj[STORE_SETTING_PU_KEY].newValue) {
-    const newPUSettings = obj[STORE_SETTING_PU_KEY].newValue
+  if (obj[STORE_SETTING_PU_KEY]) {
+    const newPUSettings = obj[STORE_SETTING_PU_KEY].newValue || {...DEFAULT_SETTING_PU}
     Object.keys(newPUSettings).forEach(key => {
       settingsPU[key] = newPUSettings[key]
     })
   }
 
   // handle popup appear setting changes
-  if (obj[STORE_SETTING_PU_UI_KEY] && obj[STORE_SETTING_PU_UI_KEY].newValue) {
-    const newPUUISettings = obj[STORE_SETTING_PU_UI_KEY].newValue
+  if (obj[STORE_SETTING_PU_UI_KEY]) {
+    const newPUUISettings = obj[STORE_SETTING_PU_UI_KEY].newValue || {...DEFAULT_SETTING_PU_UI}
     Object.keys(newPUUISettings).forEach(key => {
       settingsPUUI[key] = newPUUISettings[key]
     })
