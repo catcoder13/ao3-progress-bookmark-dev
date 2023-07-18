@@ -1,9 +1,10 @@
 <template>
   <div class="ao3pb-popup-item" :class="ipbPopupItemClass()">
     <div class="ao3pb-info">
-      <h3>{{ work.name }}</h3>
+      <h3><span v-if="index">{{ index }}. </span>{{ work.name }}</h3>
       <template v-if="!selection || selection.type !== 'author'">
-        <IpbIcon v-if="settingsPUUI.compact !== 2" type="author" fill="#166fce" />
+        <!-- <IpbIcon v-if="settingsPUUI.compact !== 2" type="author" fill="#166fce" /> -->
+        <span v-if="settingsPUUI.compact !== 2">by </span>
         <a href="#" v-if="!selection || selection.type !== 'author'" class="ao3pb-author"
         @click="() => selectAuthor(work.author)" :tabindex="getTabIndex([0])" :title="`Search ${work.author}'s bookmarked works`">
           <IpbIcon v-if="settingsPUUI.compact === 2" type="author" fill="#166fce" />
@@ -42,16 +43,16 @@ import IpbIcon from '@/common/IpbIcon.vue'
 
 
 export default {
-  props: ['work'],
+  props: ['work', 'index'],
   components: {IpbIcon},
   setup (p) {
     const percStr = computed(() => (p.work.perc * 100).toFixed(2) + '%')
     const time = (new Date(p.work.t)).toLocaleString()
     const onBtnClick = () => {
       if (p.work.oneShot) {
-        visitURL(`/works/${p.work.id}?jumptobm`)
+        visitURL(`/works/${p.work.id}?ao3pbjump`)
       } else {
-        visitURL(`/works/${p.work.id}/chapters/${p.work.chID}?jumptobm`)
+        visitURL(`/works/${p.work.id}/chapters/${p.work.chID}?ao3pbjump`)
       }
     }
     const btnTitle = computed(() => {
@@ -87,22 +88,27 @@ export default {
     .ao3pb-info {
       h3 { font-size: 14px; }
 
+      & > span,
       a.ao3pb-author { font-size: 10px; }
     }
   }
 
   &.ao3pb-compact-2 {
-    h3 { padding-right: 3px; }
+    h3 { padding-right: 3px; font-size: 13px; }
 
     a.ao3pb-author {
       margin-right: 2px;
+      opacity: 0.7;
 
+      &:hover,
+      &:focus-visible { opacity: 1; }
       .ao3pb-icon { width: 13px; height: 13px;}
     }
 
     .ao3pb-popup__item__datetime { vertical-align: middle; }
 
-    .ao3pb-info > * { display: inline; font-size: 13px; }
+    .ao3pb-info > * { display: inline; }
+
   }
 
   
@@ -147,18 +153,18 @@ export default {
   & > * { box-sizing: border-box; }
   
   .ao3pb-info {
-    padding: 8px 18px 8px 8px;
+    padding: 8px;
     width: calc(100% - 135px);
 
     h3 {
       font-family: Georgia, serif;
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.2;
       word-wrap: break-word;
 
       & > span {
         display: inline;
-        vertical-align: middle;
+        vertical-align: text-bottom;
 
         &.ao3pb-datetime {
           padding-left: 2px;
@@ -180,7 +186,7 @@ export default {
       font-size: 11px;
       line-height: 1;
       color: #555;
-      margin-top: 10px;
+      margin-top: 15px;
       opacity: 0.8;
       user-select: none;
     }
@@ -213,7 +219,7 @@ export default {
         background-color: #FFF;
         border-radius: 12px;
         border: 1px solid #888;
-        width: 110px;
+        width: 105px;
         box-sizing: border-box;
         overflow: hidden;
 
@@ -237,7 +243,8 @@ export default {
 
         span { font-size: 12px; }
 
-        &:hover { filter: brightness(0.9); }
+        &:hover,
+        &:focus-visible { filter: brightness(0.9); }
         &:active { filter: brightness(0.95); }
       }
     }

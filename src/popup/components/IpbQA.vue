@@ -12,16 +12,17 @@
 </template>
 
 <script>
-import { nextTick, ref } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { getTabIndex } from '../js/visibility'
 
 export default {
   props: {
     q: String,
     ans: String,
-    extra: Array
+    extra: Array,
+    reset: {type: Boolean, default: false}
   },
-  setup () {
+  setup (p) {
     const open = ref(false)
     const scrollTarget = ref(null)
 
@@ -33,6 +34,11 @@ export default {
         scrollTarget.value.scrollIntoView({block: 'start', behavior: 'smooth'})
       }
     }
+
+    watch(() => p.reset,
+    newReset => {
+      open.value = newReset ? false : open.value
+    })
     return {open, onToggle, scrollTarget, getTabIndex}
   }
 }

@@ -5,7 +5,7 @@
       <span v-else>&#10006;</span>
     </button>
     
-    <div class="ao3pb-style-scrollbar">
+    <div ref="scrollDom" class="ao3pb-style-scrollbar">
       <h1>Settings</h1>
       <div class="ao3pb-setting__option-group">
         <h2>AO3 work page layout</h2>
@@ -14,12 +14,12 @@
             <button :class="{checked: !settings.alignRight}" @click="settings.alignRight = false" :tabindex="getTabIndex([1])">Left</button>
             <button :class="{checked: settings.alignRight}" @click="settings.alignRight = true" :tabindex="getTabIndex([1])">Right</button>
           </div>
-          <h3>Buttons alignment</h3>
+          <h3>Alignment</h3>
         </div>
         
         <div class="ao3pb-setting__option-group__item">
           <IpbToggle v-model="settings.progressBar" :tabindex="getTabIndex([1])" />
-          <h3>Chapter progress bar</h3>
+          <h3>Chapter progress bars</h3>
         </div>
         
         <div class="ao3pb-setting__option-group__item">
@@ -60,7 +60,7 @@
 
       <div class="ao3pb-setting__option-group">
         <h2>Q & A</h2>
-        <IpbQA v-for="([q, ans, extra], i) in Q_A" :key="i" :q="q" :ans="ans" :extra="extra" />
+        <IpbQA :reset="toggle" v-for="([q, ans, extra], i) in Q_A" :key="i" :q="q" :ans="ans" :extra="extra" />
       </div>
     </div>
 
@@ -128,7 +128,7 @@ export default {
   components: { IpbToggle, IpbIcon, IpbFileSummary, IpbQA },
   setup() {
     const toggle = ref(false)
-
+    const scrollDom = ref(null)
     
     const onToggle = e => {
       toggle.value = !toggle.value
@@ -170,6 +170,8 @@ export default {
     watch(() => toggle.value,
     newToggleVal => {
       visibility.value = newToggleVal ? 1 : 0
+
+      if (newToggleVal) scrollDom.value.scrollTo(0,0)
     })
 
     watch([
@@ -181,7 +183,7 @@ export default {
     })
 
     return {
-      inputFile,
+      scrollDom, inputFile,
       deleteMsgOn, onDeleteAllBookmarkData,
       curFile, importComplete, onClearImport, onExtraBtnClick,
       toggle, onToggle, onClickedAreaCheck, settings, settingExtraBtn, EXTRA_BUTTON_INFOS,

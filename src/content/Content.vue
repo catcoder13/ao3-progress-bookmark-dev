@@ -16,7 +16,7 @@ import { computed, watch } from 'vue'
 import { storeReady } from './js/store'
 import {chapters, curChI, pageReady, windowLoaded } from './js/page'
 import { mainBM, bmInProgress, jumpToBookmark } from './js/bookmark'
-import { fullViewMode, mainContent, jumpToBMOnLoad } from './js/static'
+import { isEntireWork, jumpToBMOnLoad } from './js/static'
 import { settings } from './js/setting'
 
 import IpbBookmark from './components/IpbBookmark.vue'
@@ -30,7 +30,7 @@ export default {
   setup () {
     const canShowBookmark = computed(() => {
       if (!mainBM.chI) return false
-      if (fullViewMode) return true
+      if (isEntireWork) return true
 
       return mainBM.chI == curChI.value
     })
@@ -43,9 +43,8 @@ export default {
     })
 
     return {
-      chapters, ready,
-      bmInProgress, canShowBookmark, mainContent,
-      settings
+      chapters, ready, settings,
+      bmInProgress, canShowBookmark
     }
   }
 }
@@ -53,8 +52,9 @@ export default {
 
 <style lang="scss">
 #workskin {
-  &.bmInProgress #chapters > .chapter,
-  &.bmInProgress.oneshot #chapters {
+  &.bmInProgress #chapters > .chapter, //multi-chapter page structure
+  &.bmInProgress #chapters:not(:has(.chapter)) // one-shot page structure
+  {
     background-color: rgba(#aaa, 0.3);
   }
 }

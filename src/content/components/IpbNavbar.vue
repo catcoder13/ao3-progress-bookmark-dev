@@ -10,7 +10,7 @@
   </div>
       
   <div v-if="hoveredChI != null" class="ao3pb-navbar-info" :style="infoPos">
-    <span class="ao3pb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
+    <span class="ao3pb-note" v-if="chapterInfos.length > 1">{{ (isEntireWork) ? 'Entire work' : 'Chapter by chapter' }}</span>
     <div class="ao3pb-heading">
       <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI" />
       <b v-if="oneShot">{{name}}</b>
@@ -20,7 +20,7 @@
     <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ao3pb-title">{{ chapterInfos[approxChI].title }}</span>
 
     <template v-if="hoveredChI != null && !bmInProgress">
-      <span class="ao3pb-desc" v-if="fullViewMode">
+      <span class="ao3pb-desc" v-if="isEntireWork">
         <IpbIcon type="mouse" fill="#999"/>
         Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b>
       </span>
@@ -47,8 +47,8 @@
 import { computed, onMounted, ref, reactive, onUnmounted } from 'vue'
 import { AO3_DOMAIN } from '@/common/variables'
 import { mainBM, bmInProgress } from '../js/bookmark'
-import { chapters, curChI, curChProgress, view } from '../js/page'
-import { outer, innerDivWorkWrapper, chapterInfos, fullViewMode, workID, oneShot, name} from '../js/static'
+import { chapters, curChI, view } from '../js/page'
+import { chapterInfos, isEntireWork, workID, oneShot, name} from '../js/static'
 import {mousePos, activateMouseMove, deactivateMouseMove} from '../js/mousePos'
 import { scrollY, activateScroll, deactivateScroll } from '../js/scroll'
 
@@ -59,9 +59,20 @@ export default {
   name: 'IpbNavbar',
   components: { IpbIcon },
   setup() {
-    if (!innerDivWorkWrapper) return
+    const innerDivWorkWrapper = document.querySelector('#inner #main .wrapper')
+
+    if (!innerDivWorkWrapper) {
+      console.warn('[AO3 IPB] Navbar failed to initialised due to (#inner #main .wrapper) not exists.')
+      return
+    }
+
     activateMouseMove()
     activateScroll()
+
+    const curChProgress = computed(() => {
+      const scrollBottom = scrollY.value + view.height
+      return (Math.min(1, Math.max(0, (scrollBottom - chapters[curChI.value].top) / chapters[curChI.value].height)) * 100).toFixed(0)
+    })
 
     const navbarElem = reactive({width: 0, x: 0, barWidth: 0})
 
@@ -69,7 +80,6 @@ export default {
     let mainContentTop = 0
     let wrapperWidth = 0
     let wrapperLeft = 0
-    // const innerDivWorkWrapper = document.querySelector('#inner #main .wrapper')
 
     const onLocalScroll = () => {
       stucked.value = window.scrollY > mainContentTop
@@ -90,6 +100,7 @@ export default {
     }
 
     const resizeObserver = new ResizeObserver(onLocalResize)
+    const outer = document.getElementById('outer')
     resizeObserver.observe(outer)
 
     const inView = ref(true)
@@ -137,7 +148,7 @@ export default {
 
     const navbarHref = chI => {
       if (oneShot) return '#workskin'
-      if (fullViewMode) return `#chapter-${parseInt(chI) + 1}`
+      if (isEntireWork) return `#chapter-${parseInt(chI) + 1}`
       if (curChI.value == chI) return `#chapter-${parseInt(chI + 1)}`
       
       return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
@@ -164,7 +175,7 @@ export default {
 
     return {
       chapters, chapterInfos, curChI, curChProgress, approxChI, hoveredChI, name, bmInProgress,
-      infoPos, mainBM, fullViewMode, navbarElem, stucked, oneShot,
+      infoPos, mainBM, isEntireWork, navbarElem, stucked, oneShot,
       navbarBarClass, navbarHref
     }
   }

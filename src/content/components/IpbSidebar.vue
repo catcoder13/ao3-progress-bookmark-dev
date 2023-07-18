@@ -42,7 +42,7 @@
       <a class="ao3pb-a-button" :href="sidebarHref(chICode)" @click="onClick" v-for="({chICode, iconProps, onClick, btnKey, checkIfExternal}, i) in buttons" :key="i">
         <div class="ao3pb-bubble">
           {{ btnLabel(btnKey) }}
-          <IpbIcon v-if="checkIfExternal && !fullViewMode && isExternal[btnKey]" type="visit" fill="#999" />
+          <IpbIcon v-if="checkIfExternal && isExternal[btnKey]" type="visit" fill="#999" />
         </div>
         <IpbIcon v-bind="iconProps" fill="#FFF" />
       </a>
@@ -54,7 +54,7 @@
 import { computed } from 'vue'
 import { chapters, curChI } from '../js/page'
 import { mainBM, bmInProgress, startBookmarkEdit, withinBookmarkLimit, jumpToBookmark, removeBookmark } from '../js/bookmark'
-import { chapterInfos, fullViewMode, oneShot, workID } from '../js/static'
+import { chapterInfos, isEntireWork, oneShot, workID } from '../js/static'
 import { settings, settingExtraBtn } from '../js/setting'
 import { BOOKMARK_LIMIT, EXTRA_BUTTON_INFOS, AO3_DOMAIN } from '@/common/variables'
 
@@ -66,6 +66,8 @@ export default {
     const onBookmarkEntryClick = e => startBookmarkEdit(e, chapters)
 
     const isExternal = computed(() => {
+      if (isEntireWork) return false
+
       return {
         firstCh: curChI.value > 0,
         prevCh: curChI.value > 0,
@@ -74,16 +76,15 @@ export default {
       }
     })
 
-    const bmInOtherPage = computed(() => !fullViewMode && mainBM.chI != curChI.value)
+    const bmInOtherPage = computed(() => !isEntireWork && mainBM.chI != curChI.value)
 
     const jumpToBM = () => {
       jumpToBookmark(chapters, curChI)
     }
 
     const jumpToBookmarkHref = computed(() => {
-      if (!fullViewMode && mainBM.chI != null &&  mainBM.chI != curChI.value) {
-        // return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}#chapter-${parseInt(mainBM.chI) + 1}?jumptobm`
-        return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}?jumptobm`
+      if (!isEntireWork && mainBM.chI != null &&  mainBM.chI != curChI.value) {
+        return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[mainBM.chI].chID}?ao3pbjump`
       }
 
       return null
@@ -103,7 +104,7 @@ export default {
       if (chICode === 1) targetChHash = Math.min(curChI.value + 1, chapterInfos.length - 1)
       if (chICode === 2) targetChHash = chapterInfos.length - 1
       
-      if (fullViewMode || targetChHash === curChI.value) return `#chapter-${targetChHash + 1}`
+      if (isEntireWork || targetChHash === curChI.value) return `#chapter-${targetChHash + 1}`
       
       return `${AO3_DOMAIN}/works/${workID}/chapters/${chapterInfos[targetChHash].chID}#chapter-${targetChHash + 1}`
       
@@ -129,7 +130,7 @@ export default {
     return {
       sidebarHref,
       mainBM, curChI, removeBookmark, onBookmarkEntryClick, jumpToBM, jumpToBookmarkHref, withinBookmarkLimit, BOOKMARK_LIMIT,
-      bmInProgress, fullViewMode, settings, bmInOtherPage,
+      bmInProgress, settings, bmInOtherPage,
       buttons, btnLabel, isExternal
     }
   }

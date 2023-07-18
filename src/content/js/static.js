@@ -1,59 +1,96 @@
-// retrieve dom reference 
-// mainContent: one-shot title, one-shot chapter section
-// chapterDoms: multiple chapter work's chapter's titles, each chapter's section
-const outer = document.getElementById('outer')
+/**
+ * static.js
+ *  - retrieves page's dom element references
+ *  - determine if an ao3 page is a work page (via mainContent) + manifest.json's matches/exclude_matches lists
+ */
+
+/**
+ * dom: mainContent
+ *  - the only dom element that determined if a work page is a valid work page
+ *  - retrieve one-shot title, one-shot chapter section
+ * example of invalid work page: https:/[ao3 domain]/works/xxxxx that is a pre warning page and not a work page that has mainContent
+ */
 const mainContent = document.getElementById('workskin')
 if (!mainContent) console.warn('[AO3 IPB] URL matches a work page, however #worksin does not exist, thus it is deemed not a work page.')
 
-const innerDivWorkWrapper = document.querySelector('#inner #main .wrapper')
-if (!innerDivWorkWrapper) console.warn('[AO3 IPB] URL matches a work page, however (#inner #main .wrapper) does not exist, thus it is deemed not a work page.')
 
+/**
+ * dom: chapterDoms
+ *  - multi chapter work's chapter's titles, each chapter's section
+ * 
+ * isEntireWork
+ *  - although a page with param "view_full_work=true" is an Entire Work page in url format,
+ *  - "view_full_work=true" can also be added manually to a one-shot page while the page is not Entire Work,
+ *    and multi-chapter page with only one chapter available will not have Entire Work button available anyway
+ *    (multi-chapter page with only one chapter will always be displayed in Chapter by chapter fashion)
+ *  - therefore, isEntireWork will be determine whether there exists more than one chapter dom in a single page
+ */
 const chapterDoms = mainContent ? mainContent.querySelectorAll('#chapters > .chapter') : []
+const isEntireWork = chapterDoms.length > 1
 
-// initialise mainContent class name
-const chStat = document.querySelector('dd.chapters')
+/**
+ * oneShot
+ *  - determine is a work is multi-chapter or one-shot
+ *  - if one-shot page is loaded as a single chapter page, access chStat dom to determine if it is a one-shot page
+ */
 let oneShot = chapterDoms.length === 0
-if (chStat && chStat.innerHTML === '1/1') {
-  oneShot = true
-  console.log('oneshot', oneShot, 'determined by stat dom')
-} else {
-  console.log('oneshot', oneShot, 'determined by chapter elem count in maincontent')
-}
+const chStat = document.querySelector('dd.chapters')
+if (chStat && chStat.innerHTML === '1/1') oneShot = true
 
-if (mainContent) mainContent.classList.toggle('oneshot', oneShot)
 
-// retrieve work id and chapter id(if any)
-let workID = null
+/**
+ * name, author, authorURL
+ *  - retrieve basic info from dom
+ */
 const name = mainContent && mainContent.querySelector('.title').innerText
 const author = mainContent && mainContent.querySelector('.byline a[rel=author]').innerText
 const authorURL = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
 
-let fullViewMode = false
-const jumpToBMOnLoad = !!(window.location.href).match(/jumptobm/)
+
+/**
+ * jumpToBMOnLoad
+ *  - check if jump to bookmark on load is needed
+ *  - focus on ao3 work url with param "ao3pbjump"
+ *  - modify history.scrollRestoration to allow page jump programmatically on load
+ */
+const jumpToBMOnLoad = !!(window.location.href).match(/ao3pbjump/)
+if (jumpToBMOnLoad && history.scrollRestoration) history.scrollRestoration = 'manual'
+
+
+/**
+ * workID
+ *  - retrieve workID from url(one-shot) or mainContent(multi-chapter)
+ * 
+ * isEntireWork
+ *  - determine if a page is displayed as an Entire work by checking the url
+ *  - note: url under pattern match1 is guaranteed NOT an Entire Work page
+ */
+let workID = null
+// let isEntireWork = false
 const match1 = (window.location.href).match(/chapters\/(\d+)/)
 const match2 = (window.location.href).match(/\/works\/(\d+)/)
 
-if (jumpToBMOnLoad && history.scrollRestoration) history.scrollRestoration = 'manual'
-
 if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
-  // workID not found on window.location.href, extract from dom element instead
   workID = mainContent && mainContent.querySelector('.title a').getAttribute('href').match(/\/works\/(\d+)/)[1]
 } else if (match2) { // pattern: https://archiveofourown.org/works/xxxxxxxxx/...
   workID = match2[1]
 
-  const url = new URL(window.location.href)
-
-  const fullViewParam = url.searchParams.get('view_full_work')
-  fullViewMode = (fullViewParam && fullViewParam.toLowerCase() === 'true') ? 1 : 0
+  // const url = new URL(window.location.href)
+  // const entireWorkParam = url.searchParams.get('view_full_work')
+  // isEntireWork = (entireWorkParam && entireWorkParam.toLowerCase() === 'true') ? 1 : 0
 } else {
   console.warn('url not match, workID not found')
 }
 
-// console.log(fullViewMode, jumpToBMOnLoad, workID, name, author, authorURL)
+// console.log(isEntireWork, jumpToBMOnLoad, workID, name, author, authorURL)
 
+/**
+ * chapterInfos
+ *  - retrieve chapter title text(if any) and chapter id
+ */
 const chapterListElem = document.getElementById('selected_id')
 let chapterInfos = null 
-if (chapterListElem) {
+if (chapterListElem) { // if chapter dropdown exist(Chapter by chapter page)
   chapterInfos = Array.from(chapterListElem.querySelectorAll('option')).map((optElem,i) => {
     const title = optElem.innerText.match(/(?:\d+\. )?(.+)/)[1]
     
@@ -62,7 +99,7 @@ if (chapterListElem) {
       title: title !== `Chapter ${i+1}` ? title : null
     }
   })
-} else if (chapterDoms.length) {
+} else if (!oneShot) {
   chapterInfos = Array.from(chapterDoms).map(chDom => {
     const matches = (/^Chapter \d+(?:: (.*))?$/).exec(chDom.querySelector('.title').innerText)
     const title = matches[1] || matches[0]
@@ -77,7 +114,7 @@ if (chapterListElem) {
 }
 
 export {
-  workID, name, fullViewMode, jumpToBMOnLoad, oneShot,
-  author, authorURL,
-  outer, mainContent, innerDivWorkWrapper, chapterDoms, chapterInfos
+  workID, name, author, authorURL,
+  oneShot, isEntireWork, jumpToBMOnLoad,
+  mainContent, chapterDoms, chapterInfos
 }

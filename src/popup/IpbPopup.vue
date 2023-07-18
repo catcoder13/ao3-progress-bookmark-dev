@@ -20,7 +20,7 @@
     <div class="ao3pb-popup__subhead">
       <div class="ao3pb-popup__subhead__summary">
         <button v-if="selection" @click="clearSelection" :tabindex="getTabIndex([0])">&#10006; Clear search result</button>
-        <span>{{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)</span>
+        <span>You had bookmarked {{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} works</span>
       </div>
       
       <div class="ao3pb-popup__subhead__author" v-if="selection && selection.type === 'author'">
@@ -30,9 +30,9 @@
     </div>
     
     <IpbScrollWrapper class="ao3pb-popup__wrapper" :options="sortedWorks" :maxResultAllowed="10">
-      <template v-slot:item="{item}">
-        <IpbPopupItem :work="item" />
-        {{ item.i }}
+      <template v-slot:item="{item, index}">
+        <IpbPopupItem :work="item" :index="index" />
+        <!-- {{ item.i }} -->
       </template>
       
       <span v-if="!Object.keys(sortedWorks).length" class="ao3pb-no-bm-msg">No bookmark added.</span>
@@ -128,8 +128,10 @@ export default {
 <style lang="scss">
 $bg: #FFF;
 
+.ao3-progress-bookmark--popup { font-size: 12px; }
+
 .ao3pb-popup {
-  width: 450px;
+  width: 500px;
   max-height: 350px;
   overflow: hidden;
   display: flex;
@@ -200,10 +202,14 @@ $bg: #FFF;
         opacity: .5;
         line-height: 1;
 
-        &:hover { opacity: 1; }
+        &:hover,
+        &:focus-visible { opacity: 1; }
       }
 
-      span { float: right; }
+      span {
+        float: right; 
+        font-size: 10px;
+      }
     }
 
     .ao3pb-popup__subhead__author {

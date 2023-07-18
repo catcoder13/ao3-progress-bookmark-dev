@@ -74,7 +74,8 @@ body {
     border-bottom: 1px dashed $link_blue;
     cursor: pointer;
 
-    &:hover { border-bottom: 1px solid $link_blue; }
+    &:hover,
+    &:focus-visible { border-bottom: 1px solid $link_blue; }
     
     &:focus { outline: none; }
     &.ao3pb-a-button {

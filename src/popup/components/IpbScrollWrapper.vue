@@ -2,13 +2,13 @@
   <div ref="wrapper" class="ao3pb-scroll-wrapper" @scroll="onScroll">
     <template v-if="animate">
       <TransitionGroup name="fade-in">
-        <div class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
-          <slot name="item" v-bind="{item}"></slot>
+        <div class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
+          <slot name="item" v-bind="{item, index: anchor.min+i+1}"></slot>
         </div>
       </TransitionGroup>
     </template>
-    <div v-else class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
-      <slot name="item" v-bind="{item}"></slot>
+    <div v-else class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
+      <slot name="item" v-bind="{item, index: anchor.min+i+1}"></slot>
     </div>
     
     <slot></slot>
@@ -20,6 +20,7 @@ import { onMounted, ref, reactive, computed, nextTick, watch } from 'vue'
 
 const REACH_EDGE_THRESHOLD = 20
 
+const APPEND_OFFSET = 4
 export default {
   props: {
     options: Array,
@@ -28,8 +29,7 @@ export default {
       default: false
     },
     anchorMin: { type: Number, default: 0 },
-    maxResultAllowed: { type: Number, default: 15 },
-    appendOffset: { type: Number, default: 4 }
+    maxResultAllowed: { type: Number, default: 15 }
   },
   setup (p, {emit}) {
     const initMin = Math.max(0, Math.min(p.options.length - 1 - p.maxResultAllowed, p.anchorMin))
@@ -45,6 +45,7 @@ export default {
     () => {
       anchor.min = 0
       anchor.max = p.maxResultAllowed
+      wrapper.value.scrollTo(0, 0)
       // console.log('reset scroll anchor')
     })
 
@@ -63,7 +64,7 @@ export default {
       
       if (scrollTop <= REACH_EDGE_THRESHOLD && anchor.min > 0) { // reach scroll top
         const prevID = `#ao3pb-item-${filteredOptions.value[0].id}`
-        const newMin = Math.max(0, anchor.min - p.appendOffset)
+        const newMin = Math.max(0, anchor.min - APPEND_OFFSET)
         
         anchor.min = newMin
         anchor.max = Math.min(anchor.min + p.maxResultAllowed, p.options.length - 1)
@@ -79,7 +80,7 @@ export default {
         emit('top', anchor.min, anchor.max)
         
       } else if (Math.ceil(scrollTop) + height >= parseInt(scrollHeight) - REACH_EDGE_THRESHOLD && anchor.max < p.options.length - 1) { // reach scroll bottom
-        const newMax = Math.min(p.options.length - 1, anchor.max + p.appendOffset)
+        const newMax = Math.min(p.options.length - 1, anchor.max + APPEND_OFFSET)
         
         anchor.max = newMax
         anchor.min = Math.max(0, anchor.max - p.maxResultAllowed)
@@ -92,7 +93,7 @@ export default {
       emit('mounted', wrapper.value)
     })
 
-    return {wrapper, filteredOptions, onScroll}
+    return {wrapper, filteredOptions, onScroll, anchor}
   }
 }
 </script>

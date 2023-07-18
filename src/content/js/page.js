@@ -1,5 +1,5 @@
-import {reactive, computed, ref} from 'vue'
-import {outer, mainContent, chapterDoms, fullViewMode, oneShot} from './static'
+import { reactive, computed, ref } from 'vue'
+import { mainContent, chapterDoms, isEntireWork, oneShot } from './static'
 import { scrollY, onScroll, activateScroll } from './scroll'
 
 const pageReady = ref(false)
@@ -15,21 +15,16 @@ const curChI = computed(() => {
   if (oneShot || chapterDoms.length === 1) return initCurChI
 
   const scrollBottom = scrollY.value + view.height
-
-  const result = Object.keys(chapters).filter(chI => {
-    return chapters[chI].top < scrollBottom
-  }).length
+  const result = Object.keys(chapters).filter(chI => chapters[chI].top < scrollBottom).length
 
   return result < 2 ? 0 : result - 1
 })
 
-const curChProgress = computed(() => {
-  const scrollBottom = scrollY.value + view.height
-  return (Math.min(1, Math.max(0, (scrollBottom - chapters[curChI.value].top) / chapters[curChI.value].height)) * 100).toFixed(0)
-})
 
-
-if (outer) {
+/**
+ * only register resize/scroll event for valid work page (determined by mainContent)
+ */
+if (mainContent) {
   const onResize = () => {
     view.width = document.documentElement.clientWidth
     view.height = document.documentElement.clientHeight
@@ -49,7 +44,9 @@ if (outer) {
     onScroll()
   }
   
-  // init
+  /**
+   * initialise position/height reference multi chapter/one-shot content 
+   */
   if (chapterDoms.length) { // multi chapter
     initCurChI = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
 
@@ -60,23 +57,42 @@ if (outer) {
   } else { // one shot
     chaptersRef[0] = reactive({ top: -1, height: 0, dom: mainContent && mainContent.querySelector('#chapters') })
   }
-
-  if (!oneShot && fullViewMode && chapterDoms.length > 1) activateScroll()
-
   chapters = chaptersRef
+  
 
+  /**
+   * scroll event
+   * initialise scroll event ON LOAD is only needed if the page is
+   *  - is an Entire Work page(which chapterDoms.length must be > 1)
+   *    in which curChI must stayed updated with scroll event that updates scrollY
+   */
+  if (isEntireWork) activateScroll()
+
+  
+  /**
+   * update content's position/height reference when outer is resized
+   * this is used instead of window.resize due to
+   *  - window.resize is not triggered by page content growth/shrink
+   *  - page content resize occurs when eg. expand comment section
+   */
   const resizeObserver = new ResizeObserver(updateChapterDomSize)
+  const outer = document.getElementById('outer')
   resizeObserver.observe(outer)
   updateChapterDomSize()
 
+  
+  /**
+   * update viewport size reference when the browser is resized
+   * this is needed on top of outer's resizeObserver due to
+   *  - viewport change due to window resize vertically does not trigger outer's resize.
+   */
   window.addEventListener('resize', onResize)
   onResize()
 
-  window.addEventListener('load', () => {
-    windowLoaded.value = true
-  })
+
+  window.addEventListener('load', () => windowLoaded.value = true)
   pageReady.value = true
 }
 
 
-export { chapters, curChI, curChProgress, view, pageReady, windowLoaded }
+export { chapters, curChI, view, pageReady, windowLoaded }

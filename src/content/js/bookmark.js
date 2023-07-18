@@ -1,6 +1,6 @@
 import {ref, reactive, computed, watch } from 'vue'
 import { workIDs, updateBookmarkStore, removeBookmarkStore, work } from './store'
-import { workID, chapterInfos, mainContent, fullViewMode } from './static'
+import { workID, chapterInfos, mainContent, isEntireWork } from './static'
 import { activateMouseMove, deactivateMouseMove } from './mousePos'
 import { BOOKMARK_LIMIT } from '@/common/variables'
 import {onScroll} from './scroll'
@@ -51,10 +51,7 @@ const stopBookmarkEdit = () => {
 }
 
 const startBookmarkEdit = (e, chapters) => {
-  if (mainBM.chI == null && !withinBookmarkLimit.value) {
-    // console.warn(`[AO3 IPB] Reached bookmark limit! Maximum bookmark: ${BOOKMARK_LIMIT}`)
-    return
-  }
+  if (mainBM.chI == null && !withinBookmarkLimit.value) return
 
   mainContent.classList.toggle('bmInProgress', true)
   bmInProgress.value = true
@@ -83,7 +80,7 @@ const startBookmarkEdit = (e, chapters) => {
 
 let countDownInt = null
 const jumpToBookmark = (chapters, curChI) => {
-  if (!fullViewMode && mainBM.chI != curChI.value) return
+  if (!isEntireWork && mainBM.chI != curChI.value) return
       
   const {top, height} = chapters[mainBM.chI]
   const bmPos = top + height * mainBM.perc
