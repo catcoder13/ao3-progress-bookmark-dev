@@ -1,11 +1,11 @@
 <template>
-  <div class="ipb-tab">
-    <h2 class="ipb-title" v-if="title">{{ title }}</h2>
+  <div class="ao3pb-tab">
+    <h2 class="ao3pb-title" v-if="title">{{ title }}</h2>
     <button :class="{current: opt.val == modelValue.val}" v-for="(opt,i) in options" :key="i" @click="() => onSelect(opt)" :tabindex="getTabIndex([0])">
       <IpbIcon v-if="opt.icon" :type="opt.icon" fill=""/>
-      <span class="ipb-symbol" v-if="opt.symbol" v-html="opt.symbol"></span>
+      <span class="ao3pb-symbol" v-if="opt.symbol" v-html="opt.symbol"></span>
       <span>{{getOptLabel(opt)}}</span>
-      <button class="ipb-sort" :title="`${opt.label} is sorted in ${settingsPU.descends[i] ? 'descending' : 'ascending'} order`"
+      <button class="ao3pb-sort" :title="`${opt.label} is sorted in ${settingsPU.descends[i] ? 'descending' : 'ascending'} order`"
         @click="e => updateDescends(e, i)" :tabindex="getTabIndex([0], opt.val === modelValue.val)">
         <IpbIcon type="sort" fill="#333" :open="!settingsPU.descends[i]"/>
       </button>
@@ -41,7 +41,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-tab {
+.ao3pb-tab {
   position: relative;
 
   h2 {
@@ -73,14 +73,14 @@ export default {
       &:not(:last-child) { padding-right: 2px; }
     }
 
-    .ipb-icon {
+    .ao3pb-icon {
       width: 11px;
       height: 11px;
 
       path { fill: #333; }
     }
 
-    button.ipb-sort {
+    button.ao3pb-sort {
       pointer-events: none;
       opacity: 0.2;
     }
@@ -91,7 +91,7 @@ export default {
       background-color: rgba(#333, 0.6);
       color: #FFF;
 
-      .ipb-icon path { fill: #FFF; }
+      .ao3pb-icon path { fill: #FFF; }
     }
 
     &.current {
@@ -100,16 +100,16 @@ export default {
       color: #FFF;
       opacity: 1;
       
-      .ipb-icon path { fill: #FFF; }
+      .ao3pb-icon path { fill: #FFF; }
 
-      .ipb-sort {
+      .ao3pb-sort {
         pointer-events: all;
         cursor: pointer;
         opacity: 1;
 
         &:hover,
         &:focus-visible {
-          .ipb-icon {
+          .ao3pb-icon {
             transform: scale(1.2);
             
             path { fill: red; }

@@ -1,41 +1,41 @@
 <template>
   <IpbSetting></IpbSetting>
 
-  <div class="ipb-popup">
+  <div class="ao3pb-popup">
     <button @click="clearLocalStorage" tabindex="-1" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer', backgroundColor: '#FFF'}">Clear sync storage</button>
-    <h1 class="ipb-popup__title">AO3 Progress Bookmark</h1>
-    <!-- <h1 class="ipb-popup__title">&nbsp;</h1> -->
+    <h1 class="ao3pb-popup__title">AO3 Progress Bookmark</h1>
+    <!-- <h1 class="ao3pb-popup__title">&nbsp;</h1> -->
     <IpbSearch />
     
-    <div class="ipb-popup__filter">
+    <div class="ao3pb-popup__filter">
       <IpbSortByTab  title="Sort works by:" :options="SORT_BY" v-model="settingsPU.sortBy" />
-      <div class="ipb-popup__filter__sideBtn">
-        <button class="ipb-icon-wrapper" :title="compactTitle(settingsPUUI.compact)"
+      <div class="ao3pb-popup__filter__sideBtn">
+        <button class="ao3pb-icon-wrapper" :title="compactTitle(settingsPUUI.compact)"
           @click="onCompactClick" :tabindex="getTabIndex([0])">
           <IpbIcon type="compact" fill="#333" :index="settingsPUUI.compact" />
         </button>
       </div>
     </div>
 
-    <div class="ipb-popup__subhead">
-      <div class="ipb-popup__subhead__summary">
+    <div class="ao3pb-popup__subhead">
+      <div class="ao3pb-popup__subhead__summary">
         <button v-if="selection" @click="clearSelection" :tabindex="getTabIndex([0])">&#10006; Clear search result</button>
         <span>{{ Object.keys(works).length }}/{{ BOOKMARK_LIMIT }} work(s)</span>
       </div>
       
-      <div class="ipb-popup__subhead__author" v-if="selection && selection.type === 'author'">
+      <div class="ao3pb-popup__subhead__author" v-if="selection && selection.type === 'author'">
         <IpbIcon type="author" fill="#166fce" />
         <a href="#" :title="`Visit ${selection.val}'s AO3 page`" @click="() => visitURL(selection.authorURL)" :tabindex="getTabIndex([0])">{{ selection.val }}</a>
       </div>
     </div>
     
-    <IpbScrollWrapper class="ipb-popup__wrapper" :options="sortedWorks" :maxResultAllowed="10">
+    <IpbScrollWrapper class="ao3pb-popup__wrapper" :options="sortedWorks" :maxResultAllowed="10">
       <template v-slot:item="{item}">
         <IpbPopupItem :work="item" />
         {{ item.i }}
       </template>
       
-      <span v-if="!Object.keys(sortedWorks).length" class="ipb-no-bm-msg">No bookmark added.</span>
+      <span v-if="!Object.keys(sortedWorks).length" class="ao3pb-no-bm-msg">No bookmark added.</span>
     </IpbScrollWrapper>
   </div>
 </template>
@@ -128,7 +128,7 @@ export default {
 <style lang="scss">
 $bg: #FFF;
 
-.ipb-popup {
+.ao3pb-popup {
   width: 450px;
   max-height: 350px;
   overflow: hidden;
@@ -137,7 +137,7 @@ $bg: #FFF;
   text-align: left;
   background-color: $ao3_red;
 
-  .ipb-popup__title {
+  .ao3pb-popup__title {
     display: block;
     font-size: 18px;
     line-height: 1;
@@ -148,30 +148,30 @@ $bg: #FFF;
     background: linear-gradient(to bottom, transparent 0%, #4c0000 100%);
   }
 
-  .ipb-popup__filter {
+  .ao3pb-popup__filter {
     position: relative;
     background-color: $bm_filter_bar_color;
 
-    .ipb-tab {
+    .ao3pb-tab {
       display: block;
       padding: 5px 10px;
     }
 
-    &.ipb-popup__filter--author {
-      .ipb-sortby {
+    &.ao3pb-popup__filter--author {
+      .ao3pb-sortby {
         h2 { font-size: 12px; }
         span { font-size: 10px; }
       }
     }
     
-    .ipb-popup__filter__sideBtn {
+    .ao3pb-popup__filter__sideBtn {
       display: flex;
       gap: 3px;
       position: absolute;
       right: 5px;
       top: 5px;
 
-      .ipb-icon-wrapper {
+      .ao3pb-icon-wrapper {
         cursor: pointer;
         opacity: 0.8;
         transition: opacity 0.2s;
@@ -184,12 +184,12 @@ $bg: #FFF;
     }
   }
 
-  .ipb-popup__subhead {
+  .ao3pb-popup__subhead {
     line-height: 1;
     padding: 2px 10px;
     background-color: #FFF;
 
-    .ipb-popup__subhead__summary {
+    .ao3pb-popup__subhead__summary {
       button {
         border: 1px solid #888;
         padding: 4px 8px;
@@ -206,14 +206,14 @@ $bg: #FFF;
       span { float: right; }
     }
 
-    .ipb-popup__subhead__author {
+    .ao3pb-popup__subhead__author {
       padding-top: 5px;
       font-size: 14px;
       font-weight: bold;
     }
   }
 
-  .ipb-popup__wrapper {
+  .ao3pb-popup__wrapper {
     position: relative;
     min-height: 200px;
     padding: 5px 15px 15px;
@@ -223,7 +223,7 @@ $bg: #FFF;
     background-color: $bg;
     overflow-y: overlay;
 
-    .ipb-no-bm-msg {
+    .ao3pb-no-bm-msg {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -231,19 +231,7 @@ $bg: #FFF;
       padding: 10px;
       white-space: nowrap;
     }
-
-    // a.ipb-author {
-    //   font-size: 16px;
-    //   font-weight: bold;
-    //   display: inline-block;
-    //   line-height: 1;
-    //   padding-bottom: 2px;
-    //   margin-bottom: 5px;
-    //   color: $link_blue;
-    //   border-color: $link_blue;
-    // }
-
-    .ipb-popup__author-works {
+    .ao3pb-popup__author-works {
       padding-bottom: 10px;
     }
   }

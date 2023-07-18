@@ -1,14 +1,14 @@
 <template>
-  <div class="ipb-search" :class="{open}">
+  <div class="ao3pb-search" :class="{open}">
     <input type="text" tabindex="-1" :value="selection && selection.text" :style="{opacity: partialText ? 0 : (open ? 0.5 : 1)}"/>
-    <input class="ipb-search_main" ref="input" type="text" :value="partialText" :tabindex="getTabIndex([0])"
+    <input class="ao3pb-search_main" ref="input" type="text" :value="partialText" :tabindex="getTabIndex([0])"
       @input="onInput"
       :placeholder="selection ? '' : 'Search bookmark items by author name or work title'"
       @click="onFocus"
       @blur="onBlur"
       @keydown="onKeyDown"
     />
-    <button class="ipb-close" v-if="selection" @click="clearSelection" title="Clear search result" :tabindex="getTabIndex([0])">&#10006;</button>
+    <button class="ao3pb-close" v-if="selection" @click="clearSelection" title="Clear search result" :tabindex="getTabIndex([0])">&#10006;</button>
     <IpbSearchResult v-if="open" @select="onSelect" :options="searchResults" />
   </div>
 </template>
@@ -50,7 +50,7 @@ export default {
         }
 
         const onBlur = e => {
-            if (!e.relatedTarget || !e.relatedTarget.classList.contains("ipb-search-blur-ref")) {
+            if (!e.relatedTarget || !e.relatedTarget.classList.contains("ao3pb-search-blur-ref")) {
               open.value = false
               partialText.value = ''
             }
@@ -120,7 +120,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-search {
+.ao3pb-search {
   position: relative;
 
   &.open {
@@ -131,7 +131,7 @@ export default {
       top: 8px;
     }
 
-    .ipb-close { display: none; }
+    .ao3pb-close { display: none; }
   }
 
   input {
@@ -153,7 +153,7 @@ export default {
 
   }
 
-  .ipb-close {
+  .ao3pb-close {
     position: absolute;
     right: 25px;
     top: 50%;
@@ -181,7 +181,7 @@ export default {
     pointer-events: none;
   }
   
-  .ipb-search-result {
+  .ao3pb-search-result {
     position: absolute;
     z-index: 1;
     bottom: 0;

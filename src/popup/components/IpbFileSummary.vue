@@ -1,5 +1,5 @@
 <template>
-  <div class="ipb-file-summary">
+  <div class="ao3pb-file-summary">
     <h2>Import summary</h2>
     <div v-if="!summaries.workCount">
       <span>No bookmark data found in this file!</span>
@@ -7,22 +7,22 @@
     <div v-else-if="summaries.workCount > BOOKMARK_LIMIT">
       <span>Bookmark data exceeds limit! (Limit: {{ BOOKMARK_LIMIT }}, bookmark data in file: {{ summaries.workCount }})</span>
     </div>
-    <div v-else class="ipb-file-summary__content">
+    <div v-else class="ao3pb-file-summary__content">
       <h4>Total work(s) from file: {{ summaries.workCount }}</h4>
-      <div class="ipb-author-work" tabindex="0">
+      <div class="ao3pb-author-work" tabindex="0">
         <h4>Authors</h4>
         <div class="" v-for="(authorWorkCount, authorName) in summaries.authors" :key=authorName>
           <IpbIcon type="author" fill="#999" />
           <span>{{ authorName }}: {{ authorWorkCount }} work{{ authorWorkCount > 1 ? 's' : ''}}</span>
         </div>
       </div>
-      <div class="ipb-remark">
+      <div class="ao3pb-remark">
         <b>Note: All existing bookmarks will be removed before importing above bookmark records!</b>!
       </div>
     </div>
     
-    <div class="ipb-button">
-      <button :class="{'ipb-disable': !summaries.workCount || summaries.workCount > BOOKMARK_LIMIT }" @click="onConfirmImport">Confirm import</button>
+    <div class="ao3pb-button">
+      <button :class="{'ao3pb-disable': !summaries.workCount || summaries.workCount > BOOKMARK_LIMIT }" @click="onConfirmImport">Confirm import</button>
       <button @click="onCancel">Cancel</button>
     </div>
   </div>
@@ -77,7 +77,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-setting .ipb-file-summary {
+.ao3pb-setting .ao3pb-file-summary {
   width: 100%;
   height: 100%;
   padding: 20px;
@@ -95,10 +95,10 @@ export default {
     line-height: 1;
   }
 
-  .ipb-file-summary__content {
+  .ao3pb-file-summary__content {
     & > *:not(:last-child) { padding-bottom: 5px; }
 
-    .ipb-author-work {
+    .ao3pb-author-work {
       max-height: 110px;
       overflow-y: overlay;
       background-color: #333;
@@ -114,13 +114,13 @@ export default {
 
   
 
-  .ipb-remark {
+  .ao3pb-remark {
     font-size: 13px;
     color: red;
   }
 
-  .ipb-button {
-    button.ipb-disable {
+  .ao3pb-button {
+    button.ao3pb-disable {
       opacity: 0.5;
       cursor: not-allowed;
 

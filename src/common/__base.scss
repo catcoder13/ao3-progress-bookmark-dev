@@ -52,7 +52,7 @@ body {
     &:focus { outline: none; }
   }
 
-  .ipb-btn-child {
+  .ao3pb-btn-child {
     position: relative;
 
     &::before {
@@ -77,7 +77,7 @@ body {
     &:hover { border-bottom: 1px solid $link_blue; }
     
     &:focus { outline: none; }
-    &.ipb-a-button {
+    &.ao3pb-a-button {
       position: relative;
       outline: none;
       border-bottom: none;
@@ -91,7 +91,7 @@ body {
       }
 
       &:active::before,
-      &:active .ipb-btn-child::before {
+      &:active .ao3pb-btn-child::before {
         opacity: 1;
       }
 
@@ -109,7 +109,7 @@ body {
     }
   }
 
-  // .ipb-style-scrollbar {
+  // .ao3pb-style-scrollbar {
   //   overflow-y: auto;
 
   //   &::-webkit-scrollbar { width: 15px; }

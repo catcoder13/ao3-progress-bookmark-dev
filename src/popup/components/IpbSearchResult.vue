@@ -1,5 +1,5 @@
 <template>
-  <IpbScrollWrapper class="ipb-search-result" :options="options" :anchorMin="anchorMin"
+  <IpbScrollWrapper class="ao3pb-search-result" :options="options" :anchorMin="anchorMin"
     @mounted="onWrapperMounted"
 
     @top="onReachEdge" @bottom="onReachEdge">
@@ -7,13 +7,13 @@
         <button
             @mousemove="() => onNewItemHover(item)"
             @click="$emit('select', $event, item)"
-            class="ipb-search-blur-ref" :class="{current: hoverredItem.i === item.i, [item.type]: true}" >
+            class="ao3pb-search-blur-ref" :class="{current: hoverredItem.i === item.i, [item.type]: true}" >
             <IpbIcon v-if="item.type === 'author'" type="author" fill="#84b4e7" />
             <span>
               {{ item.text }}
               <!-- {{ item.i }} -->
             </span>
-            <span class="ipb-author" v-if="item.type === 'work'">by {{ item.author }}</span>
+            <span class="ao3pb-author" v-if="item.type === 'work'">by {{ item.author }}</span>
           </button>
       </template>
       <template v-if="!options.length">
@@ -62,7 +62,7 @@ export default {
     async newI => {
       if (newI >= 0) {
         if (hoverredItem.viaNav) {
-          const targetElem = scrollWrapper.value.querySelector(`#ipb-item-${p.options[newI].id}`)
+          const targetElem = scrollWrapper.value.querySelector(`#ao3pb-item-${p.options[newI].id}`)
           correctScrollPos(targetElem)
 
           if (newI === anchorRef.min) {
@@ -85,7 +85,7 @@ export default {
         for (var i = anchorRef.min; i <= anchorRef.max; i++) {
           if (p.options[i].id === selection.value.id) {
             onNewItemHover(p.options[i])
-            scrollWrapper.value.querySelector(`#ipb-item-${selection.value.id}`).scrollIntoView()
+            scrollWrapper.value.querySelector(`#ao3pb-item-${selection.value.id}`).scrollIntoView()
             break
           }
         }
@@ -114,7 +114,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-search-result {
+.ao3pb-search-result {
     display: flex;
     flex-direction: column;
     background-color: #FFF;
@@ -137,7 +137,7 @@ export default {
         vertical-align: bottom;
       }
 
-      .ipb-icon { padding-right: 2px; }
+      .ao3pb-icon { padding-right: 2px; }
 
       &.current,
       &.author.current {
@@ -154,7 +154,7 @@ export default {
         
         &:first-of-type { padding-right: 2px; }
 
-        &.ipb-author {
+        &.ao3pb-author {
           opacity: 0.7;
           font-size: 10px;
         }

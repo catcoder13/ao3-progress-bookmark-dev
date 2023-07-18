@@ -1,8 +1,8 @@
 <template>
-<div class="ipb-bookmark ipb-bookmark--static" :class="ipbBookmarkClass()" :style="{top: `${pos}px`}">
-  <div class="ipb-bookmark-content">
+<div class="ao3pb-bookmark ao3pb-bookmark--static" :class="ipbBookmarkClass()" :style="{top: `${pos}px`}">
+  <div class="ao3pb-bookmark-content">
   
-    <div class="ipb-bookmark__btn">
+    <div class="ao3pb-bookmark__btn">
       <div @click="removeBookmark" title="Remove this bookmark">
         <IpbIcon fill="red" type="trash" />
         <span>Remove bookmark</span>
@@ -13,11 +13,11 @@
       </div>
     </div>
 
-    <div class="ipb-bookmark__icon">
+    <div class="ao3pb-bookmark__icon">
       <IpbIcon type="location" fill=""></IpbIcon>
     </div>
 
-    <span class="ipb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>  
+    <span class="ao3pb-bookmark__info">Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>  
   </div>
 </div>
 </template>
@@ -46,45 +46,45 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-bookmark.ipb-bookmark--static {
+.ao3pb-bookmark.ao3pb-bookmark--static {
   position: absolute;
   pointer-events: none;
 
   & > * { pointer-events: all; }
 
-  &.bmInProgress.ipb-bookmark > * {
+  &.bmInProgress.ao3pb-bookmark > * {
     pointer-events: none;
 
-    .ipb-icon path { fill: #333; }
+    .ao3pb-icon path { fill: #333; }
   }
 
-  &.highlight .ipb-bookmark-content {
+  &.highlight .ao3pb-bookmark-content {
     pointer-events: none;
 
-    .ipb-bookmark__icon {
+    .ao3pb-bookmark__icon {
       animation: bookmarkScale 0.3s 4 alternate;
 
-      .ipb-icon { opacity: 1; }
+      .ao3pb-icon { opacity: 1; }
     }
   }  
 
-  .ipb-bookmark-content {
-    .ipb-bookmark__icon .ipb-icon { fill: $ao3_red; }
-    .ipb-bookmark__btn { display: none; }
+  .ao3pb-bookmark-content {
+    .ao3pb-bookmark__icon .ao3pb-icon { fill: $ao3_red; }
+    .ao3pb-bookmark__btn { display: none; }
 
     &:hover {
-      .ipb-bookmark__btn  > div:hover {
+      .ao3pb-bookmark__btn  > div:hover {
         transition: transform 0.2s;
         transform: scale(1.1);
       }
 
-      .ipb-bookmark__info { display: block; }
+      .ao3pb-bookmark__info { display: block; }
     }
   }
 
-  .ipb-bookmark__info { display: none; }
+  .ao3pb-bookmark__info { display: none; }
   
-} // ipb-bookmark
+} // ao3pb-bookmark
 
 
 </style>

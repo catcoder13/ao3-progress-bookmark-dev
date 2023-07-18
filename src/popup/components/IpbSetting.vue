@@ -1,33 +1,33 @@
 <template>
-  <div class="ipb-setting" :class="{open: toggle}" @click="onClickedAreaCheck">
-    <button class="ipb-setting__entry" @click="onToggle" :tabindex="getTabIndex([0,1])">
+  <div class="ao3pb-setting" :class="{open: toggle}" @click="onClickedAreaCheck">
+    <button class="ao3pb-setting__entry" @click="onToggle" :tabindex="getTabIndex([0,1])">
       <IpbIcon v-if="!toggle" type="menu" fill="#FFF" :open="false"/>
       <span v-else>&#10006;</span>
     </button>
     
-    <div class="ipb-style-scrollbar">
+    <div class="ao3pb-style-scrollbar">
       <h1>Settings</h1>
-      <div class="ipb-setting__option-group">
+      <div class="ao3pb-setting__option-group">
         <h2>AO3 work page layout</h2>
-        <div class="ipb-setting__option-group__item">
-          <div class="ipb-tab--custom">
+        <div class="ao3pb-setting__option-group__item">
+          <div class="ao3pb-tab--custom">
             <button :class="{checked: !settings.alignRight}" @click="settings.alignRight = false" :tabindex="getTabIndex([1])">Left</button>
             <button :class="{checked: settings.alignRight}" @click="settings.alignRight = true" :tabindex="getTabIndex([1])">Right</button>
           </div>
           <h3>Buttons alignment</h3>
         </div>
         
-        <div class="ipb-setting__option-group__item">
+        <div class="ao3pb-setting__option-group__item">
           <IpbToggle v-model="settings.progressBar" :tabindex="getTabIndex([1])" />
           <h3>Chapter progress bar</h3>
         </div>
         
-        <div class="ipb-setting__option-group__item">
+        <div class="ao3pb-setting__option-group__item">
           <IpbToggle v-model="settings.extraSideBtn" :tabindex="getTabIndex([1])"/>
           <h3>Extra navigation buttons</h3>
         </div>
         
-        <div class="ipb-setting__extra-btn" :class="{enabled: settings.extraSideBtn}">
+        <div class="ao3pb-setting__extra-btn" :class="{enabled: settings.extraSideBtn}">
           <button v-for="(val, btnKey) in settingExtraBtn" :key="btnKey" :tabindex="getTabIndex([1], settings.extraSideBtn)"
             :class="{checked: val}"
             @click="() => onExtraBtnClick(btnKey, !val)">
@@ -36,47 +36,47 @@
           </button>
         </div>
 
-        <button class="ipb-setting__reset" @click="onResetSetting" :tabindex="getTabIndex([1])">Reset to default settings</button>
+        <button class="ao3pb-setting__reset" @click="onResetSetting" :tabindex="getTabIndex([1])">Reset to default settings</button>
       </div>
      
-      <div class="ipb-setting__option-group">
+      <div class="ao3pb-setting__option-group">
         <h2>Bookmark data</h2>
-        <div class="ipb-setting__option-group__item">
+        <div class="ao3pb-setting__option-group__item">
           <input id="importBMInput" ref="inputFile" type="file" accept=".json" @change="e => curFile = e.target.files[0]" required :tabindex="getTabIndex([1])"/>
           <label for="importBMInput">&#x1F5C1; Upload</label>
           <h3>Import bookmark data</h3>
         </div>
 
-        <div class="ipb-setting__option-group__item">
+        <div class="ao3pb-setting__option-group__item">
           <button @click="downloadData" :tabindex="getTabIndex([1])">&#x1F5AB; Download</button>
           <h3>Download bookmark data</h3>
         </div>
 
-        <div class="ipb-setting__option-group__item ipb-delete">
+        <div class="ao3pb-setting__option-group__item ao3pb-delete">
           <button @click="deleteMsgOn = true" :tabindex="getTabIndex([1])">&#x1F5D1; Remove</button>
           <h3>Remove all bookmarks</h3>
         </div>
       </div>
 
-      <div class="ipb-setting__option-group">
+      <div class="ao3pb-setting__option-group">
         <h2>Q & A</h2>
         <IpbQA v-for="([q, ans, extra], i) in Q_A" :key="i" :q="q" :ans="ans" :extra="extra" />
       </div>
     </div>
 
-    <div v-if="curFile" class="ipb-setting__overlay-msg">
+    <div v-if="curFile" class="ao3pb-setting__overlay-msg">
       <IpbFileSummary :file="curFile" @complete="importComplete" @cancel="onClearImport"/>
     </div>
 
-    <div v-if="deleteMsgOn" class="ipb-setting__overlay-msg">
-      <div class="ipb-text">
+    <div v-if="deleteMsgOn" class="ao3pb-setting__overlay-msg">
+      <div class="ao3pb-text">
         <span>
           <b>Are you sure you want to remove all bookmark data?</b>
           <br />
           Before proceeding, it is advised to download your bookmark data using the "Download" button under the "Download bookmark data" setting section for potential recovery.</span>
       </div>
-      <div class="ipb-button">
-        <button class="ipb-delete" @click="onDeleteAllBookmarkData" :tabindex="getTabIndex([2])">Confirm remove</button>
+      <div class="ao3pb-button">
+        <button class="ao3pb-delete" @click="onDeleteAllBookmarkData" :tabindex="getTabIndex([2])">Confirm remove</button>
         <button @click="deleteMsgOn = false" :tabindex="getTabIndex([2])">Cancel</button>
       </div>
     </div>
@@ -192,7 +192,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-setting {
+.ao3pb-setting {
   position: fixed;
   top: 0;
   left: 0;
@@ -206,17 +206,17 @@ export default {
     pointer-events: all;
     transition: background-color 0.2s 0.2s;
     
-    .ipb-style-scrollbar {
+    .ao3pb-style-scrollbar {
       visibility:visible;
       transform: translateX(0);
       transition: transform 0.3s;
     }
 
-    .ipb-setting__entry:hover,
-    .ipb-setting__entry:focus-visible { background-color: rgba(#FFF, 0.8); }
+    .ao3pb-setting__entry:hover,
+    .ao3pb-setting__entry:focus-visible { background-color: rgba(#FFF, 0.8); }
   }
 
-  .ipb-setting__entry {
+  .ao3pb-setting__entry {
     position: absolute;
     z-index: 1;
     right: 10px;
@@ -240,7 +240,7 @@ export default {
       color: #666;
     }
 
-    .ipb-icon {
+    .ao3pb-icon {
       width: 25px;
       height: 25px;
     }
@@ -256,7 +256,7 @@ export default {
     margin-bottom: 15px;
   }
 
-  & > .ipb-style-scrollbar {
+  & > .ao3pb-style-scrollbar {
     visibility: hidden;
     position: absolute;
     top: 0;
@@ -271,7 +271,7 @@ export default {
     box-sizing: border-box;
     overflow-y: scroll;
 
-    .ipb-setting__option-group {
+    .ao3pb-setting__option-group {
       margin-bottom: 40px;
 
       h2 {
@@ -286,22 +286,22 @@ export default {
         color: #666;
       }
 
-      .ipb-setting__option-group__item {
+      .ao3pb-setting__option-group__item {
         display: flex;
         flex-direction: row-reverse;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 5px;
 
-        .ipb-toggle ~ h3 { opacity: 0.3; }
-        .ipb-toggle.checked ~ h3 { opacity: 1; }
+        .ao3pb-toggle ~ h3 { opacity: 0.3; }
+        .ao3pb-toggle.checked ~ h3 { opacity: 1; }
 
         h3 {
           font-size: 12px;
           line-height: 1;
         }
 
-        & > button:not(.ipb-toggle) {
+        & > button:not(.ao3pb-toggle) {
           border: 1px solid #777;
           cursor: pointer;
           padding: 5px 8px;
@@ -342,7 +342,7 @@ export default {
           }
         }
 
-        &.ipb-delete {
+        &.ao3pb-delete {
           button:hover,
           button:focus-visible {
             border-color: $red;
@@ -350,7 +350,7 @@ export default {
           }
         }
 
-        .ipb-tab--custom {
+        .ao3pb-tab--custom {
           display: flex;
 
           button {
@@ -376,9 +376,9 @@ export default {
 
           }
         }
-      } // .ipb-setting__option-group__item
+      } // .ao3pb-setting__option-group__item
 
-      .ipb-setting__extra-btn {
+      .ao3pb-setting__extra-btn {
         opacity: 0.5;
         cursor: not-allowed;
         
@@ -415,7 +415,7 @@ export default {
 
           & > * { display: inline-block; vertical-align: middle; }
 
-          .ipb-icon {
+          .ao3pb-icon {
             width: 12px;
             height: 12px;
             padding-right: 2px;
@@ -423,7 +423,7 @@ export default {
         }
       }
 
-      .ipb-setting__reset {
+      .ao3pb-setting__reset {
         background-color: #666;
         color: #FFF;
         line-height: 1;
@@ -435,10 +435,10 @@ export default {
         &:hover,
         &:focus-visible { background-color: #333; }
       }
-    } // ipb-setting__option-group
+    } // ao3pb-setting__option-group
   }
 
-  .ipb-setting__overlay-msg {
+  .ao3pb-setting__overlay-msg {
     position: fixed;
     top: 0;
     left: 0;
@@ -450,7 +450,7 @@ export default {
     flex-direction: column;
     font-size: 15px;
 
-    .ipb-text {
+    .ao3pb-text {
       padding: 80px 20px 40px;
 
       span {
@@ -462,7 +462,7 @@ export default {
       }
     }
 
-    .ipb-button {
+    .ao3pb-button {
       text-align: center;
 
       button {
@@ -475,8 +475,8 @@ export default {
         &:hover,
         &:focus-visible { filter: brightness(0.8); }
 
-        &.ipb-delete:hover,
-        &.ipb-delete:focus-visible {
+        &.ao3pb-delete:hover,
+        &.ao3pb-delete:focus-visible {
           background-color: $red;
           color: #FFF;
         }
@@ -484,5 +484,5 @@ export default {
     }
     
   }
-} // .ipb-setting
+} // .ao3pb-setting
 </style>

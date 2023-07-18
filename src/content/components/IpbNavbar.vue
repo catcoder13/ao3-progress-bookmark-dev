@@ -1,43 +1,43 @@
 <template>
-  <div class="ipb-navbar" :class="{stucked}" :style="{top: `${navbarElem.top}px`, width: `${navbarElem.width}px`}">
+  <div class="ao3pb-navbar" :class="{stucked}" :style="{top: `${navbarElem.top}px`, width: `${navbarElem.width}px`}">
     <a :href="navbarHref(chI)" :class="navbarBarClass(chI)" v-for="(chInfo, chI) in chapterInfos" :key="chI"
       @mouseenter="hoveredChI = chI" @mouseleave="hoveredChI = null">
-      <span class="ipb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${curChProgress}%`}"></span>
+      <span class="ao3pb-navbar__bar__progress-bar" v-if="chI == curChI" :style="{width: `${curChProgress}%`}"></span>
       <template v-if="mainBM.chI != null && mainBM.chI == chI">
-        <IpbIcon class="ipb-navbar__bar__bm" type="location" fill="#000" :style="{left: `${mainBM.perc * 100}%`}" />
+        <IpbIcon class="ao3pb-navbar__bar__bm" type="location" fill="#000" :style="{left: `${mainBM.perc * 100}%`}" />
       </template>
     </a>
   </div>
       
-  <div v-if="hoveredChI != null" class="ipb-navbar-info" :style="infoPos">
-    <span class="ipb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
-    <div class="ipb-heading">
+  <div v-if="hoveredChI != null" class="ao3pb-navbar-info" :style="infoPos">
+    <span class="ao3pb-note" v-if="chapterInfos.length > 1">{{ (fullViewMode) ? 'Entire work' : 'Chapter by chapter' }}</span>
+    <div class="ao3pb-heading">
       <IpbIcon v-if="mainBM.chI != null && mainBM.chI == approxChI" />
       <b v-if="oneShot">{{name}}</b>
       <b v-else>Chapter {{ parseInt(approxChI) + 1 }}</b>
     </div>
     
-    <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ipb-title">{{ chapterInfos[approxChI].title }}</span>
+    <span v-if="approxChI != null && chapterInfos[approxChI].title" class="ao3pb-title">{{ chapterInfos[approxChI].title }}</span>
 
     <template v-if="hoveredChI != null && !bmInProgress">
-      <span class="ipb-desc" v-if="fullViewMode">
+      <span class="ao3pb-desc" v-if="fullViewMode">
         <IpbIcon type="mouse" fill="#999"/>
         Jump to <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b>
       </span>
-      <span class="ipb-desc" v-else-if="hoveredChI != curChI">
+      <span class="ao3pb-desc" v-else-if="hoveredChI != curChI">
         <IpbIcon type="visit" fill="#999"/>
         Visit <b>Chapter {{ parseInt(hoveredChI) + 1 }}</b>
       </span>
-      <span class="ipb-desc" v-else>
+      <span class="ao3pb-desc" v-else>
         <IpbIcon type="mouse" fill="#999"/>
         Back to the beginning of this {{oneShot ? 'one-shot' : 'chapter'}}
       </span>
     </template>
   </div>
 
-  <div v-else-if="approxChI != null" class="ipb-navbar-info ipb-navbar-info--short" :style="infoPos">
-    <b v-if="oneShot" class="ipb-heading">One-shot</b>
-    <b v-else class="ipb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
+  <div v-else-if="approxChI != null" class="ao3pb-navbar-info ao3pb-navbar-info--short" :style="infoPos">
+    <b v-if="oneShot" class="ao3pb-heading">One-shot</b>
+    <b v-else class="ao3pb-heading">Chapter {{ parseInt(approxChI) + 1 }}</b>
   </div>
 
   
@@ -128,10 +128,10 @@ export default {
 
     const navbarBarClass = chI => {
       return {
-        "ipb-navbar__bar ipb-a-button": true,
+        "ao3pb-navbar__bar ao3pb-a-button": true,
         "has-bm": mainBM.chI && mainBM.chI == chI,
-        "ipb-focus": approxChI.value == chI,
-        'ipb-current': curChI.value == chI
+        "ao3pb-focus": approxChI.value == chI,
+        'ao3pb-current': curChI.value == chI
       }
     }
 
@@ -172,7 +172,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-navbar {
+.ao3pb-navbar {
   position: absolute;
   width: 100%;
   left: 50%;
@@ -184,18 +184,18 @@ export default {
   &.stucked {
     position: fixed;
 
-    .ipb-navbar__bar {
+    .ao3pb-navbar__bar {
       opacity: 1;
 
-      &:not(:only-child).ipb-current {
+      &:not(:only-child).ao3pb-current {
         height: 8px;
 
-        &.ipb-focus { height: 17px; }
+        &.ao3pb-focus { height: 17px; }
       }
     }
   }
 
-  .ipb-navbar__bar {
+  .ao3pb-navbar__bar {
     position: relative;
     bottom: 0;
     box-sizing: border-box;
@@ -211,7 +211,7 @@ export default {
 
     &.has-bm { background-color: #e84f4f; }
 
-    &.ipb-focus {
+    &.ao3pb-focus {
       height: 17px;
       cursor: pointer;
       opacity: 1;
@@ -222,7 +222,7 @@ export default {
       }
     }
 
-    .ipb-navbar__bar__progress-bar {
+    .ao3pb-navbar__bar__progress-bar {
       position: absolute;
       top: 0;
       left: 0;
@@ -230,9 +230,9 @@ export default {
       background-color: $bar_darken_color;
     }
 
-    &.has-bm .ipb-navbar__bar__progress-bar { background-color: $ao3_red; }
+    &.has-bm .ao3pb-navbar__bar__progress-bar { background-color: $ao3_red; }
 
-    .ipb-navbar__bar__bm {
+    .ao3pb-navbar__bar__bm {
       position: absolute;
       top: 1px;
       transform: translateX(-50%);
@@ -244,18 +244,18 @@ export default {
 
 } // navbar
 
-.ipb-navbar-info.ipb-navbar-info--short {
+.ao3pb-navbar-info.ao3pb-navbar-info--short {
   opacity: 0.8;
   padding: 5px;
 
-  .ipb-heading {
+  .ao3pb-heading {
     padding: 0;
     font-size: 10px;
     min-width: 0;
   }
 } 
 
-.ipb-navbar-info {
+.ao3pb-navbar-info {
   position: fixed;
   z-index: 100;
   background-color: #eee;
@@ -272,7 +272,7 @@ export default {
     &:not(:last-child) { padding-bottom: 7px; }
   }
 
-  .ipb-heading {
+  .ao3pb-heading {
     font-size: 12px;
     line-height: 1;
     min-width: 100px;
@@ -285,10 +285,10 @@ export default {
 
     & > * { vertical-align: middle;}
 
-    .ipb-icon { display: inline-block; width: 20px; height: 20px; }
+    .ao3pb-icon { display: inline-block; width: 20px; height: 20px; }
   }
 
-  .ipb-note {
+  .ao3pb-note {
     position: absolute;
     font-size: 10px;
     top: 0;
@@ -298,18 +298,18 @@ export default {
     color: #FFF;
   }
 
-  .ipb-title {
+  .ao3pb-title {
     font-size: 13px;
     color: #444;
     padding-bottom: 5px;
   }
 
-  .ipb-bm-note {
+  .ao3pb-bm-note {
     font-size: 11px;
 
     & > * { display: inline-block; vertical-align: middle;}
 
-    .ipb-icon {
+    .ao3pb-icon {
       width: 17px; height: 17px;
       padding-right: 3px;
 
@@ -319,10 +319,10 @@ export default {
     }
   }
 
-  .ipb-desc {
+  .ao3pb-desc {
     font-size: 11px;
     font-style: italic;
     color: #85aec2;
   }
-} // ipb-navbar-info
+} // ao3pb-navbar-info
 </style>

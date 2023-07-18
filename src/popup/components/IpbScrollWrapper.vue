@@ -1,13 +1,13 @@
 <template>
-  <div ref="wrapper" class="ipb-scroll-wrapper" @scroll="onScroll">
+  <div ref="wrapper" class="ao3pb-scroll-wrapper" @scroll="onScroll">
     <template v-if="animate">
       <TransitionGroup name="fade-in">
-        <div class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
+        <div class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
           <slot name="item" v-bind="{item}"></slot>
         </div>
       </TransitionGroup>
     </template>
-    <div v-else class="ipb-scroll-wrapper__item" :id="`ipb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
+    <div v-else class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="item in filteredOptions" :key="item.id">
       <slot name="item" v-bind="{item}"></slot>
     </div>
     
@@ -62,7 +62,7 @@ export default {
       const {scrollTop, scrollHeight} = scrollContainer
       
       if (scrollTop <= REACH_EDGE_THRESHOLD && anchor.min > 0) { // reach scroll top
-        const prevID = `#ipb-item-${filteredOptions.value[0].id}`
+        const prevID = `#ao3pb-item-${filteredOptions.value[0].id}`
         const newMin = Math.max(0, anchor.min - p.appendOffset)
         
         anchor.min = newMin
@@ -98,8 +98,8 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-scroll-wrapper {
-  .ipb-scroll-wrapper__item {
+.ao3pb-scroll-wrapper {
+  .ao3pb-scroll-wrapper__item {
     & > * {
       width: 100%;
     }

@@ -1,5 +1,5 @@
 <template>
-  <button class="ipb-toggle" :class="{checked: modelValue}" @click="$emit('update:modelValue', !modelValue)"></button>
+  <button class="ao3pb-toggle" :class="{checked: modelValue}" @click="$emit('update:modelValue', !modelValue)"></button>
 </template>
 
 <script>
@@ -10,7 +10,7 @@ export default {
 </script>
 
 <style lang="scss">
-button.ipb-toggle {
+button.ao3pb-toggle {
   position: relative;
   display: inline-block;
   width: 40px;

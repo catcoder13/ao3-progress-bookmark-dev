@@ -39,7 +39,7 @@ const downloadData = () => {
       const a = document.createElement('a')
       a.href = URL.createObjectURL(new Blob([JSON.stringify(downloadObj)], { type: 'application/json' }))
 
-      a.download = 'ao3-ipb-data.json'
+      a.download = 'ao3-ao3pb-data.json'
       a.click()
       a.remove()
     })

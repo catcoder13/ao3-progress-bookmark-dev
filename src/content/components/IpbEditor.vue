@@ -1,17 +1,17 @@
 <template>
-  <div class="ipb-bookmark ipb-bookmark--editor" :style="{top: `${editBM.y}px`}">
-    <span class="ipb-bookmark__remark" v-if="editBM.invalid">Out of bookmark region</span>
-    <div class="ipb-bookmark-content">
-      <div class="ipb-bookmark__btn">
-        <div class="ipb-cancel" title="Cancel" @click="stopBookmarkEdit">&#10006;</div>
-        <div v-if="!editBM.invalid" class="ipb-confirm" title="Confirm" @click="onUpdateBookmark">&#10003;</div>
+  <div class="ao3pb-bookmark ao3pb-bookmark--editor" :style="{top: `${editBM.y}px`}">
+    <span class="ao3pb-bookmark__remark" v-if="editBM.invalid">Out of bookmark region</span>
+    <div class="ao3pb-bookmark-content">
+      <div class="ao3pb-bookmark__btn">
+        <div class="ao3pb-cancel" title="Cancel" @click="stopBookmarkEdit">&#10006;</div>
+        <div v-if="!editBM.invalid" class="ao3pb-confirm" title="Confirm" @click="onUpdateBookmark">&#10003;</div>
       </div>
 
-      <div class="ipb-bookmark__icon">
+      <div class="ao3pb-bookmark__icon">
         <IpbIcon type="location"></IpbIcon>
       </div>
 
-      <div class="ipb-bookmark__info" v-if="!editBM.invalid">
+      <div class="ao3pb-bookmark__info" v-if="!editBM.invalid">
         <template v-if="mainBM.chI != null">
           <span :style="{opacity: 0.6}">Old bookmark: Chapter {{parseInt(mainBM.chI) + 1}} | {{ (mainBM.perc * 100).toFixed(2) }}%</span>
           <span>New bookmark: Chapter {{parseInt(editBM.chI) + 1}} | {{ (editBM.perc * 100).toFixed(2) }}%</span>
@@ -94,12 +94,12 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-bookmark.ipb-bookmark--editor {
+.ao3pb-bookmark.ao3pb-bookmark--editor {
   position: fixed;
   z-index: 100;
   pointer-events: none;
 
-  .ipb-bookmark__remark {
+  .ao3pb-bookmark__remark {
     position: absolute;
     z-index: -1;
     top: 50%;
@@ -114,10 +114,10 @@ export default {
     pointer-events: none;
   }
 
-  .ipb-bookmark-content {
+  .ao3pb-bookmark-content {
     pointer-events: all;
 
-    .ipb-bookmark__btn {
+    .ao3pb-bookmark__btn {
       & > div {
         line-height: 25px;
         font-size: 22px;
@@ -133,9 +133,9 @@ export default {
       
     }
 
-    .ipb-bookmark__icon { opacity: 0.5; }
+    .ao3pb-bookmark__icon { opacity: 0.5; }
 
-    .ipb-bookmark__info {
+    .ao3pb-bookmark__info {
       text-align: right;
       
       span {
@@ -145,8 +145,8 @@ export default {
         &:first-child:not(:only-child) { padding-bottom: 2px; }
       }
     }
-  } // ipb-bookmark-content
+  } // ao3pb-bookmark-content
 
   
-} // ipb-bookmark
+} // ao3pb-bookmark
 </style>

@@ -1,5 +1,5 @@
 <template v-if="ready">
-  <div :class="{'ipb-left': !settings.alignRight}">
+  <div :class="{'ao3pb-left': !settings.alignRight}">
     <IpbSidebar v-if="!bmInProgress"></IpbSidebar>
     <IpbEditor v-else :chapters="chapters"></IpbEditor>
     
@@ -59,7 +59,7 @@ export default {
   }
 }
 
-.ipb-bookmark {
+.ao3pb-bookmark {
   position: absolute;
   width: 100%;
   max-width: 1160px;
@@ -67,12 +67,12 @@ export default {
   transform: translate(-50%, -50%);
   filter: brightness(1.5);
 
-  .ipb-bookmark-content {
+  .ao3pb-bookmark-content {
     position: absolute;
     top: -17px;
     right: 15px;
 
-    .ipb-bookmark__icon {
+    .ao3pb-bookmark__icon {
       position: relative;
       width: 40px;
       height: 40px;
@@ -80,7 +80,7 @@ export default {
       box-sizing: border-box;
       opacity: 0.3;
 
-      .ipb-icon {
+      .ao3pb-icon {
         position: absolute;
         width: 30px;
         height: 30px;
@@ -88,11 +88,11 @@ export default {
     }
 
     &:hover {
-      .ipb-bookmark__btn { display: flex; }
+      .ao3pb-bookmark__btn { display: flex; }
     }
-  } // ipb-bookmark-content
+  } // ao3pb-bookmark-content
 
-  .ipb-bookmark__btn {
+  .ao3pb-bookmark__btn {
     display: flex;
     position: absolute;
     z-index: 1;
@@ -115,7 +115,7 @@ export default {
       
       &:hover { opacity: 1; }
       
-      .ipb-icon {
+      .ao3pb-icon {
         width: 100%;
         height: 100%;
       }
@@ -130,7 +130,7 @@ export default {
     }
   }
 
-  .ipb-bookmark__info {
+  .ao3pb-bookmark__info {
     position: absolute;
     font-size: 11px;
     line-height: 1;
@@ -142,20 +142,20 @@ export default {
     white-space: nowrap;
     padding: 5px 10px;
   }
-} // ipb-bookmark
+} // ao3pb-bookmark
 
-.ipb-left .ipb-bookmark {
-  .ipb-bookmark-content {
+.ao3pb-left .ao3pb-bookmark {
+  .ao3pb-bookmark-content {
     right: auto;
     left: 15px;
 
-    .ipb-bookmark__btn {
+    .ao3pb-bookmark__btn {
       right: auto;
       left: 5px;
       flex-direction: row-reverse;
     }
 
-    .ipb-bookmark__info {
+    .ao3pb-bookmark__info {
       right: auto;
       left: 0;
     }

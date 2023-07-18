@@ -1,31 +1,32 @@
 <template>
-  <div class="ipb-popup-item" :class="ipbPopupItemClass()">
-    <div class="ipb-info">
+  <div class="ao3pb-popup-item" :class="ipbPopupItemClass()">
+    <div class="ao3pb-info">
       <h3>{{ work.name }}</h3>
       <template v-if="!selection || selection.type !== 'author'">
-        <a href="#" v-if="!selection || selection.type !== 'author'" class="ipb-author"
+        <IpbIcon v-if="settingsPUUI.compact !== 2" type="author" fill="#166fce" />
+        <a href="#" v-if="!selection || selection.type !== 'author'" class="ao3pb-author"
         @click="() => selectAuthor(work.author)" :tabindex="getTabIndex([0])" :title="`Search ${work.author}'s bookmarked works`">
-          <IpbIcon type="author" fill="#166fce" />
+          <IpbIcon v-if="settingsPUUI.compact === 2" type="author" fill="#166fce" />
           <span v-if="settingsPUUI.compact !== 2">{{ work.author }}</span>
         </a>
       </template>
-      <span class="ipb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">
+      <span class="ao3pb-popup__item__datetime" :title="`Bookmark created/updated on ${time}`">
         <template v-if="settingsPUUI.compact === 0">&#x1F550; {{time}}</template>
         <template v-else>&#x1F550;</template>
       </span>
     </div>
 
-    <div class="ipb-record">
-      <div class="ipb-record-content">
+    <div class="ao3pb-record">
+      <div class="ao3pb-record-content">
         <button :class="{oneshot: work.oneShot}" :title="btnTitle" @click="onBtnClick" :tabindex="getTabIndex([0])">
           <b v-if="!settingsPUUI.compact">{{work.oneShot ? 'One-shot' : `Chapter ${parseInt(work.chI) + 1}`}}<br/></b>
-          <span v-else class="ipb-chapter-num">{{ work.oneShot ? '' : parseInt(work.chI) + 1 }}</span>
+          <span v-else class="ao3pb-chapter-num">{{ work.oneShot ? '' : parseInt(work.chI) + 1 }}</span>
           <p><span>{{ percStr }}</span><IpbIcon type="location" fill="#555" /></p>
         </button>
       </div>
     </div>
 
-    <button title="Remove this bookmark" class="ipb-close-btn" @click="() => removeWork(work.id)" :tabindex="getTabIndex([0])">
+    <button title="Remove this bookmark" class="ao3pb-close-btn" @click="() => removeWork(work.id)" :tabindex="getTabIndex([0])">
       <span >&#10006;</span>
     </button>
   </div>
@@ -63,8 +64,8 @@ export default {
 
     const ipbPopupItemClass = () => {
       return {
-        'ipb-popup-item--compact': settingsPUUI.compact,
-        [`ipb-compact-${settingsPUUI.compact}`]: settingsPUUI.compact
+        'ao3pb-popup-item--compact': settingsPUUI.compact,
+        [`ao3pb-compact-${settingsPUUI.compact}`]: settingsPUUI.compact
       }
     }
     return { percStr, btnTitle, time, removeWork, onBtnClick, settings, settingsPUUI, ipbPopupItemClass, selectAuthor, selection, getTabIndex } 
@@ -73,43 +74,48 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-popup-item.ipb-popup-item--compact {
-
-  .ipb-popup__item__datetime { padding-left: 2px; }
-
-  &.ipb-compact-1 {
-    a.ipb-author,
-    .ipb-popup__item__datetime {
+.ao3pb-popup-item.ao3pb-popup-item--compact {
+  &.ao3pb-compact-1 {
+    a.ao3pb-author,
+    .ao3pb-popup__item__datetime {
       display: inline;
       vertical-align: middle;
     }
 
-    .ipb-info {
+    a.ao3pb-author { margin-right: 4px; }
+
+    .ao3pb-info {
       h3 { font-size: 14px; }
-      a.ipb-author { font-size: 11px; }
+
+      a.ao3pb-author { font-size: 10px; }
     }
   }
 
-  &.ipb-compact-2 {
-    a.ipb-author {
-      padding-left: 2px;
+  &.ao3pb-compact-2 {
+    h3 { padding-right: 3px; }
 
-      .ipb-icon { width: 13px; height: 13px;}
+    a.ao3pb-author {
+      margin-right: 2px;
+
+      .ao3pb-icon { width: 13px; height: 13px;}
     }
-    .ipb-info > * { display: inline; font-size: 13px; }
+
+    .ao3pb-popup__item__datetime { vertical-align: middle; }
+
+    .ao3pb-info > * { display: inline; font-size: 13px; }
   }
 
   
 
-  .ipb-record .ipb-record-content button {
+  .ao3pb-record .ao3pb-record-content button {
     padding: 4px 8px;
 
-    &.oneshot .ipb-chapter-num {
+    &.oneshot .ao3pb-chapter-num {
       padding: 0;
       background-color: #ccc;
     }
 
-    .ipb-chapter-num {
+    .ao3pb-chapter-num {
       position: absolute;
       top: 0;
       left: 0;
@@ -132,7 +138,7 @@ export default {
   }
 }
 
-.ipb-popup-item {
+.ao3pb-popup-item {
   position: relative;
   background-color: #eee;
   margin-bottom: 7px;
@@ -140,7 +146,7 @@ export default {
 
   & > * { box-sizing: border-box; }
   
-  .ipb-info {
+  .ao3pb-info {
     padding: 8px 18px 8px 8px;
     width: calc(100% - 135px);
 
@@ -154,7 +160,7 @@ export default {
         display: inline;
         vertical-align: middle;
 
-        &.ipb-datetime {
+        &.ao3pb-datetime {
           padding-left: 2px;
           font-size: 12px;
           opacity: 0.6;
@@ -162,14 +168,14 @@ export default {
       }
     }
 
-    a.ipb-author {
-      font-size: 12px;
+    a.ao3pb-author {
+      font-size: 11px;
       word-wrap: break-word;
       
       & > * { vertical-align: text-bottom; }
     }
 
-    .ipb-popup__item__datetime {
+    .ao3pb-popup__item__datetime {
       display: block;
       font-size: 11px;
       line-height: 1;
@@ -178,9 +184,9 @@ export default {
       opacity: 0.8;
       user-select: none;
     }
-  } // ipb-info
+  } // ao3pb-info
 
-  .ipb-record {
+  .ao3pb-record {
     position: absolute;
     top: 0;
     right: 0;
@@ -191,7 +197,7 @@ export default {
     background-color: #ccc;
     
 
-    .ipb-record-content {
+    .ao3pb-record-content {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
@@ -235,9 +241,9 @@ export default {
         &:active { filter: brightness(0.95); }
       }
     }
-  } // ipb-record
+  } // ao3pb-record
 
-  .ipb-close-btn {
+  .ao3pb-close-btn {
     position: absolute;
     right: 0;
     top: 0;
@@ -267,5 +273,5 @@ export default {
       color: #FFF;
     }
   }
-} // ipb-popup-item
+} // ao3pb-popup-item
 </style>

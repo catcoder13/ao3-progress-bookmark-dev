@@ -1,5 +1,5 @@
 <template>
-  <div ref="scrollTarget" class="ipb-q-and-a">
+  <div ref="scrollTarget" class="ao3pb-q-and-a">
     <button @click="onToggle" :class="{open}" :tabindex="getTabIndex([1])">{{ q }}</button>
     <div v-if="open">
       <p> {{ ans }}</p>
@@ -39,7 +39,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-q-and-a {
+.ao3pb-q-and-a {
   margin-bottom: 12px;
   color: #333;
   scroll-margin-top: 5px;

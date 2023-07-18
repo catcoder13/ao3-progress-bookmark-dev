@@ -1,11 +1,11 @@
 <template>
-  <div class="ipb-sidebar-group">
-    <div class="ipb-sidebar">
-      <div class="ipb-sidebar__button--bookmark">
+  <div class="ao3pb-sidebar-group">
+    <div class="ao3pb-sidebar">
+      <div class="ao3pb-sidebar__button--bookmark">
         <template v-if="mainBM.chI == null">
-          <a class="ipb-a-button" @click="onBookmarkEntryClick" :class="{exceed: !withinBookmarkLimit}">
+          <a class="ao3pb-a-button" @click="onBookmarkEntryClick" :class="{exceed: !withinBookmarkLimit}">
             <IpbIcon fill="#FFF" type="add" />
-              <div class="ipb-bubble">
+              <div class="ao3pb-bubble">
                 <template  v-if="!withinBookmarkLimit">
                   <b>You had reached bookmark limit ({{ BOOKMARK_LIMIT }}).</b>
                   <span>Try to remove some existing bookmarks to create more space for new bookmarks.</span>
@@ -15,32 +15,32 @@
           </a>
         </template>
         <template v-else>
-          <a class="ipb-a-button ipb-a-button--entry" :href="jumpToBookmarkHref" :class="{bmInOtherPage}" @click="jumpToBM">
+          <a class="ao3pb-a-button ao3pb-a-button--entry" :href="jumpToBookmarkHref" :class="{bmInOtherPage}" @click="jumpToBM">
             <IpbIcon fill="#FFF" type="location" />
-            <div class="ipb-bubble">
+            <div class="ao3pb-bubble">
               <b>Jump to bookmark</b>
-              <span v-if="bmInOtherPage" class="ipb-warning">
+              <span v-if="bmInOtherPage" class="ao3pb-warning">
                 Bookmark located at Chapter {{ parseInt(mainBM.chI) + 1 }}.<br/>
                 Click to redirect to Chapter {{ parseInt(mainBM.chI) + 1 }}
                 <IpbIcon type="visit" fill="#999" />
               </span>
             </div>
           </a>
-          <a class="ipb-a-button ipb-a-button--extra" @click="onBookmarkEntryClick">
+          <a class="ao3pb-a-button ao3pb-a-button--extra" @click="onBookmarkEntryClick">
             <IpbIcon fill="#FFF" type="edit" />
-            <div class="ipb-bubble">Change bookmark location</div>
+            <div class="ao3pb-bubble">Change bookmark location</div>
           </a>
-          <a class="ipb-a-button ipb-a-button--extra" @click="removeBookmark">
+          <a class="ao3pb-a-button ao3pb-a-button--extra" @click="removeBookmark">
             <IpbIcon fill="#FFF" type="trash" />
-            <div class="ipb-bubble">Remove bookmark</div>
+            <div class="ao3pb-bubble">Remove bookmark</div>
           </a>
         </template>
       </div>
 
     </div>
-    <div v-if="settings.extraSideBtn" class="ipb-sidebar ipb-sidebar--extra">
-      <a class="ipb-a-button" :href="sidebarHref(chICode)" @click="onClick" v-for="({chICode, iconProps, onClick, btnKey, checkIfExternal}, i) in buttons" :key="i">
-        <div class="ipb-bubble">
+    <div v-if="settings.extraSideBtn" class="ao3pb-sidebar ao3pb-sidebar--extra">
+      <a class="ao3pb-a-button" :href="sidebarHref(chICode)" @click="onClick" v-for="({chICode, iconProps, onClick, btnKey, checkIfExternal}, i) in buttons" :key="i">
+        <div class="ao3pb-bubble">
           {{ btnLabel(btnKey) }}
           <IpbIcon v-if="checkIfExternal && !fullViewMode && isExternal[btnKey]" type="visit" fill="#999" />
         </div>
@@ -137,7 +137,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ipb-sidebar-group {
+.ao3pb-sidebar-group {
   position: fixed;
   z-index: 99;
   top: 100px;
@@ -147,13 +147,13 @@ export default {
   gap: 5px;
 }
 
-.ipb-sidebar {
+.ao3pb-sidebar {
   display: flex;
   gap: 3px;
   flex-direction: column;
   align-items: flex-end;
 
-  a.ipb-a-button {
+  a.ao3pb-a-button {
     position: relative;
     background-color: $ao3_red;
     width: 23px;
@@ -167,7 +167,7 @@ export default {
       opacity: 1;
       transition: opacity 0.2s;
 
-      .ipb-bubble {
+      .ao3pb-bubble {
         display: block;
       }
     }
@@ -178,7 +178,7 @@ export default {
 
       &:active::before { opacity: 0; }
 
-      .ipb-bubble {
+      .ao3pb-bubble {
         white-space: normal;
         width: 250px;
 
@@ -189,7 +189,7 @@ export default {
     }
     
 
-    & > .ipb-icon {
+    & > .ao3pb-icon {
       transition: transform 0.2s;
       position: absolute;
       top: 50%;
@@ -200,7 +200,7 @@ export default {
     }
     
 
-    .ipb-bubble {
+    .ao3pb-bubble {
       display: none;
       position: absolute;
       z-index: 1;
@@ -219,33 +219,33 @@ export default {
     }
   }
 
-  .ipb-sidebar__button--bookmark {
+  .ao3pb-sidebar__button--bookmark {
     display: flex;
     flex-direction: row-reverse;
 
     &:hover {
-      a.ipb-a-button.ipb-a-button--entry { border-radius: 0; }
-      a.ipb-a-button.ipb-a-button--extra {
+      a.ao3pb-a-button.ao3pb-a-button--entry { border-radius: 0; }
+      a.ao3pb-a-button.ao3pb-a-button--extra {
         display: block;
 
         &:not(:last-of-type) { border-radius: 0; }
       }
     }
 
-    a.ipb-a-button {
-      &:hover ~ .ipb-a-button { opacity: 0.75; }
+    a.ao3pb-a-button {
+      &:hover ~ .ao3pb-a-button { opacity: 0.75; }
 
-      &.ipb-a-button--extra {
+      &.ao3pb-a-button--extra {
         display: none;
         color: #FFF;
         text-align: center;
 
-        .ipb-bubble { right: 4px; }
+        .ao3pb-bubble { right: 4px; }
       }
 
       &.bmInOtherPage { background-color: grey; }
 
-      .ipb-bubble {
+      .ao3pb-bubble {
         b {
           display: block;
           padding-bottom: 5px;
@@ -256,49 +256,49 @@ export default {
           }
         }
 
-        .ipb-warning {
+        .ao3pb-warning {
           display: block;
           color: #397ce1;
         }
       }
     }
-  } //.ipb-sidebar__button--bookmark
-} // .ipb-sidebar
+  } //.ao3pb-sidebar__button--bookmark
+} // .ao3pb-sidebar
 
-.ipb-left .ipb-sidebar-group {
+.ao3pb-left .ao3pb-sidebar-group {
   right: auto;
   left: 0;
 
-  .ipb-sidebar {
+  .ao3pb-sidebar {
     align-items: flex-start;
 
-    a.ipb-a-button {
+    a.ao3pb-a-button {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
 
-      .ipb-bubble {
+      .ao3pb-bubble {
         right: auto;
         left: 24px;
       }
     }
 
-    .ipb-sidebar__button--bookmark {
+    .ao3pb-sidebar__button--bookmark {
       flex-direction: row;
       
-      & > a.ipb-a-button {
-        .ipb-bubble {
+      & > a.ao3pb-a-button {
+        .ao3pb-bubble {
           right: auto;
           left: 24px;
         }
 
-        &.ipb-a-button--extra .ipb-bubble { right: auto; left: 4px; }
+        &.ao3pb-a-button--extra .ao3pb-bubble { right: auto; left: 4px; }
       }
     }
   }
 }
 
-.ipb-sidebar.ipb-sidebar--extra > a { background-color: $btn_blue; }
+.ao3pb-sidebar.ao3pb-sidebar--extra > a { background-color: $btn_blue; }
 
 </style>

@@ -60,13 +60,13 @@ for (var i = 0; i < NUM_OF_WORKS; i++) {
   const [workID, work] = generateWork()
   workIDs.push(workID)
   // workIDs[workID] = work.name
-  workObjs['AO3IPB' + workID] = work
+  workObjs['AO3PB' + workID] = work
 }
 
 fs.writeFileSync('./test-data-limit/datas/works.json', JSON.stringify(workObjs))
 fs.writeFileSync('./test-data-limit/datas/authors.json', JSON.stringify(AUTHORS))
 fs.writeFileSync('./test-data-limit/datas/workIDs.json', JSON.stringify(workIDs))
 fs.writeFileSync('./test-data-limit/datas/bm.json', JSON.stringify({
-  AO3_IPB_ALL_WORK_KEYS: workIDs,
+  AO3PB_ALL_WORK_KEYS: workIDs,
   ...workObjs
 }))
