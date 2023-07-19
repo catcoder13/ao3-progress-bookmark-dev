@@ -5,11 +5,11 @@
       <span v-else>&#10006;</span>
     </button>
     
-    <div ref="scrollDom" class="ao3pb-style-scrollbar">
+    <div ref="scrollDom" class="ao3pb-setting__content">
       <h1>Settings</h1>
-      <div class="ao3pb-setting__option-group">
+      <div>
         <h2>AO3 work page layout</h2>
-        <div class="ao3pb-setting__option-group__item">
+        <div class="ao3pb-setting__content__item">
           <div class="ao3pb-tab--custom">
             <button :class="{checked: !settings.alignRight}" @click="settings.alignRight = false" :tabindex="getTabIndex([1])">Left</button>
             <button :class="{checked: settings.alignRight}" @click="settings.alignRight = true" :tabindex="getTabIndex([1])">Right</button>
@@ -17,12 +17,12 @@
           <h3>Alignment</h3>
         </div>
         
-        <div class="ao3pb-setting__option-group__item">
+        <div class="ao3pb-setting__content__item">
           <IpbToggle v-model="settings.progressBar" :tabindex="getTabIndex([1])" />
           <h3>Chapter progress bars</h3>
         </div>
         
-        <div class="ao3pb-setting__option-group__item">
+        <div class="ao3pb-setting__content__item">
           <IpbToggle v-model="settings.extraSideBtn" :tabindex="getTabIndex([1])"/>
           <h3>Extra navigation buttons</h3>
         </div>
@@ -39,26 +39,19 @@
         <button class="ao3pb-setting__reset" @click="onResetSetting" :tabindex="getTabIndex([1])">Reset to default settings</button>
       </div>
      
-      <div class="ao3pb-setting__option-group">
+      <div class="ao3pb-setting__content__data">
         <h2>Bookmark data</h2>
-        <div class="ao3pb-setting__option-group__item">
+        <div>
           <input id="importBMInput" ref="inputFile" type="file" accept=".json" @change="e => curFile = e.target.files[0]" required :tabindex="getTabIndex([1])"/>
-          <label for="importBMInput">&#x1F5C1; Upload</label>
-          <h3>Import bookmark data</h3>
+          <label for="importBMInput">&#x1F5C1; Upload bookmark records</label>
         </div>
 
-        <div class="ao3pb-setting__option-group__item">
-          <button @click="downloadData" :tabindex="getTabIndex([1])">&#x1F5AB; Download</button>
-          <h3>Download bookmark data</h3>
-        </div>
+        <button @click="downloadData" :tabindex="getTabIndex([1])">&#x1F5AB; Download all bookmark records</button>
 
-        <div class="ao3pb-setting__option-group__item ao3pb-delete">
-          <button @click="deleteMsgOn = true" :tabindex="getTabIndex([1])">&#x1F5D1; Remove</button>
-          <h3>Remove all bookmarks</h3>
-        </div>
+        <button class="ao3pb-delete" @click="deleteMsgOn = true" :tabindex="getTabIndex([1])">&#x1F5D1; Remove all bookmarks</button>
       </div>
 
-      <div class="ao3pb-setting__option-group">
+      <div>
         <h2>Q & A</h2>
         <IpbQA :reset="toggle" v-for="([q, ans, extra], i) in Q_A" :key="i" :q="q" :ans="ans" :extra="extra" />
       </div>
@@ -216,7 +209,7 @@ export default {
     pointer-events: all;
     transition: background-color 0.2s 0.2s;
     
-    .ao3pb-style-scrollbar {
+    .ao3pb-setting__content {
       visibility:visible;
       transform: translateX(0);
       transition: transform 0.3s;
@@ -229,7 +222,7 @@ export default {
   .ao3pb-setting__entry {
     position: absolute;
     z-index: 1;
-    right: 10px;
+    right: 5px;
     top: 5px;
     width: 27px;
     height: 27px;
@@ -266,7 +259,7 @@ export default {
     margin-bottom: 15px;
   }
 
-  & > .ao3pb-style-scrollbar {
+  .ao3pb-setting__content {
     visibility: hidden;
     position: absolute;
     top: 0;
@@ -281,7 +274,7 @@ export default {
     box-sizing: border-box;
     overflow-y: scroll;
 
-    .ao3pb-setting__option-group {
+    & > div {
       margin-bottom: 40px;
 
       h2 {
@@ -296,7 +289,7 @@ export default {
         color: #666;
       }
 
-      .ao3pb-setting__option-group__item {
+      .ao3pb-setting__content__item {
         display: flex;
         flex-direction: row-reverse;
         align-items: center;
@@ -327,39 +320,6 @@ export default {
           }
         }
 
-        input[type=file] {
-          opacity: 0;
-          width: 0;
-          height: 0;
-          position: absolute;
-
-          & ~ label {
-            border: 1px solid #777;
-            cursor: pointer;
-            padding: 5px 8px;
-            font-size: 13px;
-            line-height: 1;
-            color: #FFF;
-            background-color: #666;
-          }
-          
-          &:focus-visible ~ label { box-shadow: 0 0 2px 2px #51a7e8; }
-
-          &:focus-visible ~ label,
-          & ~ label:hover {
-            background-color: #333;
-            color: #FFF;
-          }
-        }
-
-        &.ao3pb-delete {
-          button:hover,
-          button:focus-visible {
-            border-color: $red;
-            background-color: $red;
-          }
-        }
-
         .ao3pb-tab--custom {
           display: flex;
 
@@ -386,8 +346,8 @@ export default {
 
           }
         }
-      } // .ao3pb-setting__option-group__item
-
+      } // .ao3pb-setting__content__item
+      
       .ao3pb-setting__extra-btn {
         opacity: 0.5;
         cursor: not-allowed;
@@ -445,7 +405,42 @@ export default {
         &:hover,
         &:focus-visible { background-color: #333; }
       }
-    } // ao3pb-setting__option-group
+    } // ao3pb-setting__content > div
+
+    .ao3pb-setting__content__data {
+      & > * { margin-bottom: 10px; }
+
+      input[type=file] {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+
+        & ~ label { display: inline-block;}
+        
+        &:focus-visible ~ label { box-shadow: 0 0 2px 2px #51a7e8; }
+      }
+
+      input[type=file] ~ label,
+      button {
+        cursor: pointer;
+        color: #FFF;
+        background-color: #666;
+        padding: 5px 8px;
+        font-size: 13px;
+        line-height: 16px;
+
+        &:hover,
+        &:focus-visible { background-color: #333; }
+      }
+
+      button.ao3pb-delete {
+        &:hover,
+        &:focus-visible {
+          background-color: $red;
+        }
+      }
+    } // ao3pb-setting__content__data
   }
 
   .ao3pb-setting__overlay-msg {

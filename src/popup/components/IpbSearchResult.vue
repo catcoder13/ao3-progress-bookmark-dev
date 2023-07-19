@@ -145,9 +145,7 @@ export default {
         color: #FFF;
       }
 
-      &.author {
-        color: #166fce;
-      }
+      &.author { color: $link_blue; }
 
       span {
         word-wrap: break-word;

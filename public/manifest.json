@@ -4,15 +4,13 @@
   "version": "0.1.0",
   "description": "Bookmarking AO3's works precisely at the page scroll position.",
   "icons":  {
-    "128": "imgs/ipb.png",
-    "32": "imgs/ipb32.png"
+    "128": "imgs/ao3pb.png"
   },
   "permissions": ["storage", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "128": "imgs/ipb.png",
-      "32": "imgs/ipb32.png"
+      "128": "imgs/ao3pb.png"
     }
   },
   "background": {

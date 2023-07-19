@@ -1,13 +1,13 @@
 <template>
   <div ref="wrapper" class="ao3pb-scroll-wrapper" @scroll="onScroll">
-    <template v-if="animate">
+    <!-- <template v-if="animate">
       <TransitionGroup name="fade-in">
         <div class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
           <slot name="item" v-bind="{item, index: anchor.min+i+1}"></slot>
         </div>
       </TransitionGroup>
-    </template>
-    <div v-else class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
+    </template> -->
+    <div class="ao3pb-scroll-wrapper__item" :id="`ao3pb-item-${item.id}`" v-for="(item, i) in filteredOptions" :key="item.id">
       <slot name="item" v-bind="{item, index: anchor.min+i+1}"></slot>
     </div>
     
@@ -24,10 +24,7 @@ const APPEND_OFFSET = 4
 export default {
   props: {
     options: Array,
-    animate: {
-      type: Boolean,
-      default: false
-    },
+    // animate: { type: Boolean, default: false },
     anchorMin: { type: Number, default: 0 },
     maxResultAllowed: { type: Number, default: 15 }
   },

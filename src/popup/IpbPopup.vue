@@ -2,9 +2,8 @@
   <IpbSetting></IpbSetting>
 
   <div class="ao3pb-popup">
-    <button @click="clearLocalStorage" tabindex="-1" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer', backgroundColor: '#FFF'}">Clear sync storage</button>
+    <!-- <button @click="clearLocalStorage" tabindex="-1" :style="{position: 'fixed', zIndex: 10, cursor: 'pointer', backgroundColor: '#FFF'}">Clear sync storage</button> -->
     <h1 class="ao3pb-popup__title">AO3 Progress Bookmark</h1>
-    <!-- <h1 class="ao3pb-popup__title">&nbsp;</h1> -->
     <IpbSearch />
     
     <div class="ao3pb-popup__filter">
@@ -32,7 +31,6 @@
     <IpbScrollWrapper class="ao3pb-popup__wrapper" :options="sortedWorks" :maxResultAllowed="10">
       <template v-slot:item="{item, index}">
         <IpbPopupItem :work="item" :index="index" />
-        <!-- {{ item.i }} -->
       </template>
       
       <span v-if="!Object.keys(sortedWorks).length" class="ao3pb-no-bm-msg">No bookmark added.</span>
@@ -144,7 +142,7 @@ $bg: #FFF;
     font-size: 18px;
     line-height: 1;
     font-family: Georgia, serif;
-    padding: 10px 0;
+    padding: 10px 0 15px;
     color: #FFF;
     text-align: center;
     background: linear-gradient(to bottom, transparent 0%, #4c0000 100%);
@@ -243,16 +241,16 @@ $bg: #FFF;
   }
 }
 
-.fade-in-enter-active {
-  transition: all 0.5s ease;
-}
+// .fade-in-enter-active {
+//   transition: all 0.5s ease;
+// }
 
-.fade-in-leave-active {
-  transition: all 0.5s ease;
-}
+// .fade-in-leave-active {
+//   transition: all 0.5s ease;
+// }
 
-.fade-in-enter,
-.fade-in-leave-to {
-  opacity: 0;
-}
+// .fade-in-enter,
+// .fade-in-leave-to {
+//   opacity: 0;
+// }
 </style>
