@@ -23,8 +23,9 @@
       </div>
       
       <div class="ao3pb-popup__subhead__author" v-if="selection && selection.type === 'author'">
-        <IpbIcon type="author" fill="#166fce" />
-        <a href="#" :title="`Visit ${selection.val}'s AO3 page`" @click="() => visitURL(selection.authorURL)" :tabindex="getTabIndex([0])">{{ selection.val }}</a>
+        Works by {{ selection.val }}
+        <!-- <IpbIcon type="author" fill="#555" /> {{ getAuthorTitle(selection.val) }} -->
+        <!-- <a href="#" :title="`Visit ${selection.val}'s AO3 page`" @click="() => visitURL(selection.authorURL)" :tabindex="getTabIndex([0])">AO3 page <IpbIcon type="author" fill="#166fce" /></a> -->
       </div>
     </div>
     
@@ -112,7 +113,6 @@ export default {
       settingsPUUI.compact = (settingsPUUI.compact + 1) % 3
     }
 
-
     return {
       works, selection, sortedWorks,
       clearSelection, getTabIndex, compactTitle, onCompactClick,
@@ -186,7 +186,7 @@ $bg: #FFF;
 
   .ao3pb-popup__subhead {
     line-height: 1;
-    padding: 2px 10px;
+    padding: 2px 15px;
     background-color: #FFF;
 
     .ao3pb-popup__subhead__summary {
@@ -211,9 +211,10 @@ $bg: #FFF;
     }
 
     .ao3pb-popup__subhead__author {
-      padding-top: 5px;
+      padding-top: 10px;
       font-size: 14px;
       font-weight: bold;
+      color: #555;
     }
   }
 
