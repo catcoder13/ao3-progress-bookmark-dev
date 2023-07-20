@@ -2,10 +2,11 @@ import {ref, reactive, computed, watch } from 'vue'
 import { workIDs, updateBookmarkStore, removeBookmarkStore, work } from './store'
 import { workID, chapterInfos, mainContent, isEntireWork } from './static'
 import { activateMouseMove, deactivateMouseMove } from './mousePos'
-import { BOOKMARK_LIMIT } from '@/common/variables'
+import { BOOKMARK_LIMIT } from '@/common/const'
 import {onScroll} from './scroll'
+import { extValidState } from './valid'
 
-const mainBM = reactive({chI: null, perc: null, chID: null, link: null, fwLink: null})
+const mainBM = reactive({cI: null, pct: null, cID: null, link: null, fwLink: null})
 
 const bmInProgress = ref(false)
 const bmFocusCountDown = ref(0)
@@ -15,33 +16,44 @@ const withinBookmarkLimit = computed(() => workIDs.value.length < BOOKMARK_LIMIT
 watch(() => work.value,
 newWork => {
   if (newWork) {
-    const {chI, perc, chID} = newWork
-    mainBM.chI = chI
-    mainBM.perc = perc
-    mainBM.chID = chID
-    mainBM.link = `/works/${workID}/chapters/${chID}#chapter-${parseInt(chI) + 1}`
-    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+    const {cI, pct, cID} = newWork
+    mainBM.cI = cI
+    mainBM.pct = pct
+    mainBM.cID = cID
+    mainBM.link = `/works/${workID}/chapters/${cID}#chapter-${parseInt(cI) + 1}`
+    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(cI) + 1}`
   } else {
-    mainBM.chI = null
+    mainBM.cI = null
   }
   
 })
 
-const updateBookmark = (chI, perc) => {
-  if (mainBM.chI != null || withinBookmarkLimit.value) {
-    updateBookmarkStore(chI, perc, chapterInfos[chI].chID, chapterInfos[chI].title)
-    mainBM.chI = chI
-    mainBM.perc = perc
-    mainBM.chID = chapterInfos[chI].chID
-    mainBM.link = `/works/${workID}/chapters/${chapterInfos[chI].chID}#chapter-${parseInt(chI) + 1}`
-    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(chI) + 1}`
+const updateBookmark = (cI, pct) => {
+  if (!extValidState.value) {
+    console.warn('[AO3 PB] content script outdated. Kindly refresh the page to stay updated.')
+    return
+  }
+
+  if (mainBM.cI != null || withinBookmarkLimit.value) {
+    updateBookmarkStore(cI, pct, chapterInfos[cI].cID, chapterInfos[cI].title)
+    mainBM.cI = cI
+    mainBM.pct = pct
+    mainBM.cID = chapterInfos[cI].cID
+    mainBM.link = `/works/${workID}/chapters/${chapterInfos[cI].cID}#chapter-${parseInt(cI) + 1}`
+    mainBM.fwLink = `/works/${workID}?view_full_work=true#chapter-${parseInt(cI) + 1}`
   }
 }
 
 const removeBookmark = e => {
-  mainBM.chI = null
+  if (!extValidState.value) {
+    console.warn('[AO3 PB] content script outdated. Kindly refresh the page to stay updated.')
+    return
+  }
+  
   e.stopPropagation()
-  removeBookmarkStore() // delete store record
+  removeBookmarkStore(() => {
+    mainBM.cI = null
+  }) // delete store record
 }
 
 const stopBookmarkEdit = () => {
@@ -51,7 +63,12 @@ const stopBookmarkEdit = () => {
 }
 
 const startBookmarkEdit = (e, chapters) => {
-  if (mainBM.chI == null && !withinBookmarkLimit.value) return
+  if (!extValidState.value) {
+    console.warn('[AO3 PB] content script outdated. Kindly refresh the page to stay updated.')
+    return
+  }
+
+  if (mainBM.cI == null && !withinBookmarkLimit.value) return
 
   mainContent.classList.toggle('bmInProgress', true)
   bmInProgress.value = true
@@ -59,9 +76,9 @@ const startBookmarkEdit = (e, chapters) => {
 
   if (!chapters) return
 
-  const chIs = Object.keys(chapters)
-  const firstChI = chIs[0]
-  const lastChI = chIs[chIs.length - 1]
+  const cIs = Object.keys(chapters)
+  const firstChI = cIs[0]
+  const lastChI = cIs[cIs.length - 1]
   const {y: bmAreaFirstTop} = chapters[firstChI].dom.getBoundingClientRect()
   const {y: bmAreaLastTop, height: lastHeight} = chapters[lastChI].dom.getBoundingClientRect()
 
@@ -79,11 +96,11 @@ const startBookmarkEdit = (e, chapters) => {
 }
 
 let countDownInt = null
-const jumpToBookmark = (chapters, curChI) => {
-  if (!isEntireWork && mainBM.chI != curChI.value) return
+const jumpToBookmark = (chapters, curCI) => {
+  if (!isEntireWork && mainBM.cI != curCI.value) return
       
-  const {top, height} = chapters[mainBM.chI]
-  const bmPos = top + height * mainBM.perc
+  const {top, height} = chapters[mainBM.cI]
+  const bmPos = top + height * mainBM.pct
   const targetScroll = bmPos - window.innerHeight / 2
   window.scrollTo({top: targetScroll })
   onScroll(null, targetScroll)

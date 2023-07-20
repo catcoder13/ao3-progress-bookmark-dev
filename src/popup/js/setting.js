@@ -2,14 +2,30 @@ import { reactive, watch } from "vue"
 import {
   STORE_SETTING_KEY, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_PU_KEY,
   DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS, DEFAULT_SETTING_PU, DEFAULT_SETTING_PU_UI, STORE_SETTING_PU_UI_KEY
-} from "@/common/variables"
+} from "@/common/const"
 
-// settings influent both content and popup, should be read-only when accessed by popup
+/**
+ * settings
+ * - influent both content and popup
+ * - should be read-only when accessed by content
+ */
 const settings = reactive({...DEFAULT_SETTINGS})
+/**
+ * settingExtraBtn
+ * - should be read-only when accessed by popup
+ */
 const settingExtraBtn = reactive({...DEFAULT_SETTING_EXTRA_BUTTONS})
 
-// settingsPU only affect popup, read/write on popup only
+/**
+ * settingsPU
+ * - influence popup listing item
+ */
 const settingsPU = reactive({...DEFAULT_SETTING_PU}) // focus on item sorting
+/**
+ * settingsPU
+ * - influence style change
+ * - must not trigger item sorting
+ */
 const settingsPUUI = reactive({...DEFAULT_SETTING_PU_UI}) // focus on item appearance, update of settingsPUUI must not influence sorting result
 
 const onResetSetting = () => {

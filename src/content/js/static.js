@@ -6,12 +6,12 @@
 
 /**
  * dom: mainContent
- *  - the only dom element that determined if a work page is a valid work page
+ *  - the only dom element that determines if a work page is a valid work page
  *  - retrieve one-shot title, one-shot chapter section
  * example of invalid work page: https:/[ao3 domain]/works/xxxxx that is a pre warning page and not a work page that has mainContent
  */
 const mainContent = document.getElementById('workskin')
-if (!mainContent) console.warn('[AO3 IPB] URL matches a work page, however #worksin does not exist, thus it is deemed not a work page.')
+if (!mainContent) console.warn('[AO3 PB] URL matches a work page, however #worksin does not exist, thus it is deemed not a work page.')
 
 
 /**
@@ -19,10 +19,10 @@ if (!mainContent) console.warn('[AO3 IPB] URL matches a work page, however #work
  *  - multiple chapter dom reference (if exists)
  * 
  * isEntireWork
- *  - although a page with param "view_full_work=true" is an Entire Work page in url format,
+ *  - although a page with param "view_full_work=true" is an Entire Work page's url format,
  *  - "view_full_work=true" can also be added manually to a one-shot page while the page is not Entire Work,
  *    and multi-chapter page with only one chapter available will not have Entire Work button available anyway
- *    (multi-chapter page with only one chapter will always be displayed in Chapter by chapter fashion)
+ *    (multi-chapter page with only one chapter will always be displayed in Chapter by chapter fashion regardless the present of view_full_work=true)
  *  - therefore, isEntireWork will be determine whether there exists more than one chapter dom in a single page
  */
 const chapterDoms = mainContent ? mainContent.querySelectorAll('#chapters > .chapter') : []
@@ -39,13 +39,22 @@ if (chStat && chStat.innerHTML === '1/1') oneShot = true
 
 
 /**
- * name, author, authorURL
+ * name, author's name and url if any 
  *  - retrieve basic info from dom
  */
-const name = mainContent && mainContent.querySelector('.title').innerText
-const author = mainContent && mainContent.querySelector('.byline a[rel=author]').innerText
-const authorURL = mainContent && mainContent.querySelector('.byline a[rel=author]').getAttribute('href')
+const name = mainContent && mainContent.querySelector('.title').innerText.trim()
+let authorsObj = null
 
+if (mainContent) {
+  const authorByline = mainContent.querySelector('.byline')
+  const authorElem = authorByline.querySelectorAll('a[rel=author]')
+  if (authorElem.length) {
+    authorsObj = [...authorElem].reduce((acc, aItem) => {
+      acc[aItem.innerText] = aItem.getAttribute('href')
+      return acc
+    } , {})
+  }
+}
 
 /**
  * jumpToBMOnLoad
@@ -73,7 +82,7 @@ if (match1) { // pattern: https://archiveofourown.org/chapters/xxxxxxxxx
   console.warn('url not match, workID not found')
 }
 
-// console.log(isEntireWork, jumpToBMOnLoad, workID, name, author, authorURL)
+// console.log(isEntireWork, jumpToBMOnLoad, workID, name, authorsObj)
 
 /**
  * chapterInfos
@@ -86,7 +95,7 @@ if (chapterListElem) { // if chapter dropdown exist(Chapter by chapter page)
     const title = optElem.innerText.match(/(?:\d+\. )?(.+)/)[1]
     
     return {
-      chID: optElem.getAttribute('value'),
+      cID: optElem.getAttribute('value'),
       title: title !== `Chapter ${i+1}` ? title : null
     }
   })
@@ -95,17 +104,17 @@ if (chapterListElem) { // if chapter dropdown exist(Chapter by chapter page)
     const matches = (/^Chapter \d+(?:: (.*))?$/).exec(chDom.querySelector('.title').innerText)
     const title = matches[1] || matches[0]
     return {
-      chID: chDom.querySelector('.title a').getAttribute('href').match(/\/works\/\d+\/chapters\/(\d+)/)[1],
+      cID: chDom.querySelector('.title a').getAttribute('href').match(/\/works\/\d+\/chapters\/(\d+)/)[1],
       title: title !== chDom.querySelector('.title a').innerText ? title : null
     }
   })
 } else {
   // one shot does not have chapter id
-  chapterInfos = [{ chID: null, title: null }]
+  chapterInfos = [{ cID: null, title: null }]
 }
 
 export {
-  workID, name, author, authorURL,
+  workID, name, authorsObj,
   oneShot, isEntireWork, jumpToBMOnLoad,
   mainContent, chapterDoms, chapterInfos
 }

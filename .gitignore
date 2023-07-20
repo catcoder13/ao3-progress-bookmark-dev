@@ -3,6 +3,8 @@ node_modules
 /dist
 *.zip
 /promo
+/icons
+/test
 
 # local env files
 .env.local

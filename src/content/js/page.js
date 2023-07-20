@@ -1,24 +1,31 @@
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, watch } from 'vue'
 import { mainContent, chapterDoms, isEntireWork, oneShot } from './static'
 import { scrollY, onScroll, activateScroll } from './scroll'
 
 const pageReady = ref(false)
 const windowLoaded = ref(false)
 
-let chapters = null
-const chaptersRef = {}
-let initCurChI = 0
+let chapters = {}
 
 const view = reactive({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight})
 
-const curChI = computed(() => {
-  if (oneShot || chapterDoms.length === 1) return initCurChI
+const curCICom = computed(() => {
+  if (oneShot || chapterDoms.length === 1) return 0
 
   const scrollBottom = scrollY.value + view.height
-  const result = Object.keys(chapters).filter(chI => chapters[chI].top < scrollBottom).length
+  const result = Object.keys(chapters).filter(cI => chapters[cI].top < scrollBottom).length
 
   return result < 2 ? 0 : result - 1
 })
+
+/**
+ * update curCI by watching curCICom value change prevents curCI dependent dom rerender during every scroll
+ * curCICom is updated during every scrollY update (despite final calculation may reach a same value as old curCICom)
+ * curCI only updated when curCICom value differ from its old value
+ */
+const curCI = ref(0)
+
+watch(() => curCICom.value, newCIComVal => curCI.value = newCIComVal)
 
 
 /**
@@ -35,36 +42,36 @@ if (mainContent) {
     view.width = document.documentElement.clientWidth
     view.height = document.documentElement.clientHeight
   
-    const chIs = Object.keys(chapters)
-    chIs.forEach(chI => {
-      const {top, height} = (chapters[chI].dom && chapters[chI].dom.getBoundingClientRect()) || {top: 0, height: 0}
-      chapters[chI].top = window.scrollY + top
-      chapters[chI].height = height
+    const cIs = Object.keys(chapters)
+    cIs.forEach(cI => {
+      const {top, height} = (chapters[cI].dom && chapters[cI].dom.getBoundingClientRect()) || {top: 0, height: 0}
+      chapters[cI].top = window.scrollY + top
+      chapters[cI].height = height
     })
     onScroll()
   }
   
+
   /**
    * initialise position/height reference multi chapter/one-shot content 
    */
-  if (chapterDoms.length) { // multi chapter
-    initCurChI = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
+  if (chapterDoms.length) { // multi chapter or one shot with chapter wrapper
+    curCI.value = parseInt(chapterDoms[0].getAttribute('id').split('chapter-')[1]) - 1
 
     chapterDoms.forEach(ch => {
-      const chIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
-      chaptersRef[chIndex] = reactive({ top: -1, height: 0, dom: ch })
+      const cIndex = parseInt(ch.getAttribute('id').split('chapter-')[1]) - 1
+      chapters[cIndex] = reactive({ top: -1, height: 0, dom: ch })
     })
-  } else { // one shot
-    chaptersRef[0] = reactive({ top: -1, height: 0, dom: mainContent && mainContent.querySelector('#chapters') })
+  } else { // one shot without chapter wrapper
+    chapters[0] = reactive({ top: -1, height: 0, dom: mainContent && mainContent.querySelector('#chapters') })
   }
-  chapters = chaptersRef
   
 
   /**
    * scroll event
    * initialise scroll event ON LOAD is only needed if the page is
    *  - is an Entire Work page(which chapterDoms.length must be > 1)
-   *    in which curChI must stayed updated with scroll event that updates scrollY
+   *    in which curCI must stayed updated with scroll event that updates scrollY
    */
   if (isEntireWork) activateScroll()
 
@@ -95,4 +102,4 @@ if (mainContent) {
 }
 
 
-export { chapters, curChI, view, pageReady, windowLoaded }
+export { chapters, curCI, view, pageReady, windowLoaded }

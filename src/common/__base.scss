@@ -1,16 +1,17 @@
-.ao3-progress-bookmark {
-  font-family: sans-serif;
-  font-size: 17px;
-  user-select: none;
-}
-
 body {
   margin: 0;
   color: #333;
 }
 
-.ao3-progress-bookmark,
-.ao3-progress-bookmark--popup {
+[class*=ao3-progress-bookmark] {
+  font-family: sans-serif;
+  user-select: none;
+
+  * {
+    box-sizing: border-box;
+    line-height: 1;
+  }
+
   p,
   h1,
   h2, 
@@ -32,7 +33,7 @@ body {
   input {
     outline: none;
     font-size: 12px;
-    line-height: 1;
+    
     border: none;
 
     &:focus {
@@ -42,7 +43,6 @@ body {
   }
 
   button {
-    position: relative;
     padding: 0;
     border: none;
     border-radius: 0;
@@ -50,22 +50,6 @@ body {
     background-color: transparent;
 
     &:focus { outline: none; }
-  }
-
-  .ao3pb-btn-child {
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(#FFF, 0.1);
-      opacity: 0;
-      pointer-events: none;
-    }
   }
 
   a {
@@ -78,56 +62,54 @@ body {
     &:focus-visible { border-bottom: 1px solid $link_blue; }
     
     &:focus { outline: none; }
-    &.ao3pb-a-button {
-      position: relative;
-      outline: none;
-      border-bottom: none;
-
-      &:hover,
-      &:focus,
-      &:visited {
-        outline: none;
-        border-bottom: none;
-        color: #333;
-      }
-
-      &:active::before,
-      &:active .ao3pb-btn-child::before {
-        opacity: 1;
-      }
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(#FFF, 0.1);
-        opacity: 0;
-        pointer-events: none;
-      }
-    }
   }
 
-  // .ao3pb-style-scrollbar {
-  //   overflow-y: auto;
+  a[class*=ao3pb-abtn] {
+    position: relative;
+    outline: none;
+    border-bottom: none;
+  
+    &:hover,
+    &:focus,
+    &:visited {
+      outline: none;
+      border-bottom: none;
+      color: #333;
+    }
+  
+    &:active::before,
+    &:active .ao3pb-btn-child::before {
+      display: block;
+    }
+  
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(#FFF, 0.1);
+      display: none;
+      pointer-events: none;
+    }
+  }
+} // [class*=ao3-progress-bookmark]
 
-  //   &::-webkit-scrollbar { width: 15px; }
 
-  //   &::-webkit-scrollbar-track { background-color: transparent; }
 
-  //   &::-webkit-scrollbar-thumb {
-  //     background-color: #bbb;
-  //     border-radius: 17px;
-  //     border: 6px solid transparent;
-  //     background-clip: content-box;
-
-  //     &:hover { background-color: #999;}
-  //   }
-  // }
+.ao3pbs-ctr {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
+.ao3pbs-ctr-v {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
 @keyframes bookmarkHighlight {
   0% {

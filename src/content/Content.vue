@@ -1,11 +1,11 @@
-<template v-if="ready">
-  <div :class="{'ao3pb-left': !settings.alignRight}">
-    <IpbSidebar v-if="!bmInProgress"></IpbSidebar>
-    <IpbEditor v-else :chapters="chapters"></IpbEditor>
+<template>
+  <div :class="contentClass" v-if="ready">
+    <PBSidebar v-if="!bmInProgress" />
+    <PBEditor class="ao3pbs-ctr" v-else :chapters="chapters" />
     
-    <IpbBookmark v-if="canShowBookmark" :chapters="chapters"></IpbBookmark>
+    <PBBookmark class="ao3pbs-ctr" v-if="canShowBookmark" :chapters="chapters" />
 
-    <IpbNavbar v-if="settings.progressBar"></IpbNavbar>
+    <PBNav v-if="settings.progressBar" />
   </div>
 </template>
 
@@ -14,37 +14,46 @@ import '@/common/__base.scss'
 
 import { computed, watch } from 'vue'
 import { storeReady } from './js/store'
-import {chapters, curChI, pageReady, windowLoaded } from './js/page'
+import {chapters, curCI, pageReady, windowLoaded } from './js/page'
 import { mainBM, bmInProgress, jumpToBookmark } from './js/bookmark'
 import { isEntireWork, jumpToBMOnLoad } from './js/static'
 import { settings } from './js/setting'
+import { extValidState } from './js/valid'
 
-import IpbBookmark from './components/IpbBookmark.vue'
-import IpbEditor from './components/IpbEditor.vue'
-import IpbNavbar from './components/IpbNavbar.vue'
-import IpbSidebar from './components/IpbSidebar.vue'
+import PBBookmark from './components/PBBookmark.vue'
+import PBEditor from './components/PBEditor.vue'
+import PBNav from './components/PBNav/PBNav.vue'
+import PBSidebar from './components/PBSidebar.vue'
 
 export default {
   name: 'App',
-  components: { IpbNavbar, IpbSidebar, IpbEditor, IpbBookmark },
+  components: { PBNav, PBSidebar, PBEditor, PBBookmark },
   setup () {
     const canShowBookmark = computed(() => {
-      if (!mainBM.chI) return false
+      if (!mainBM.cI) return false
       if (isEntireWork) return true
 
-      return mainBM.chI == curChI.value
+      return mainBM.cI == curCI.value
     })
 
     const ready = computed(() => windowLoaded.value && storeReady.value && pageReady.value)
 
     watch(() => ready.value,
     () => {
-      if (jumpToBMOnLoad) jumpToBookmark(chapters, curChI)
+      if (jumpToBMOnLoad) jumpToBookmark(chapters, curCI)
+    })
+
+    const contentClass = computed(() => {
+      return {
+        'ao3pb-left': !settings.alignRight,
+        'ao3pb-extraHid': settings.extraSideBtnMode,
+        'ao3pb-outdated': !extValidState.value
+      }
     })
 
     return {
-      chapters, ready, settings,
-      bmInProgress, canShowBookmark
+      chapters, ready, settings, contentClass,
+      bmInProgress, canShowBookmark, extValidState
     }
   }
 }
@@ -59,51 +68,49 @@ export default {
   }
 }
 
-.ao3pb-bookmark {
-  position: absolute;
+.ao3pb-bm {
   width: 100%;
   max-width: 1160px;
-  left: 50%;
-  transform: translate(-50%, -50%);
   filter: brightness(1.5);
 
-  .ao3pb-bookmark-content {
+  .ao3pb-bm-content { // styles shared by both PBBookmark and PBEditor
     position: absolute;
     top: -17px;
     right: 15px;
 
-    .ao3pb-bookmark__icon {
+    .ao3pb-bm__icon {
       position: relative;
       width: 40px;
       height: 40px;
       padding: 5px;
-      box-sizing: border-box;
+      
       opacity: 0.3;
 
       .ao3pb-icon {
         position: absolute;
         width: 30px;
         height: 30px;
+
+        path { fill: $ao3_red; }
+        
       }
     }
 
     &:hover {
-      .ao3pb-bookmark__btn { display: flex; }
+      .ao3pb-bm__btn { display: flex; }
     }
-  } // ao3pb-bookmark-content
+  } // ao3pb-bm-content
 
-  .ao3pb-bookmark__btn {
+  .ao3pb-bm__btn {
     display: flex;
-    position: absolute;
     z-index: 1;
-    top: 50%;
-    transform: translateY(-50%);
     right: 5px;
     overflow: hidden;
     white-space: nowrap;
     border-top-right-radius: 30px;
     border-bottom-right-radius: 30px;
     cursor: pointer;
+    overflow: visible;
 
     & > div {
       position: relative;
@@ -111,7 +118,7 @@ export default {
       width: 28px;
       opacity: 0.75;
       padding: 5px;
-      box-sizing: border-box;
+      
       
       &:hover { opacity: 1; }
       
@@ -119,21 +126,13 @@ export default {
         width: 100%;
         height: 100%;
       }
-
-      span {
-        position: absolute;
-        bottom: 0;
-        transform: translateY(calc(100% + 10px));
-        background-color: grey;
-        padding: 5px 10px;
-      }
     }
   }
 
-  .ao3pb-bookmark__info {
+  .ao3pb-bm__info {
     position: absolute;
     font-size: 11px;
-    line-height: 1;
+    line-height: 12px;
     background-color: #333;
     color: #ddd;
     bottom: 0;
@@ -141,24 +140,53 @@ export default {
     right: 0;
     white-space: nowrap;
     padding: 5px 10px;
-  }
-} // ao3pb-bookmark
+    
 
-.ao3pb-left .ao3pb-bookmark {
-  .ao3pb-bookmark-content {
+    &.ao3pb-invalid {
+      background-color: $invalid_orange;
+      filter: brightness(0.69);
+      color: #FFF;
+      white-space: wrap;
+      width: 243px;
+      padding: 5px;
+      line-height: 13px;
+    }
+  }
+} // ao3pb-bm
+
+.ao3pb-left .ao3pb-bm {
+  .ao3pb-bm-content {
     right: auto;
     left: 15px;
 
-    .ao3pb-bookmark__btn {
+    .ao3pb-bm__btn {
       right: auto;
       left: 5px;
       flex-direction: row-reverse;
     }
 
-    .ao3pb-bookmark__info {
+    .ao3pb-bm__info {
       right: auto;
       left: 0;
     }
   }
 }
+
+.ao3-progress-bookmark > .ao3pb-outdated {
+  .ao3pb-sidebar:not(.ao3pb-sidebar--extra) .ao3pb-abtn,
+  .ao3pb-sidebar:not(.ao3pb-sidebar--extra) .ao3pb-abtn:hover {
+    cursor: not-allowed;
+    background-color: rgba($invalid_orange, 0.7);
+
+    &:active::before { opacity: 0; }
+  }
+
+  .ao3pb-bm-content {
+    cursor: not-allowed;
+
+    // overwrite bookmark and editor fill color but NOT bmInProgress' bookmark fill color 
+    .ao3pb-icon path { fill: $invalid_orange; }
+  }
+}
+
 </style>

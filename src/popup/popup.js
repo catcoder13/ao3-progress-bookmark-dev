@@ -1,4 +1,4 @@
 import { createApp } from 'vue'
-import IpbPopup from './IpbPopup.vue'
+import PBPopup from './PBPopup.vue'
 
-createApp(IpbPopup).mount('#app')
+createApp(PBPopup).mount('#app')

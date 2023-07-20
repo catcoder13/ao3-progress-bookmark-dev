@@ -1,12 +1,18 @@
 import { ref } from "vue"
-import { workID, name, author, authorURL, oneShot } from "./static"
+import { compressToUTF16  } from 'lz-string'
+
+import { workID, name, authorsObj, oneShot } from "./static"
 import { updateSetting, updateSettingExtraBtn } from './setting'
+import { PREVIEW_CHAR_LIMIT } from "@/common/const"
+
 import {
   DEFAULT_SETTINGS, DEFAULT_SETTING_EXTRA_BUTTONS,
-  STORE_ALL_WORK_KEYS, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_KEY, STORE_WORK_KEY_PREFIX
-} from "@/common/variables"
+  STORE_ALL_WORK_KEYS, STORE_BACKUP_PREFIX, STORE_SETTING_EXTRA_BTN_KEY, STORE_SETTING_KEY, STORE_WORK_KEY_PREFIX
+} from "@/common/const"
+import { chapters } from "./page"
 
 const STORE_WORK_KEY = STORE_WORK_KEY_PREFIX + workID
+const STORE_WORK_BACKUP_KEY = STORE_BACKUP_PREFIX + workID
 
 const work = ref(null)
 const storeReady = ref(false)
@@ -60,24 +66,52 @@ const initStoreData = () => {
 }
 initStoreData()
 
-const updateBookmarkStore = (chI, perc, chID, chTitle) => {
+
+/**
+ * 
+ * updateBookmarkStore 
+ *  - responsible to create/update a bookmark into the storage.local
+ *  - preview page goes through some custom minification + lz compression before saving into storage.local
+ */
+const updateBookmarkStore = (cI, pct, cID, chT) => {
   if (!workIDArr.some(wID => wID === workID)) workIDArr.push(workID)
   workIDs.value = workIDArr
 
   const t = Date.now()
+
+  let previewHTML = chapters[cI].dom.innerHTML.replace(/(?<=>)\s+(?=<)/g, '').replace(/<!--[\s\S]*?-->/g, '')
+  const compressHTML = compressToUTF16(previewHTML)
+  // console.log(previewHTML.length, compressHTML.length)
+  
+  const cannotPreview = compressHTML.length > PREVIEW_CHAR_LIMIT
+
+  if (!cannotPreview) chrome.storage.local.set({[STORE_WORK_BACKUP_KEY]: compressHTML})
+  
+  const v = (work.value && work.value.v) != null ? work.value.v : null // consider existing status(v), including work.v === 0
+
+  const workObj = { cI, pct, t, name, v}
+  if (authorsObj) workObj.a = authorsObj
+  if (oneShot) workObj.os = 1
+  if (cannotPreview) workObj.xpv = 1
+  if (cID) workObj.cID = cID
+  if (chT) workObj.chT = chT
+
   chrome.storage.local.set({
-    [STORE_WORK_KEY]: { authorURL, author, chI, chID, oneShot, perc, t, chTitle, name},
+    [STORE_WORK_KEY]: workObj,
     [STORE_ALL_WORK_KEYS]: workIDArr
-  })
+  }).catch(err => console.warn('[AO3 PB] Error on updateBookmarkStore', err))
 }
 
-const removeBookmarkStore = () => {
-  chrome.storage.local.remove(STORE_WORK_KEY)
+const removeBookmarkStore = cb => {
+  chrome.storage.local.remove([STORE_WORK_KEY, STORE_WORK_BACKUP_KEY ]).then(() => {
+    if (cb) cb()
+  }).catch(err => console.warn('[AO3 PB] Error on removeBookmarkStore(remove)', err))
   
   workIDArr = workIDArr.filter(wID => wID !== workID)
   workIDs.value = workIDArr
 
   chrome.storage.local.set({[STORE_ALL_WORK_KEYS]: workIDArr})
+    .catch(err => console.warn('[AO3 PB] Error on removeBookmarkStore(set)', err))
 }
 
 export {work, workIDs, storeReady, updateBookmarkStore, removeBookmarkStore}
